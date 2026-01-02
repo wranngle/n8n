@@ -1,0 +1,438 @@
+# Workflow Registry - Central relationship map for n8n workflows
+# This file tracks:
+# - Business processes and their workflows
+# - Many-to-many relationships between workflows
+# - Integration usage across workflows
+# - Documentation cache status
+
+version: "1.1"
+last_updated: "2025-12-29"
+
+# ============================================================================
+# BUSINESS PROCESSES
+# Each process groups related workflows that serve a common business goal
+# ============================================================================
+business_processes:
+  # Example/demo workflows (pre-existing)
+  _demos:
+    description: "Demo and test workflows"
+    status: development
+    workflows:
+      - webhook-echo
+      - get-weather
+      - hello-world-minimal
+      - example-webhook-to-slack
+    integrations: [webhook, openweathermap, slack]
+
+  # Sales call logging - sync VoIP calls to CRM
+  sales_call_logging:
+    description: "Log VoIP calls from RingCentral to CRM systems"
+    status: development
+    workflows:
+      - ringcentral-to-pipedrive
+    integrations: [ringcentral, pipedrive]
+
+  # Voice AI Agents - ElevenLabs + Twilio + Pipedrive integrations
+  voice_ai_agents:
+    description: "Commercial lead qualification pipeline with AI voice agents"
+    status: production
+    workflows:
+      - elevenlabs-twilio-client-data
+      - elevenlabs-twilio-bulletproof
+      - pipedrive-lead-caller
+      - elevenlabs-call-completed
+      - transcript-field-extractor
+    integrations: [elevenlabs, twilio, pipedrive, google_gemini]
+    n8n_instance_ids:
+      elevenlabs-twilio-client-data: "5eowJIoZFZOSG85m"
+      elevenlabs-twilio-bulletproof: "NcP4oEeS3xolYXzC"
+      pipedrive-lead-caller: "qQmGqBM1pe4QUI05"
+      elevenlabs-call-completed: "cEORduJCqCVDOKce"
+      transcript-field-extractor: "5hvmE72qa4VYyPOK"
+    commercial_pipeline:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      agent_name: "Wranngle Lead Qualifier"
+      phone_number_id: "phnum_1901kdgev877fep99ex5fc5abb3m"
+      webhook_id: "351df617fc4c4e61ab33e91020b890c7"
+
+  # Supersystem - Autonomous Self-Improving Evaluation Pipeline
+  supersystem:
+    description: "Autonomous evaluation and autorefinement for voice agents"
+    status: development
+    workflows:
+      - parallel-evaluation-runner
+      - autorefinement-orchestrator
+      - autonomous-sleep-loop
+      - client-lookup-test
+    integrations: [elevenlabs, openrouter, slack]
+    n8n_instance_ids:
+      parallel-evaluation-runner: "M7ZmLGCxyVOn5QJ6"
+      autorefinement-orchestrator: "c9dFlI51VhvANoEj"
+      autonomous-sleep-loop: "SjItj6uzYSr9rotM"
+    capabilities:
+      - "1000 tests in <60 seconds"
+      - "Automatic failure pattern detection"
+      - "AI-powered prompt fixes via gemini-3-pro"
+      - "Nightly scheduled runs at midnight"
+      - "Slack notifications on completion"
+
+  # Knowledge Management - RAG Ingestion and Vector Databases
+  knowledge_management:
+    description: "Systems for ingesting and vectorizing content for AI knowledge bases"
+    status: development
+    workflows:
+      - youtube-rag-pipeline
+    integrations: [youtube, openai, qdrant]
+
+  # Template: Copy this for new business processes
+  # _template:
+  #   description: "What this process accomplishes"
+  #   status: planning | development | staging | production
+  #   owner: team-or-person
+  #   workflows: []
+  #   integrations: []
+  #   dependencies: []  # Other processes this depends on
+
+# ============================================================================
+# WORKFLOWS
+# Individual workflow metadata and relationships
+# ============================================================================
+workflows:
+  webhook-echo:
+    path: "dev/webhook-echo.json"
+    type: webhook_listener
+    description: "Echo webhook payload for testing"
+    serves_processes: [_demos]
+    depends_on: []
+    enables: []
+    integrations:
+      - name: webhook
+        type: trigger
+        docs_cached: false
+
+  get-weather:
+    path: "dev/get-weather.json"
+    type: data_fetch
+    description: "Fetch weather data demo"
+    serves_processes: [_demos]
+    depends_on: []
+    enables: []
+    integrations:
+      - name: openweathermap
+        type: api
+        docs_cached: false
+        credential_env: ".env.openweathermap"
+
+  hello-world-minimal:
+    path: "dev/hello-world-minimal.json"
+    type: utility
+    description: "Minimal workflow for testing"
+    serves_processes: [_demos]
+    depends_on: []
+    enables: []
+    integrations: []
+
+  example-webhook-to-slack:
+    path: "dev/example-webhook-to-slack.json"
+    type: webhook_processor
+    description: "Webhook to Slack notification"
+    serves_processes: [_demos]
+    depends_on: []
+    enables: []
+    integrations:
+      - name: webhook
+        type: trigger
+        docs_cached: false
+      - name: slack
+        type: output
+        docs_cached: false
+        credential_env: ".env.slack"
+
+  ringcentral-to-pipedrive:
+    path: "sales_call_logging/ringcentral-to-pipedrive/workflow.json"
+    type: data_sync
+    description: "Sync RingCentral call logs to PipeDrive activities"
+    serves_processes: [sales_call_logging]
+    depends_on: []
+    enables: []
+    integrations:
+      - name: ringcentral
+        type: input
+        docs_cached: true
+        credential_env: ".env.ringcentral"
+      - name: pipedrive
+        type: output
+        docs_cached: true
+        credential_env: ".env.pipedrive"
+
+  elevenlabs-twilio-client-data:
+    path: "voice_ai_agents/elevenlabs-twilio-client-data.json"
+    type: ai_agent
+    status: deployed
+    n8n_id: "5eowJIoZFZOSG85m"
+    description: "ElevenLabs outbound calling with client initiation data (MVP)"
+    serves_processes: [voice_ai_agents]
+    depends_on: []
+    enables: [elevenlabs-twilio-bulletproof]
+    webhook_path: "/initiate-call"
+    integrations:
+      - name: elevenlabs
+        type: ai_voice
+        docs_cached: true
+        credential_env: ".env.elevenlabs"
+      - name: twilio
+        type: telephony
+        docs_cached: true
+        credential_env: ".env.twilio"
+
+  elevenlabs-twilio-bulletproof:
+    path: "voice_ai_agents/elevenlabs-twilio-bulletproof.json"
+    type: ai_agent
+    status: active
+    n8n_id: "NcP4oEeS3xolYXzC"
+    description: "Production-ready outbound calling with retry logic and comprehensive error handling"
+    serves_processes: [voice_ai_agents]
+    depends_on: []
+    enables: [elevenlabs-call-completed]
+    webhook_path: "/initiate-call-v2"
+    features:
+      - input_validation
+      - phone_normalization
+      - xss_prevention
+      - exponential_backoff
+      - rate_limit_handling
+      - error_classification
+      - request_tracking
+    integrations:
+      - name: elevenlabs
+        type: ai_voice
+        docs_cached: true
+        credential_env: ".env.elevenlabs"
+      - name: twilio
+        type: telephony
+        docs_cached: true
+        credential_env: ".env.twilio"
+
+  pipedrive-lead-caller:
+    path: "voice_ai_agents/pipedrive-lead-caller.json"
+    type: crm_trigger
+    status: inactive  # Needs Pipedrive credentials
+    n8n_id: "qQmGqBM1pe4QUI05"
+    description: "Auto-call new Pipedrive leads via bulletproof workflow"
+    serves_processes: [voice_ai_agents]
+    depends_on: [elevenlabs-twilio-bulletproof]
+    enables: []
+    integrations:
+      - name: pipedrive
+        type: trigger
+        docs_cached: true
+        credential_env: ".env.pipedrive"
+
+  elevenlabs-call-completed:
+    path: "voice_ai_agents/elevenlabs-call-completed.json"
+    type: webhook_processor
+    status: active
+    n8n_id: "cEORduJCqCVDOKce"
+    description: "Process ElevenLabs post-call webhooks and update Pipedrive with qualification results"
+    serves_processes: [voice_ai_agents]
+    depends_on: [elevenlabs-twilio-bulletproof]
+    enables: []
+    webhook_path: "/call-completed"
+    features:
+      - bant_qualification
+      - call_result_parsing
+      - crm_note_creation
+      - lead_status_update
+    integrations:
+      - name: elevenlabs
+        type: webhook_source
+        docs_cached: true
+      - name: pipedrive
+        type: output
+        docs_cached: true
+        credential_env: ".env.pipedrive"
+
+  transcript-field-extractor:
+    path: "voice_ai_agents/transcript-extraction/transcript-field-extractor.json"
+    type: ai_agent
+    status: archived
+    n8n_id: "5hvmE72qa4VYyPOK"
+    version: 30
+    description: "[ARCHIVED] Original 7-field extractor - replaced by v2"
+    serves_processes: [voice_ai_agents]
+    depends_on: []
+    enables: []
+    webhook_path: "/extract-transcript"
+    tests_passed: ["extraction", "custom_schema", "error_handling", "validation"]
+    last_updated: "2025-12-29"
+    integrations:
+      - name: elevenlabs
+        type: ai_voice
+        docs_cached: true
+      - name: google_gemini
+        type: ai_llm
+        docs_cached: true
+
+  transcript-field-extractor-v2:
+    path: "voice_ai_agents/transcript-extraction/transcript-field-extractor-v2.json"
+    type: ai_agent
+    status: active
+    n8n_id: "54sXqqJVSctlSF6V"
+    version: 1
+    description: "5-Component Architecture: Extract 22 structured fields from ElevenLabs transcripts using Gemini 2.0 Flash"
+    serves_processes: [voice_ai_agents]
+    depends_on: []
+    enables: []
+    webhook_path: "/extract-transcript-v2"
+    architecture: "5-component-bulk-prompt"
+    components:
+      - "A: Conversation Transcript RAW"
+      - "B: Agent System Prompt"
+      - "C: Response Schema (22 fields)"
+      - "D: Extraction Instructions (micro-prompts)"
+      - "E: Agent Configuration (full spec)"
+    tests_passed: ["e2e_extraction", "22_field_schema", "5_component_verification"]
+    last_updated: "2025-12-29"
+    integrations:
+      - name: elevenlabs
+        type: ai_voice
+        docs_cached: true
+      - name: google_gemini
+        type: ai_llm
+        model: "gemini-3-pro-preview"
+        docs_cached: true
+
+  youtube-rag-pipeline:
+    path: "knowledge_management/youtube-rag-pipeline/workflow.json"
+    type: scheduled
+    status: development
+    description: "Complete YouTube ingestion pipeline: Metadata, Comments, and Scraped Transcripts vectorized into Qdrant"
+    serves_processes: [knowledge_management]
+    depends_on: []
+    enables: []
+    integrations:
+      - name: youtube
+        type: api
+        docs_cached: true
+      - name: openai
+        type: ai_embeddings
+        docs_cached: true
+      - name: qdrant
+        type: vector_store
+        docs_cached: true
+
+# ============================================================================
+# INTEGRATIONS
+# Tracked integrations and their documentation status
+# ============================================================================
+integrations:
+  # Core integrations used across workflows
+  webhook:
+    n8n_node: "n8n-nodes-base.webhook"
+    used_by: [webhook-echo, example-webhook-to-slack]
+    docs_cached: false
+    docs_path: null
+
+  openweathermap:
+    n8n_node: "n8n-nodes-base.openWeatherMap"
+    used_by: [get-weather]
+    docs_cached: false
+    docs_path: null
+    api_base: "https://api.openweathermap.org"
+
+  slack:
+    n8n_node: "n8n-nodes-base.slack"
+    used_by: [example-webhook-to-slack]
+    docs_cached: false
+    docs_path: null
+    auth_type: oauth2
+
+  ringcentral:
+    n8n_node: null  # No native node - uses HTTP Request
+    used_by: [ringcentral-to-pipedrive]
+    docs_cached: true
+    docs_cached_date: "2025-12-20"
+    docs_path: "sales_call_logging/ringcentral-to-pipedrive/docs/ringcentral/"
+    auth_type: jwt
+    api_base: "https://platform.ringcentral.com/restapi/v1.0"
+
+  pipedrive:
+    n8n_node: "n8n-nodes-base.pipedrive"
+    used_by: [ringcentral-to-pipedrive]
+    docs_cached: true
+    docs_cached_date: "2025-12-20"
+    docs_path: "sales_call_logging/ringcentral-to-pipedrive/docs/pipedrive/"
+    auth_type: api_token
+    api_base: "https://api.pipedrive.com/v1"
+
+  elevenlabs:
+    n8n_node: null  # No native node - uses HTTP Request
+    used_by: [elevenlabs-twilio-client-data, elevenlabs-twilio-bulletproof, transcript-field-extractor]
+    docs_cached: true
+    docs_cached_date: "2025-12-27"
+    docs_path: "docs/elevenlabs-twilio-failure-modes.md"
+    auth_type: api_key
+    api_base: "https://api.elevenlabs.io"
+    notes: "MCP server available: mcp__elevenlabs-mcp"
+    api_endpoints:
+      - path: "/v1/convai/twilio/outbound-call"
+        method: POST
+        purpose: "Initiate outbound call with client data"
+
+  google_gemini:
+    n8n_node: null # Using HTTP Request for bulk prompt
+    used_by: [transcript-field-extractor]
+    docs_cached: true
+    docs_cached_date: "2025-12-28"
+    auth_type: api_key
+    api_base: "https://generativelanguage.googleapis.com"
+    api_endpoints:
+      - path: "/v1beta/models/gemini-3-pro:generateContent"
+        method: POST
+        purpose: "LLM content generation and extraction"
+
+  twilio:
+    n8n_node: "n8n-nodes-base.twilio"
+    used_by: [elevenlabs-twilio-client-data, elevenlabs-twilio-bulletproof]
+    docs_cached: true
+    docs_cached_date: "2025-12-27"
+    docs_path: "docs/elevenlabs-twilio-failure-modes.md"
+    auth_type: basic  # Account SID + Auth Token
+    api_base: "https://api.twilio.com"
+    notes: "Phone number must be linked to ElevenLabs for outbound calls"
+
+# ============================================================================
+# WORKFLOW TYPES
+# Standard types for categorization
+# ============================================================================
+workflow_types:
+  webhook_listener: "Receives external webhooks, minimal processing"
+  webhook_processor: "Receives webhooks, processes and routes data"
+  data_fetch: "Pulls data from external APIs"
+  data_sync: "Bidirectional sync between systems"
+  notification: "Sends notifications/alerts"
+  utility: "Helper workflows called by others"
+  ai_agent: "AI/LLM powered workflows"
+  scheduled: "Cron/schedule triggered workflows"
+
+# ============================================================================
+# SHARED RESOURCES
+# Reusable subworkflows and utilities
+# ============================================================================
+shared:
+  error_handlers: []
+  notification_dispatchers: []
+  data_transformers: []
+
+# ============================================================================
+# PENDING DOCUMENTATION
+# Queue of integrations needing docs retrieval
+# ============================================================================
+docs_queue:
+  - integration: openweathermap
+    priority: low
+    reason: "Demo workflow"
+  - integration: slack
+    priority: medium
+    reason: "Common integration"
+  # elevenlabs and twilio removed - documented in docs/elevenlabs-twilio-failure-modes.md

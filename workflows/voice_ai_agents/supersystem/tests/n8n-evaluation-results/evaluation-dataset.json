@@ -1,0 +1,541 @@
+{
+  "name": "Supersystem Voice Agent Tests",
+  "description": "Auto-generated from supersystem simulation-scenarios.yaml",
+  "generated": "2025-12-30T03:55:18.378Z",
+  "version": "1.0",
+  "rows": [
+    {
+      "test_id": "known-client-greeting",
+      "test_name": "Known Client - Personalized Greeting",
+      "category": "pre_call_integration",
+      "priority": "critical",
+      "input": {
+        "simulated_user_prompt": "You are Dr. Smith from Acme Dental. You've called before.\nNotice if the agent seems to know who you are or recognizes your number.\nYou want to schedule another demo for your new office location.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "recognized_caller",
+            "name": "Recognized returning caller",
+            "prompt": "The agent showed signs of recognizing the caller or having prior context.",
+            "weight": 1
+          },
+          {
+            "id": "personalized_greeting",
+            "name": "Personalized greeting",
+            "prompt": "The agent's greeting felt personalized rather than generic.",
+            "weight": 0.8
+          },
+          {
+            "id": "completed_booking",
+            "name": "Completed booking flow",
+            "prompt": "The agent successfully completed the booking flow with SMS.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "client-lookup",
+        "personalization",
+        "integration"
+      ]
+    },
+    {
+      "test_id": "new-client-discovery",
+      "test_name": "New Client - Full Discovery",
+      "category": "pre_call_integration",
+      "priority": "critical",
+      "input": {
+        "simulated_user_prompt": "You are Maria, calling for the first time. You run a pet grooming business.\nYou heard about AI voice agents from a friend and want to learn more.\nYour number is 555-888-9999.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "full_discovery",
+            "name": "Full discovery process",
+            "prompt": "The agent gathered name, business type, and contact info for a new caller.",
+            "weight": 1
+          },
+          {
+            "id": "no_assumed_context",
+            "name": "No assumed context",
+            "prompt": "The agent did not pretend to know the caller or make incorrect assumptions.",
+            "weight": 1
+          },
+          {
+            "id": "sent_booking_sms",
+            "name": "Sent booking SMS",
+            "prompt": "The agent successfully sent the booking SMS after getting permission.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "client-lookup",
+        "new-caller",
+        "discovery"
+      ]
+    },
+    {
+      "test_id": "successful-call-orchestration",
+      "test_name": "Successful Call - Full Orchestration",
+      "category": "post_call_integration",
+      "priority": "critical",
+      "input": {
+        "simulated_user_prompt": "You are Jake from a law firm. You want to learn about AI voice agents.\nBe cooperative and answer all questions. When offered, agree to receive the SMS.\nYour phone is 555-777-1234. Complete the full conversation naturally.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "natural_conversation",
+            "name": "Natural conversation flow",
+            "prompt": "The conversation flowed naturally from greeting to booking.",
+            "weight": 1
+          },
+          {
+            "id": "collected_all_info",
+            "name": "Collected all required info",
+            "prompt": "The agent collected name, phone, and business type before sending SMS.",
+            "weight": 1
+          },
+          {
+            "id": "proper_sms_flow",
+            "name": "Proper SMS permission flow",
+            "prompt": "The agent asked permission before sending SMS and confirmed delivery after.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "orchestrator",
+        "execution-logger",
+        "slack-notifier"
+      ]
+    },
+    {
+      "test_id": "failed-call-logging",
+      "test_name": "Failed Call - Error Logging",
+      "category": "post_call_integration",
+      "priority": "high",
+      "input": {
+        "simulated_user_prompt": "You are extremely busy and impatient. You called by accident.\nSay \"Wrong number, sorry\" and hang up immediately.\nDo NOT engage in any conversation.\n",
+        "expected_tool_calls": [],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "graceful_exit",
+            "name": "Graceful exit",
+            "prompt": "The agent allowed the caller to exit gracefully without pushiness.",
+            "weight": 1
+          },
+          {
+            "id": "brief_interaction",
+            "name": "Brief interaction",
+            "prompt": "The conversation was appropriately brief given the caller's desire to leave.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": []
+      },
+      "tags": [
+        "orchestrator",
+        "error-handling",
+        "logging"
+      ]
+    },
+    {
+      "test_id": "sms-success-notification",
+      "test_name": "SMS Success - Slack Notification",
+      "category": "tool_integration",
+      "priority": "critical",
+      "input": {
+        "simulated_user_prompt": "You are calling about AI voice agents for your restaurant.\nYour name is Tony. Phone is 555-PIZZA (555-749-9211).\nYou want the booking link texted to you. Be quick and efficient.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "collected_phone",
+            "name": "Collected phone number",
+            "prompt": "The agent asked for and correctly understood the phone number.",
+            "weight": 1
+          },
+          {
+            "id": "got_sms_permission",
+            "name": "Got SMS permission",
+            "prompt": "The agent explicitly asked for permission before sending SMS.",
+            "weight": 1
+          },
+          {
+            "id": "confirmed_sms_sent",
+            "name": "Confirmed SMS sent",
+            "prompt": "The agent confirmed the SMS was sent after the tool executed.",
+            "weight": 1
+          },
+          {
+            "id": "no_premature_confirm",
+            "name": "No premature confirmation",
+            "prompt": "The agent did NOT say SMS was sent before the tool actually ran.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "send_sms",
+        "slack-notifier",
+        "happy-path"
+      ]
+    },
+    {
+      "test_id": "sms-declined-no-notification",
+      "test_name": "SMS Declined - No Trigger",
+      "category": "tool_integration",
+      "priority": "high",
+      "input": {
+        "simulated_user_prompt": "You are interested in AI voice agents for your accounting firm.\nWhen offered the SMS, say \"No thanks, I prefer email\" or \"Just tell me the URL\".\nDo NOT consent to receiving a text message under any circumstances.\n",
+        "expected_tool_calls": [],
+        "forbidden_tool_calls": [
+          "send_sms"
+        ]
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "respected_preference",
+            "name": "Respected SMS decline",
+            "prompt": "The agent respected the caller's preference not to receive SMS.",
+            "weight": 1
+          },
+          {
+            "id": "no_unauthorized_sms",
+            "name": "No unauthorized SMS",
+            "prompt": "The agent did NOT send an SMS without explicit consent.",
+            "weight": 1
+          },
+          {
+            "id": "offered_alternative",
+            "name": "Offered alternative",
+            "prompt": "The agent offered the website URL or email as an alternative.",
+            "weight": 0.8
+          }
+        ],
+        "tool_calls": []
+      },
+      "tags": [
+        "send_sms",
+        "declined",
+        "edge-case"
+      ]
+    },
+    {
+      "test_id": "full-data-extraction",
+      "test_name": "Full Data Extraction - All Fields",
+      "category": "data_extraction",
+      "priority": "critical",
+      "input": {
+        "simulated_user_prompt": "You are Sarah Johnson, CEO of TechStart Inc., a software company with 50 employees.\nYour email is sarah@techstart.io. Phone is 555-TECH (555-8324).\nYou're interested in AI voice agents to handle customer support calls.\nYou currently receive about 200 calls per day. Your main pain point is missed calls after hours.\nBudget is around $5000/month. You'd like to start with a demo next week.\nBe thorough in explaining your needs - you want to make sure this is a good fit.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "collected_name",
+            "name": "Collected full name",
+            "prompt": "The agent collected the caller's full name (Sarah Johnson).",
+            "weight": 1
+          },
+          {
+            "id": "collected_company",
+            "name": "Collected company name",
+            "prompt": "The agent collected the company name (TechStart Inc).",
+            "weight": 1
+          },
+          {
+            "id": "collected_industry",
+            "name": "Collected industry/use case",
+            "prompt": "The agent understood this is a software company wanting customer support.",
+            "weight": 0.8
+          },
+          {
+            "id": "collected_volume",
+            "name": "Collected call volume",
+            "prompt": "The agent noted the call volume (200 calls/day).",
+            "weight": 0.8
+          },
+          {
+            "id": "identified_pain_point",
+            "name": "Identified pain point",
+            "prompt": "The agent identified the main pain point (missed after-hours calls).",
+            "weight": 0.8
+          },
+          {
+            "id": "discussed_budget",
+            "name": "Discussed budget",
+            "prompt": "The agent addressed the budget topic appropriately.",
+            "weight": 0.6
+          },
+          {
+            "id": "scheduled_next_step",
+            "name": "Scheduled next step",
+            "prompt": "The agent moved toward scheduling a demo.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "transcript-extractor",
+        "field-extraction",
+        "comprehensive"
+      ]
+    },
+    {
+      "test_id": "minimal-data-extraction",
+      "test_name": "Minimal Data Extraction - Quick Call",
+      "category": "data_extraction",
+      "priority": "high",
+      "input": {
+        "simulated_user_prompt": "You are in a hurry. Just say \"Hi, I want to book a demo. My name is Bob. Phone is 555-1111.\"\nDon't offer any additional information. Keep responses very short.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "efficient_handling",
+            "name": "Efficient handling",
+            "prompt": "The agent efficiently handled the quick caller without dragging out the call.",
+            "weight": 1
+          },
+          {
+            "id": "collected_minimum_fields",
+            "name": "Collected minimum required fields",
+            "prompt": "The agent collected at least name and phone number.",
+            "weight": 1
+          },
+          {
+            "id": "completed_task",
+            "name": "Completed the task",
+            "prompt": "The agent successfully sent the SMS with the info provided.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "transcript-extractor",
+        "minimal",
+        "edge-case"
+      ]
+    },
+    {
+      "test_id": "rapid-fire-questions",
+      "test_name": "Rapid Fire Questions",
+      "category": "stress_test",
+      "priority": "medium",
+      "input": {
+        "simulated_user_prompt": "You are a rapid talker. Ask these questions all at once without waiting for answers:\n\"What's your pricing? Do you integrate with Salesforce? How long does setup take?\nCan I see a demo? Is there a free trial? What about HIPAA compliance?\"\nThen wait for the agent to respond to at least some of these.\n",
+        "expected_tool_calls": [],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "addressed_multiple_questions",
+            "name": "Addressed multiple questions",
+            "prompt": "The agent attempted to address multiple questions from the barrage.",
+            "weight": 1
+          },
+          {
+            "id": "stayed_composed",
+            "name": "Stayed composed",
+            "prompt": "The agent remained composed and didn't get flustered.",
+            "weight": 0.8
+          },
+          {
+            "id": "offered_to_slow_down",
+            "name": "Managed the pace",
+            "prompt": "The agent either answered or offered to take questions one at a time.",
+            "weight": 0.6
+          }
+        ],
+        "tool_calls": []
+      },
+      "tags": [
+        "stress",
+        "comprehension"
+      ]
+    },
+    {
+      "test_id": "long-conversation",
+      "test_name": "Extended Conversation - 15+ Turns",
+      "category": "stress_test",
+      "priority": "medium",
+      "input": {
+        "simulated_user_prompt": "You are very thorough and want to understand everything before committing.\nAsk about: pricing tiers, setup process, training requirements, support options,\ncancellation policy, customer references, integration options, and security measures.\nTake your time - ask one or two questions at a time and wait for full answers.\nYour name is Patricia and your company is LongForm LLC.\nEventually, if satisfied, agree to receive the SMS for booking.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "maintained_context",
+            "name": "Maintained context throughout",
+            "prompt": "The agent maintained context of the conversation over many turns.",
+            "weight": 1
+          },
+          {
+            "id": "answered_all_categories",
+            "name": "Addressed major topics",
+            "prompt": "The agent addressed most of the major question categories raised.",
+            "weight": 0.8
+          },
+          {
+            "id": "natural_progression",
+            "name": "Natural progression",
+            "prompt": "The conversation progressed naturally toward booking despite length.",
+            "weight": 0.8
+          },
+          {
+            "id": "remembered_name",
+            "name": "Remembered caller info",
+            "prompt": "The agent remembered the caller's name/company throughout.",
+            "weight": 1
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "stress",
+        "context-retention",
+        "long-form"
+      ]
+    },
+    {
+      "test_id": "garbled-phone-number",
+      "test_name": "Garbled Phone Number - Recovery",
+      "category": "error_recovery",
+      "priority": "high",
+      "input": {
+        "simulated_user_prompt": "You are calling about AI voice agents. Your name is Chris.\nWhen asked for your phone number, mumble it unclearly: \"It's five five five... uh... \none two... wait, three four... no, one two three four\".\nIf the agent asks for clarification, then say it clearly: \"555-123-4567\".\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "sought_clarification",
+            "name": "Sought clarification",
+            "prompt": "The agent asked for the phone number to be repeated or clarified.",
+            "weight": 1
+          },
+          {
+            "id": "confirmed_number",
+            "name": "Confirmed the number",
+            "prompt": "The agent confirmed the phone number before sending SMS.",
+            "weight": 1
+          },
+          {
+            "id": "patient_handling",
+            "name": "Patient handling",
+            "prompt": "The agent handled the confusion patiently without frustration.",
+            "weight": 0.8
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "error-recovery",
+        "phone-validation"
+      ]
+    },
+    {
+      "test_id": "interrupted-mid-flow",
+      "test_name": "Interrupted Mid-Flow",
+      "category": "error_recovery",
+      "priority": "medium",
+      "input": {
+        "simulated_user_prompt": "You are interested but impatient. Interrupt the agent frequently.\nWhen they start explaining pricing, cut them off and say \"Just send me the link\".\nWhen they ask for your phone, interrupt with \"555-999-0000\" before they finish asking.\nYour name is Alex.\n",
+        "expected_tool_calls": [
+          "send_sms"
+        ],
+        "forbidden_tool_calls": []
+      },
+      "expected": {
+        "criteria": [
+          {
+            "id": "handled_interruptions",
+            "name": "Handled interruptions",
+            "prompt": "The agent handled being interrupted without getting confused.",
+            "weight": 1
+          },
+          {
+            "id": "completed_task",
+            "name": "Completed task despite interruptions",
+            "prompt": "The agent still managed to complete the SMS sending despite interruptions.",
+            "weight": 1
+          },
+          {
+            "id": "adapted_pace",
+            "name": "Adapted to caller's pace",
+            "prompt": "The agent adapted to the caller's impatient style.",
+            "weight": 0.8
+          }
+        ],
+        "tool_calls": [
+          "send_sms"
+        ]
+      },
+      "tags": [
+        "error-recovery",
+        "interruption"
+      ]
+    }
+  ]
+}

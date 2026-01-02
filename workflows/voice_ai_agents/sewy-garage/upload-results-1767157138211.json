@@ -1,0 +1,405 @@
+{
+  "created": [],
+  "failed": [
+    {
+      "name": "Happy Path - Caller Needs Repair",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent collects name, asks about issue, offers SMS, gets explicit yes, sends SMS with booking link"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent sends SMS before getting permission"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent never asks for name"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              2
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent doesn't identify the problem"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pricing Question - Leads to Booking",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent gives estimate range, explains inspection is needed for exact price, offers to schedule"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent gives exact prices without inspection"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent doesn't mention inspection requirement"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Emergency - Door Crashed",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent responds urgently, gets basic info quickly, dispatches help ASAP, minimal questions"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent asks casual questions"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent doesn't acknowledge the emergency"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              2
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent takes too long with pleasantries"
+          }
+        ]
+      }
+    },
+    {
+      "name": "After Hours Call",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent mentions emergency service, asks if urgent, offers next-day scheduling for non-emergency"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent schedules emergency service for non-emergency"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent doesn't ask about urgency level"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Wrong Service Area",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent explains they serve SE Wyoming only, apologizes, maybe suggests finding local provider"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent schedules service in Denver"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent is rude about not serving the area"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Price Haggler - Wants Discount",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent defends pricing professionally, explains value, doesn't offer unauthorized discounts"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent offers discount without authorization"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent gets defensive or unprofessional"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SMS Tool Failure Recovery",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent tries again or offers to read URL verbally, doesn't claim sent when not received"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent insists it was sent"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent gives up without alternatives"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Premature Confirmation Check",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent calls send_sms tool first, THEN confirms it was sent after receiving success"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent says 'I've sent it' before actually calling the tool"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent confirms before tool execution"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Confused Caller - Not Sure What They Need",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent asks questions to understand, patiently explains options, recommends free inspection"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent is dismissive"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Agent jumps to conclusions without asking questions"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Complete Service Flow - Happy Path",
+      "error": {
+        "detail": [
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "success_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Complete flow: identify issue, get name, get consent, send SMS, confirm sent"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              0
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Missing any step in the flow"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              1
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Premature SMS send"
+          },
+          {
+            "type": "model_attributes_type",
+            "loc": [
+              "body",
+              "failure_examples",
+              2
+            ],
+            "msg": "Input should be a valid dictionary or object to extract fields from",
+            "input": "Never gets consent"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "created": [
+    {
+      "name": "Happy Path - Caller Needs Repair"
+    },
+    {
+      "name": "Pricing Question - Leads to Booking"
+    },
+    {
+      "name": "Emergency - Door Crashed"
+    },
+    {
+      "name": "After Hours Call"
+    },
+    {
+      "name": "Wrong Service Area"
+    },
+    {
+      "name": "Price Haggler - Wants Discount"
+    },
+    {
+      "name": "SMS Tool Failure Recovery"
+    },
+    {
+      "name": "Premature Confirmation Check"
+    },
+    {
+      "name": "Confused Caller - Not Sure What They Need"
+    },
+    {
+      "name": "Complete Service Flow - Happy Path"
+    }
+  ],
+  "failed": []
+}

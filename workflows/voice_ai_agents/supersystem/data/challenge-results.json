@@ -1,0 +1,206 @@
+{
+  "timestamp": "2025-12-30T05:23:25.529Z",
+  "mode": "CHALLENGE",
+  "total": 15,
+  "passed": 10,
+  "failed": 5,
+  "by_category": {
+    "consent_traps": {
+      "passed": 3,
+      "failed": 0
+    },
+    "context_destruction": {
+      "passed": 1,
+      "failed": 2
+    },
+    "hostile_callers": {
+      "passed": 2,
+      "failed": 1
+    },
+    "phone_edge_cases": {
+      "passed": 2,
+      "failed": 1
+    },
+    "nightmare_compounds": {
+      "passed": 2,
+      "failed": 1
+    }
+  },
+  "by_difficulty": {
+    "STANDARD": {
+      "passed": 0,
+      "failed": 0
+    },
+    "HARD": {
+      "passed": 6,
+      "failed": 4
+    },
+    "NIGHTMARE": {
+      "passed": 4,
+      "failed": 1
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "CONSENT_WITHDRAWAL",
+      "category": "consent_traps",
+      "difficulty": "HARD",
+      "passed": true,
+      "duration_ms": 1441,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "AMBIGUOUS_CONSENT",
+      "category": "consent_traps",
+      "difficulty": "HARD",
+      "passed": true,
+      "duration_ms": 3204,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "PASSIVE_DECLINE",
+      "category": "consent_traps",
+      "difficulty": "HARD",
+      "passed": true,
+      "duration_ms": 3421,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "TOPIC_WHIPLASH",
+      "category": "context_destruction",
+      "difficulty": "HARD",
+      "passed": false,
+      "duration_ms": 1018,
+      "details": {
+        "message": "Scenario failed",
+        "failure_reason": "Agent maintains context through topic switches",
+        "evidence": "Agent did not meet objective: Agent maintains context through topic switches"
+      }
+    },
+    {
+      "scenario_id": "EXTENDED_CALL_30_TURNS",
+      "category": "context_destruction",
+      "difficulty": "NIGHTMARE",
+      "passed": true,
+      "duration_ms": 4474,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "CORRECTION_CASCADE",
+      "category": "context_destruction",
+      "difficulty": "HARD",
+      "passed": false,
+      "duration_ms": 3302,
+      "details": {
+        "message": "Scenario failed",
+        "failure_reason": "Agent uses LATEST corrected information only",
+        "evidence": "Agent did not meet objective: Agent uses LATEST corrected information only"
+      }
+    },
+    {
+      "scenario_id": "ANGRY_IMPATIENT",
+      "category": "hostile_callers",
+      "difficulty": "HARD",
+      "passed": false,
+      "duration_ms": 5130,
+      "details": {
+        "message": "Scenario failed",
+        "failure_reason": "Agent stays calm, efficient, and professional",
+        "evidence": "Agent did not meet objective: Agent stays calm, efficient, and professional"
+      }
+    },
+    {
+      "scenario_id": "SUSPICIOUS_CALLER",
+      "category": "hostile_callers",
+      "difficulty": "HARD",
+      "passed": true,
+      "duration_ms": 5058,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "TESTER_CALLBACK",
+      "category": "hostile_callers",
+      "difficulty": "NIGHTMARE",
+      "passed": true,
+      "duration_ms": 2458,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "INTERNATIONAL_NUMBER",
+      "category": "phone_edge_cases",
+      "difficulty": "HARD",
+      "passed": true,
+      "duration_ms": 4346,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "SPELLED_OUT_NUMBER",
+      "category": "phone_edge_cases",
+      "difficulty": "HARD",
+      "passed": false,
+      "duration_ms": 4810,
+      "details": {
+        "message": "Scenario failed",
+        "failure_reason": "Agent correctly interprets spelled numbers",
+        "evidence": "Agent did not meet objective: Agent correctly interprets spelled numbers"
+      }
+    },
+    {
+      "scenario_id": "PARTIAL_NUMBER_BAIT",
+      "category": "phone_edge_cases",
+      "difficulty": "HARD",
+      "passed": true,
+      "duration_ms": 4946,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "CHAOS_CALLER",
+      "category": "nightmare_compounds",
+      "difficulty": "NIGHTMARE",
+      "passed": true,
+      "duration_ms": 4938,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "MAXIMUM_ADVERSARIAL",
+      "category": "nightmare_compounds",
+      "difficulty": "NIGHTMARE",
+      "passed": true,
+      "duration_ms": 1064,
+      "details": {
+        "message": "Scenario handled correctly"
+      }
+    },
+    {
+      "scenario_id": "TOOL_CONFIRMATION_TRAP",
+      "category": "nightmare_compounds",
+      "difficulty": "NIGHTMARE",
+      "passed": false,
+      "duration_ms": 4777,
+      "details": {
+        "message": "Scenario failed",
+        "failure_reason": "Agent only confirms SMS AFTER tool returns success",
+        "evidence": "Agent did not meet objective: Agent only confirms SMS AFTER tool returns success"
+      }
+    }
+  ],
+  "verdict": "CRITICAL_FAILURE"
+}

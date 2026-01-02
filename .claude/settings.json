@@ -1,0 +1,228 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/detect-workflow-intent.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/detect-voice-agent-intent.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/run-evaluations.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/credential-automation.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "mcp__n8n-mcp__n8n_create_workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/naming-convention.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/llm-node-enforcement.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow-governance.js",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/if-node-warning.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/suggest-code-node.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/pre-deploy-check.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__n8n-mcp__n8n_update_full_workflow|mcp__n8n-mcp__n8n_update_partial_workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/naming-convention.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/llm-node-enforcement.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow-governance.js",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/if-node-warning.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/suggest-code-node.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/pre-deploy-check.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__n8n-mcp__n8n_delete_workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow-governance.js",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow-file-guard.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/naming-convention.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__elevenlabs-mcp__create_agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/elevenlabs-agent-governance.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__n8n-mcp__|mcp__n8n-instance__|mcp__elevenlabs-mcp__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/api-fallback-enforcer.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__n8n-mcp__n8n_create_workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow-governance.js",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/post-deploy-log.js",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/workflow-activation.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__n8n-mcp__n8n_update_full_workflow|mcp__n8n-mcp__n8n_update_partial_workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/post-deploy-log.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/auto-git-stage.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__elevenlabs-mcp__create_agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/elevenlabs-agent-governance.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session-init.js",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(node:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Read(D:\\Things\\Work\\Wranngle\\n8n_workflow_development\\**)",
+      "Write(D:\\Things\\Work\\Wranngle\\n8n_workflow_development\\workflows\\**)",
+      "Edit(D:\\Things\\Work\\Wranngle\\n8n_workflow_development\\workflows\\**)",
+      "mcp__n8n-mcp__*"
+    ],
+    "deny": [
+      "Write(**/.env*)",
+      "Write(**/*credentials*)",
+      "Write(**/*secret*)"
+    ]
+  }
+}

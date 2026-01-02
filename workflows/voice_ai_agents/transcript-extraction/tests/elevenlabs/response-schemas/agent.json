@@ -1,0 +1,24 @@
+{
+  "description": "ElevenLabs get_agent expected response",
+  "required": ["agent_id", "name", "conversation_config"],
+  "properties": {
+    "agent_id": { "type": "string", "pattern": "^agent_" },
+    "name": { "type": "string" },
+    "conversation_config": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "object",
+              "properties": {
+                "prompt": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

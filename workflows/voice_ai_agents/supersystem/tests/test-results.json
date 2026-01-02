@@ -1,0 +1,1305 @@
+{
+  "timestamp": "2025-12-29T23:55:22.563Z",
+  "base_url": "https://n8n.wranngle.com/webhook",
+  "total": 14,
+  "passed": 14,
+  "failed": 0,
+  "errors": 0,
+  "results": [
+    {
+      "id": "lookup-known-phone",
+      "workflow": "client-data-lookup",
+      "category": "happy_path",
+      "priority": "critical",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "latency_ms",
+          "operator": "less_than",
+          "expected": 5000,
+          "actual": 3,
+          "passed": true,
+          "message": "latency_ms (3) < 5000"
+        }
+      ],
+      "duration_ms": 376,
+      "response": {
+        "success": true,
+        "client": {
+          "first_name": "John",
+          "last_name": "Smith",
+          "company": "Acme Corp",
+          "account_type": "Premium",
+          "loyalty_tier": "Gold",
+          "last_interaction": "Called 3 days ago about demo",
+          "notes": "Prefers morning calls"
+        },
+        "cache_hit": true,
+        "lookup_key": "+15551234567",
+        "latency_ms": 3,
+        "source": "mock_database"
+      }
+    },
+    {
+      "id": "lookup-unknown-phone",
+      "workflow": "client-data-lookup",
+      "category": "edge_case",
+      "priority": "high",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "client",
+          "operator": "equals",
+          "expected": null,
+          "actual": null,
+          "passed": true,
+          "message": "client equals null"
+        }
+      ],
+      "duration_ms": 145,
+      "response": {
+        "success": true,
+        "client": null,
+        "cache_hit": false,
+        "lookup_key": "+19995550000",
+        "latency_ms": 11,
+        "message": "Client not found - new caller"
+      }
+    },
+    {
+      "id": "lookup-by-email",
+      "workflow": "client-data-lookup",
+      "category": "happy_path",
+      "priority": "high",
+      "status": "pass",
+      "message": "All 1 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        }
+      ],
+      "duration_ms": 113,
+      "response": {
+        "success": true,
+        "client": null,
+        "cache_hit": false,
+        "lookup_key": "test@example.com",
+        "latency_ms": 4,
+        "message": "Client not found - new caller"
+      }
+    },
+    {
+      "id": "lookup-empty-payload",
+      "workflow": "client-data-lookup",
+      "category": "error_handling",
+      "priority": "medium",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "client",
+          "operator": "equals",
+          "expected": null,
+          "actual": null,
+          "passed": true,
+          "message": "client equals null"
+        }
+      ],
+      "duration_ms": 97,
+      "response": {
+        "success": true,
+        "client": null,
+        "cache_hit": false,
+        "lookup_key": "none",
+        "latency_ms": 4,
+        "message": "Client not found - new caller"
+      }
+    },
+    {
+      "id": "log-success-call",
+      "workflow": "execution-logger",
+      "category": "happy_path",
+      "priority": "critical",
+      "status": "pass",
+      "message": "All 4 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "logged",
+          "operator": "exists",
+          "actual": {
+            "timestamp": "2025-12-29T23:55:19.633Z",
+            "conversation_id": "test_conv_001",
+            "agent_name": "Sarah",
+            "caller_phone": "+15551234567",
+            "duration_seconds": 180,
+            "outcome": "success",
+            "extracted_fields": "{\"customer_name\":\"John Smith\",\"inquiry_type\":\"demo_request\"}",
+            "errors": ""
+          },
+          "passed": true,
+          "message": "logged exists"
+        },
+        {
+          "field": "logged.conversation_id",
+          "operator": "equals",
+          "expected": "test_conv_001",
+          "actual": "test_conv_001",
+          "passed": true,
+          "message": "logged.conversation_id equals \"test_conv_001\""
+        },
+        {
+          "field": "logged.outcome",
+          "operator": "equals",
+          "expected": "success",
+          "actual": "success",
+          "passed": true,
+          "message": "logged.outcome equals \"success\""
+        }
+      ],
+      "duration_ms": 103,
+      "response": {
+        "success": true,
+        "logged": {
+          "timestamp": "2025-12-29T23:55:19.633Z",
+          "conversation_id": "test_conv_001",
+          "agent_name": "Sarah",
+          "caller_phone": "+15551234567",
+          "duration_seconds": 180,
+          "outcome": "success",
+          "extracted_fields": "{\"customer_name\":\"John Smith\",\"inquiry_type\":\"demo_request\"}",
+          "errors": ""
+        },
+        "message": "Test mode - not written to sheet"
+      }
+    },
+    {
+      "id": "log-failure-call",
+      "workflow": "execution-logger",
+      "category": "edge_case",
+      "priority": "high",
+      "status": "pass",
+      "message": "All 3 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "logged.outcome",
+          "operator": "equals",
+          "expected": "failure",
+          "actual": "failure",
+          "passed": true,
+          "message": "logged.outcome equals \"failure\""
+        },
+        {
+          "field": "logged.errors",
+          "operator": "equals",
+          "expected": "Connection timeout",
+          "actual": "Connection timeout",
+          "passed": true,
+          "message": "logged.errors equals \"Connection timeout\""
+        }
+      ],
+      "duration_ms": 103,
+      "response": {
+        "success": true,
+        "logged": {
+          "timestamp": "2025-12-29T23:55:19.739Z",
+          "conversation_id": "test_conv_002",
+          "agent_name": "Sarah",
+          "caller_phone": "",
+          "duration_seconds": 0,
+          "outcome": "failure",
+          "extracted_fields": "{}",
+          "errors": "Connection timeout"
+        },
+        "message": "Test mode - not written to sheet"
+      }
+    },
+    {
+      "id": "log-minimal-payload",
+      "workflow": "execution-logger",
+      "category": "edge_case",
+      "priority": "medium",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "logged.agent_name",
+          "operator": "equals",
+          "expected": "unknown",
+          "actual": "unknown",
+          "passed": true,
+          "message": "logged.agent_name equals \"unknown\""
+        }
+      ],
+      "duration_ms": 116,
+      "response": {
+        "success": true,
+        "logged": {
+          "timestamp": "2025-12-29T23:55:19.855Z",
+          "conversation_id": "test_conv_003",
+          "agent_name": "unknown",
+          "caller_phone": "",
+          "duration_seconds": 0,
+          "outcome": "unknown",
+          "extracted_fields": "{}",
+          "errors": ""
+        },
+        "message": "Test mode - not written to sheet"
+      }
+    },
+    {
+      "id": "notify-success-call",
+      "workflow": "slack-notifier",
+      "category": "happy_path",
+      "priority": "critical",
+      "status": "pass",
+      "message": "All 3 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "slackPayload",
+          "operator": "exists",
+          "actual": {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "✅ Voice Agent Call SUCCESS",
+                  "emoji": true
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Agent:*\nSarah"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Duration:*\n3m 0s"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Caller:*\n+15551234567"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Conversation ID:*\n`test_conv_001`"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*Summary:*\nCustomer inquired about demo scheduling"
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "Sent at 2025-12-29T23:55:19.980Z"
+                  }
+                ]
+              }
+            ]
+          },
+          "passed": true,
+          "message": "slackPayload exists"
+        },
+        {
+          "field": "slackPayload.blocks",
+          "operator": "is_array",
+          "actual": [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "✅ Voice Agent Call SUCCESS",
+                "emoji": true
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Agent:*\nSarah"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Duration:*\n3m 0s"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Caller:*\n+15551234567"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Conversation ID:*\n`test_conv_001`"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "*Summary:*\nCustomer inquired about demo scheduling"
+              }
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "context",
+              "elements": [
+                {
+                  "type": "mrkdwn",
+                  "text": "Sent at 2025-12-29T23:55:19.980Z"
+                }
+              ]
+            }
+          ],
+          "passed": true,
+          "message": "slackPayload.blocks is an array"
+        }
+      ],
+      "duration_ms": 129,
+      "response": {
+        "success": true,
+        "message": "Test mode - would send this to Slack",
+        "slackPayload": {
+          "blocks": [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "✅ Voice Agent Call SUCCESS",
+                "emoji": true
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Agent:*\nSarah"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Duration:*\n3m 0s"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Caller:*\n+15551234567"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Conversation ID:*\n`test_conv_001`"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "*Summary:*\nCustomer inquired about demo scheduling"
+              }
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "context",
+              "elements": [
+                {
+                  "type": "mrkdwn",
+                  "text": "Sent at 2025-12-29T23:55:19.980Z"
+                }
+              ]
+            }
+          ]
+        },
+        "timestamp": "2025-12-29T18:55:19.982-05:00"
+      }
+    },
+    {
+      "id": "notify-failure-call",
+      "workflow": "slack-notifier",
+      "category": "edge_case",
+      "priority": "high",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "slackPayload.blocks[0].text.text",
+          "operator": "contains",
+          "expected": "❌",
+          "actual": "❌ Voice Agent Call FAILURE",
+          "passed": true,
+          "message": "slackPayload.blocks[0].text.text contains \"❌\""
+        }
+      ],
+      "duration_ms": 113,
+      "response": {
+        "success": true,
+        "message": "Test mode - would send this to Slack",
+        "slackPayload": {
+          "blocks": [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "❌ Voice Agent Call FAILURE",
+                "emoji": true
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Agent:*\nSarah"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Duration:*\n0m 15s"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Caller:*\nUnknown"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Conversation ID:*\n`N/A`"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "*Summary:*\nCall failed to connect"
+              }
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "context",
+              "elements": [
+                {
+                  "type": "mrkdwn",
+                  "text": "Sent at 2025-12-29T23:55:20.086Z"
+                }
+              ]
+            }
+          ]
+        },
+        "timestamp": "2025-12-29T18:55:20.087-05:00"
+      }
+    },
+    {
+      "id": "notify-unknown-outcome",
+      "workflow": "slack-notifier",
+      "category": "edge_case",
+      "priority": "medium",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "success equals true"
+        },
+        {
+          "field": "slackPayload.blocks[0].text.text",
+          "operator": "contains",
+          "expected": "❓",
+          "actual": "❓ Voice Agent Call UNKNOWN",
+          "passed": true,
+          "message": "slackPayload.blocks[0].text.text contains \"❓\""
+        }
+      ],
+      "duration_ms": 95,
+      "response": {
+        "success": true,
+        "message": "Test mode - would send this to Slack",
+        "slackPayload": {
+          "blocks": [
+            {
+              "type": "header",
+              "text": {
+                "type": "plain_text",
+                "text": "❓ Voice Agent Call UNKNOWN",
+                "emoji": true
+              }
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Agent:*\nSarah"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Duration:*\nN/A"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "fields": [
+                {
+                  "type": "mrkdwn",
+                  "text": "*Caller:*\nUnknown"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "*Conversation ID:*\n`N/A`"
+                }
+              ]
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "context",
+              "elements": [
+                {
+                  "type": "mrkdwn",
+                  "text": "Sent at 2025-12-29T23:55:20.194Z"
+                }
+              ]
+            }
+          ]
+        },
+        "timestamp": "2025-12-29T18:55:20.195-05:00"
+      }
+    },
+    {
+      "id": "orchestrate-full-flow",
+      "workflow": "post-call-orchestrator",
+      "category": "happy_path",
+      "priority": "critical",
+      "status": "pass",
+      "message": "All 4 assertions passed",
+      "assertions": [
+        {
+          "field": "orchestration_complete",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "orchestration_complete equals true"
+        },
+        {
+          "field": "all_success",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "all_success equals true"
+        },
+        {
+          "field": "subworkflow_results.execution_logger",
+          "operator": "exists",
+          "actual": {
+            "success": true,
+            "response": {
+              "success": true,
+              "logged": {
+                "timestamp": "2025-12-29T23:55:20.370Z",
+                "conversation_id": "test_orch_001",
+                "agent_name": "Sarah",
+                "caller_phone": "+15551234567",
+                "duration_seconds": 180,
+                "outcome": "success",
+                "extracted_fields": "{}",
+                "errors": ""
+              },
+              "message": "Test mode - not written to sheet"
+            }
+          },
+          "passed": true,
+          "message": "subworkflow_results.execution_logger exists"
+        },
+        {
+          "field": "subworkflow_results.slack_notifier",
+          "operator": "exists",
+          "actual": {
+            "success": true,
+            "response": {
+              "success": true,
+              "message": "Test mode - would send this to Slack",
+              "slackPayload": {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "✅ Voice Agent Call SUCCESS",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Agent:*\nSarah"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Duration:*\n3m 0s"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Caller:*\n+15551234567"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Conversation ID:*\n`test_orch_001`"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Summary:*\nPost-call processing triggered"
+                    }
+                  },
+                  {
+                    "type": "divider"
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "Sent at 2025-12-29T23:55:20.429Z"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "timestamp": "2025-12-29T18:55:20.431-05:00"
+            }
+          },
+          "passed": true,
+          "message": "subworkflow_results.slack_notifier exists"
+        }
+      ],
+      "duration_ms": 270,
+      "response": {
+        "orchestration_complete": true,
+        "all_success": true,
+        "subworkflow_results": {
+          "execution_logger": {
+            "success": true,
+            "response": {
+              "success": true,
+              "logged": {
+                "timestamp": "2025-12-29T23:55:20.370Z",
+                "conversation_id": "test_orch_001",
+                "agent_name": "Sarah",
+                "caller_phone": "+15551234567",
+                "duration_seconds": 180,
+                "outcome": "success",
+                "extracted_fields": "{}",
+                "errors": ""
+              },
+              "message": "Test mode - not written to sheet"
+            }
+          },
+          "slack_notifier": {
+            "success": true,
+            "response": {
+              "success": true,
+              "message": "Test mode - would send this to Slack",
+              "slackPayload": {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "✅ Voice Agent Call SUCCESS",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Agent:*\nSarah"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Duration:*\n3m 0s"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Caller:*\n+15551234567"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Conversation ID:*\n`test_orch_001`"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Summary:*\nPost-call processing triggered"
+                    }
+                  },
+                  {
+                    "type": "divider"
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "Sent at 2025-12-29T23:55:20.429Z"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "timestamp": "2025-12-29T18:55:20.431-05:00"
+            }
+          }
+        },
+        "timestamp": "2025-12-29T23:55:20.452Z"
+      }
+    },
+    {
+      "id": "orchestrate-failure-event",
+      "workflow": "post-call-orchestrator",
+      "category": "edge_case",
+      "priority": "high",
+      "status": "pass",
+      "message": "All 2 assertions passed",
+      "assertions": [
+        {
+          "field": "orchestration_complete",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "orchestration_complete equals true"
+        },
+        {
+          "field": "subworkflow_results",
+          "operator": "exists",
+          "actual": {
+            "execution_logger": {
+              "success": true,
+              "response": {
+                "success": true,
+                "logged": {
+                  "timestamp": "2025-12-29T23:55:20.613Z",
+                  "conversation_id": "test_orch_002",
+                  "agent_name": "Sarah",
+                  "caller_phone": "",
+                  "duration_seconds": 0,
+                  "outcome": "failure",
+                  "extracted_fields": "{}",
+                  "errors": "Network timeout"
+                },
+                "message": "Test mode - not written to sheet"
+              }
+            },
+            "slack_notifier": {
+              "success": true,
+              "response": {
+                "success": true,
+                "message": "Test mode - would send this to Slack",
+                "slackPayload": {
+                  "blocks": [
+                    {
+                      "type": "header",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "❌ Voice Agent Call FAILURE",
+                        "emoji": true
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Agent:*\nSarah"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Duration:*\nN/A"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Caller:*\nUnknown"
+                        },
+                        {
+                          "type": "mrkdwn",
+                          "text": "*Conversation ID:*\n`test_orch_002`"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Summary:*\nPost-call processing triggered"
+                      }
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "context",
+                      "elements": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "Sent at 2025-12-29T23:55:20.689Z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "timestamp": "2025-12-29T18:55:20.696-05:00"
+              }
+            }
+          },
+          "passed": true,
+          "message": "subworkflow_results exists"
+        }
+      ],
+      "duration_ms": 261,
+      "response": {
+        "orchestration_complete": true,
+        "all_success": true,
+        "subworkflow_results": {
+          "execution_logger": {
+            "success": true,
+            "response": {
+              "success": true,
+              "logged": {
+                "timestamp": "2025-12-29T23:55:20.613Z",
+                "conversation_id": "test_orch_002",
+                "agent_name": "Sarah",
+                "caller_phone": "",
+                "duration_seconds": 0,
+                "outcome": "failure",
+                "extracted_fields": "{}",
+                "errors": "Network timeout"
+              },
+              "message": "Test mode - not written to sheet"
+            }
+          },
+          "slack_notifier": {
+            "success": true,
+            "response": {
+              "success": true,
+              "message": "Test mode - would send this to Slack",
+              "slackPayload": {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "❌ Voice Agent Call FAILURE",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Agent:*\nSarah"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Duration:*\nN/A"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Caller:*\nUnknown"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Conversation ID:*\n`test_orch_002`"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Summary:*\nPost-call processing triggered"
+                    }
+                  },
+                  {
+                    "type": "divider"
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "Sent at 2025-12-29T23:55:20.689Z"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "timestamp": "2025-12-29T18:55:20.696-05:00"
+            }
+          }
+        },
+        "timestamp": "2025-12-29T23:55:20.714Z"
+      }
+    },
+    {
+      "id": "orchestrate-minimal-payload",
+      "workflow": "post-call-orchestrator",
+      "category": "error_handling",
+      "priority": "medium",
+      "status": "pass",
+      "message": "All 1 assertions passed",
+      "assertions": [
+        {
+          "field": "orchestration_complete",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "orchestration_complete equals true"
+        }
+      ],
+      "duration_ms": 298,
+      "response": {
+        "orchestration_complete": true,
+        "all_success": true,
+        "subworkflow_results": {
+          "execution_logger": {
+            "success": true,
+            "response": {
+              "success": true,
+              "logged": {
+                "timestamp": "2025-12-29T23:55:20.900Z",
+                "conversation_id": "test_orch_003",
+                "agent_name": "Unknown Agent",
+                "caller_phone": "",
+                "duration_seconds": 0,
+                "outcome": "unknown",
+                "extracted_fields": "{}",
+                "errors": ""
+              },
+              "message": "Test mode - not written to sheet"
+            }
+          },
+          "slack_notifier": {
+            "success": true,
+            "response": {
+              "success": true,
+              "message": "Test mode - would send this to Slack",
+              "slackPayload": {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "❓ Voice Agent Call UNKNOWN",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Agent:*\nUnknown Agent"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Duration:*\nN/A"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Caller:*\nUnknown"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Conversation ID:*\n`test_orch_003`"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Summary:*\nPost-call processing triggered"
+                    }
+                  },
+                  {
+                    "type": "divider"
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "Sent at 2025-12-29T23:55:20.988Z"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "timestamp": "2025-12-29T18:55:20.991-05:00"
+            }
+          }
+        },
+        "timestamp": "2025-12-29T23:55:21.020Z"
+      }
+    },
+    {
+      "id": "orchestrate-with-transcript",
+      "workflow": "post-call-orchestrator",
+      "category": "happy_path",
+      "priority": "high",
+      "status": "pass",
+      "message": "All 1 assertions passed",
+      "assertions": [
+        {
+          "field": "orchestration_complete",
+          "operator": "equals",
+          "expected": true,
+          "actual": true,
+          "passed": true,
+          "message": "orchestration_complete equals true"
+        }
+      ],
+      "duration_ms": 601,
+      "response": {
+        "orchestration_complete": true,
+        "all_success": true,
+        "subworkflow_results": {
+          "execution_logger": {
+            "success": true,
+            "response": {
+              "success": true,
+              "logged": {
+                "timestamp": "2025-12-29T23:55:21.364Z",
+                "conversation_id": "test_orch_004",
+                "agent_name": "Sarah",
+                "caller_phone": "",
+                "duration_seconds": 0,
+                "outcome": "success",
+                "extracted_fields": "{}",
+                "errors": ""
+              },
+              "message": "Test mode - not written to sheet"
+            }
+          },
+          "slack_notifier": {
+            "success": true,
+            "response": {
+              "success": true,
+              "message": "Test mode - would send this to Slack",
+              "slackPayload": {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "✅ Voice Agent Call SUCCESS",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Agent:*\nSarah"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Duration:*\nN/A"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Caller:*\nUnknown"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "*Conversation ID:*\n`test_orch_004`"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Summary:*\nPost-call processing triggered"
+                    }
+                  },
+                  {
+                    "type": "divider"
+                  },
+                  {
+                    "type": "context",
+                    "elements": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "Sent at 2025-12-29T23:55:21.591Z"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "timestamp": "2025-12-29T18:55:21.597-05:00"
+            }
+          }
+        },
+        "timestamp": "2025-12-29T23:55:21.621Z"
+      }
+    }
+  ]
+}

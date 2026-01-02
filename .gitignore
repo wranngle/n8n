@@ -1,0 +1,154 @@
+# n8n Workflow Development - Git Ignore
+
+# ===================
+# CREDENTIALS & SECRETS
+# ===================
+# NEVER commit these
+.env
+.env.local
+.env.*.local
+credentials*.json
+secrets*.json
+**/credentials/**
+**/secrets/**
+*.key
+*.pem
+
+# BUT DO commit example files
+!.env.example
+!config/mcp-credentials.example.env
+
+# ===================
+# TEMPORARY FILES
+# ===================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*~
+
+# ===================
+# IDE & EDITORS
+# ===================
+.vscode/
+.idea/
+*.sublime-*
+.project
+.settings/
+
+# ===================
+# OS FILES
+# ===================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===================
+# NODE.JS
+# ===================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn
+
+# ===================
+# PYTHON
+# ===================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+
+# ===================
+# LOGS
+# ===================
+logs/
+.claude/logs/
+*.log
+npm-debug.log*
+
+# ===================
+# BUILD OUTPUTS
+# ===================
+dist/
+build/
+out/
+
+# ===================
+# CACHE
+# ===================
+.cache/
+*.cache
+
+# ===================
+# WORKFLOW SPECIFIC
+# ===================
+# Keep workflow JSONs but ignore exports with credentials
+*-with-credentials.json
+*-export-full.json
+
+# Backup files (keep in separate backup system)
+# workflows/**/*.backup.json  # Uncomment if you want to ignore backups
+
+# ===================
+# RESEARCH & TEMP FILES
+# ===================
+# Personal research dumps and temporary files
+*_infodump.txt
+*_dump.txt
+youtube discord reddit Scraping.txt
+nul
+
+# Temp debug files (move to /old instead of committing)
+temp-*.json
+temp-*.txt
+temp_*.json
+test-payload*.json
+commit-message.txt
+*_login.html
+*_verify.json
+
+# ===================
+# MCP SERVERS
+# ===================
+# External MCP server installations
+youtube-mcp-server/
+discord-mcp-server/
+reddit-mcp-server/
+
+# ===================
+# LARGE DATA FILES
+# ===================
+# Consider using Git LFS for these if needed
+# context/youtube-knowledge/video-index.json  # Uncomment if too large
+# context/youtube-knowledge/transcripts/*.json
+
+# ===================
+# PACKAGE MANAGERS
+# ===================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+n8n Discord bot help.csv
+n8n Discord general.csv
+n8n reddit post 1.txt
+
+# ===================
+# MCP & ENV SAFETY
+# ===================
+mcp.json
+**/mcp.json
+mcp-server-config.json
+.env
+.env.*
+!.env.example

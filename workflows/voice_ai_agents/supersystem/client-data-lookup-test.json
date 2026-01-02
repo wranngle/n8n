@@ -1,0 +1,52 @@
+{
+  "name": "[DEV] Supersystem - Client Data Lookup (Test)",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Client Lookup",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "webhookId": "client-lookup-test",
+      "parameters": {
+        "path": "client-lookup-test",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "simulate-lookup",
+      "name": "Simulate Client Lookup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Simulate client data lookup\nconst input = $json.body || $json;\nconst phone = input.phone || '';\nconst email = input.email || '';\nconst conversationId = input.conversation_id || '';\n\n// Mock client database\nconst mockClients = {\n  '+15551234567': {\n    first_name: 'John',\n    last_name: 'Smith',\n    company: 'Acme Corp',\n    account_type: 'Premium',\n    loyalty_tier: 'Gold',\n    last_interaction: 'Called 3 days ago about demo',\n    notes: 'Prefers morning calls'\n  },\n  '+15559876543': {\n    first_name: 'Jane',\n    last_name: 'Doe',\n    company: 'Tech Startup Inc',\n    account_type: 'Standard',\n    loyalty_tier: 'Silver',\n    last_interaction: 'First-time caller',\n    notes: ''\n  },\n  'john@acme.com': {\n    first_name: 'John',\n    last_name: 'Smith',\n    company: 'Acme Corp',\n    account_type: 'Premium',\n    loyalty_tier: 'Gold',\n    last_interaction: 'Called 3 days ago about demo',\n    notes: 'Prefers morning calls'\n  }\n};\n\n// Lookup by phone first, then email\nlet client = null;\nlet lookupKey = null;\n\nif (phone && mockClients[phone]) {\n  client = mockClients[phone];\n  lookupKey = phone;\n} else if (email && mockClients[email]) {\n  client = mockClients[email];\n  lookupKey = email;\n}\n\nif (client) {\n  return {\n    json: {\n      success: true,\n      client: client,\n      cache_hit: true,\n      lookup_key: lookupKey,\n      latency_ms: Math.floor(Math.random() * 10) + 2,\n      source: 'mock_database'\n    }\n  };\n} else {\n  return {\n    json: {\n      success: true,\n      client: null,\n      cache_hit: false,\n      lookup_key: phone || email || 'none',\n      latency_ms: Math.floor(Math.random() * 10) + 2,\n      message: 'Client not found - new caller'\n    }\n  };\n}"
+      }
+    },
+    {
+      "id": "respond-success",
+      "name": "Respond with Client Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [440, 0],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Client Lookup": {
+      "main": [[{"node": "Simulate Client Lookup", "type": "main", "index": 0}]]
+    },
+    "Simulate Client Lookup": {
+      "main": [[{"node": "Respond with Client Data", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {"executionOrder": "v1"},
+  "staticData": null,
+  "tags": []
+}

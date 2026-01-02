@@ -1,0 +1,99 @@
+{
+  "pattern_name": "ElevenLabs Outbound Call with Client Data",
+  "description": "Initiate an outbound call with personalized client data injection",
+  "version": "1.0",
+  "last_updated": "2025-12-27",
+  
+  "use_case": "When you need to make automated outbound calls with dynamic, personalized content",
+  
+  "prerequisites": [
+    "ElevenLabs API key configured",
+    "Agent created with appropriate system prompt",
+    "Phone number purchased and linked to agent",
+    "Webhook configured for call completion events"
+  ],
+  
+  "http_request_template": {
+    "method": "POST",
+    "url": "https://api.elevenlabs.io/v1/convai/conversation/initiate_outbound_call",
+    "headers": {
+      "Content-Type": "application/json",
+      "xi-api-key": "{{ $credentials.httpHeaderAuth.value }}"
+    },
+    "body": {
+      "agent_id": "{{ $json.agent_id }}",
+      "to_number": "{{ $json.phone_number }}",
+      "from_number_id": "{{ $json.from_number_id }}",
+      "conversation_config_override": {
+        "agent": {
+          "prompt": {
+            "prompt": "You are calling {{ dynamic_variables.name }} about their inquiry regarding {{ dynamic_variables.topic }}. Be professional and helpful."
+          }
+        },
+        "dynamic_variables": {
+          "name": "{{ $json.client_name }}",
+          "topic": "{{ $json.inquiry_topic }}",
+          "company": "{{ $json.company_name }}"
+        }
+      }
+    }
+  },
+  
+  "n8n_node_config": {
+    "type": "n8n-nodes-base.httpRequest",
+    "typeVersion": 4.2,
+    "parameters": {
+      "method": "POST",
+      "url": "https://api.elevenlabs.io/v1/convai/conversation/initiate_outbound_call",
+      "authentication": "predefinedCredentialType",
+      "nodeCredentialType": "httpHeaderAuth",
+      "sendHeaders": true,
+      "headerParameters": {
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "sendBody": true,
+      "specifyBody": "json",
+      "jsonBody": "={{ JSON.stringify({ agent_id: $json.agent_id, to_number: $json.phone_number, from_number_id: $json.from_number_id, conversation_config_override: { agent: { prompt: { prompt: `You are calling ${$json.client_name}...` } }, dynamic_variables: { name: $json.client_name } } }) }}"
+    },
+    "credentials": {
+      "httpHeaderAuth": {
+        "id": "eR7srDUHDyZLIZgh",
+        "name": "ElevenLabs API Key"
+      }
+    }
+  },
+  
+  "error_handling": {
+    "429_rate_limit": {
+      "detection": "statusCode === 429",
+      "action": "Wait and retry with exponential backoff",
+      "max_retries": 3,
+      "initial_delay_ms": 5000
+    },
+    "400_bad_request": {
+      "detection": "statusCode === 400",
+      "action": "Check phone number format (E.164), verify agent_id exists",
+      "retryable": false
+    },
+    "call_failed": {
+      "detection": "response.status === 'failed'",
+      "action": "Log failure reason, optionally retry later",
+      "common_reasons": ["busy", "no-answer", "invalid_number"]
+    }
+  },
+  
+  "related_patterns": [
+    "patterns/call-completed-webhook.json",
+    "patterns/rate-limit-queue.json"
+  ],
+  
+  "documentation_refs": [
+    "docs/elevenlabs-twilio-failure-modes.md",
+    "docs/elevenlabs-twilio-client-data-mvp.md"
+  ]
+}

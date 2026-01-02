@@ -1,0 +1,269 @@
+# ElevenLabs Integration Manifest
+# The definitive source of truth for ElevenLabs integration
+
+service:
+  name: "ElevenLabs"
+  description: "AI-powered voice synthesis, conversational AI agents, and audio processing"
+  website: "https://elevenlabs.io"
+  docs_url: "https://elevenlabs.io/docs"
+  api_base: "https://api.elevenlabs.io"
+  
+mcp_server:
+  connected: true
+  server_name: "elevenlabs-mcp"
+  tool_prefix: "mcp__elevenlabs-mcp__"
+  tool_count: 24
+  
+subscription:
+  tier: "creator"
+  character_limit: 110000
+  concurrent_limit: 5
+  requests_per_min: 100
+  
+capabilities:
+  - category: "Text-to-Speech"
+    tools:
+      - name: "text_to_speech"
+        purpose: "Convert text to audio with voice selection"
+        cost_warning: true
+      - name: "list_models"
+        purpose: "List TTS models (eleven_v3, multilingual_v2, flash, turbo)"
+      - name: "search_voices"
+        purpose: "Search existing voices in library"
+      - name: "get_voice"
+        purpose: "Get voice details by ID"
+      - name: "search_voice_library"
+        purpose: "Search global ElevenLabs voice library"
+        
+  - category: "Speech-to-Text"
+    tools:
+      - name: "speech_to_text"
+        purpose: "Transcribe audio files with optional diarization"
+        cost_warning: true
+        
+  - category: "Voice Cloning"
+    tools:
+      - name: "voice_clone"
+        purpose: "Clone voice from audio samples"
+        cost_warning: true
+      - name: "text_to_voice"
+        purpose: "Create voice from text description"
+        cost_warning: true
+      - name: "create_voice_from_preview"
+        purpose: "Save generated voice to library"
+        cost_warning: true
+        
+  - category: "Audio Processing"
+    tools:
+      - name: "speech_to_speech"
+        purpose: "Transform audio from one voice to another"
+        cost_warning: true
+      - name: "isolate_audio"
+        purpose: "Remove background noise from audio"
+        cost_warning: true
+      - name: "text_to_sound_effects"
+        purpose: "Generate sound effects from text"
+        cost_warning: true
+      - name: "play_audio"
+        purpose: "Play audio file locally"
+        
+  - category: "Music Generation"
+    tools:
+      - name: "compose_music"
+        purpose: "Generate music from prompt or composition plan"
+        cost_warning: true
+      - name: "create_composition_plan"
+        purpose: "Create structured music composition plan"
+        
+  - category: "Conversational AI Agents"
+    tools:
+      - name: "create_agent"
+        purpose: "Create voice AI agent with custom config"
+        cost_warning: true
+      - name: "list_agents"
+        purpose: "List all agents in account"
+      - name: "get_agent"
+        purpose: "Get agent details by ID"
+      - name: "add_knowledge_base_to_agent"
+        purpose: "Add documents/URLs to agent knowledge"
+        cost_warning: true
+        
+  - category: "Conversations"
+    tools:
+      - name: "list_conversations"
+        purpose: "List agent conversations with filters"
+      - name: "get_conversation"
+        purpose: "Get conversation with full transcript"
+        
+  - category: "Telephony"
+    tools:
+      - name: "list_phone_numbers"
+        purpose: "List phone numbers in account"
+      - name: "make_outbound_call"
+        purpose: "Initiate outbound call via agent"
+        cost_warning: true
+
+  - category: "Account"
+    tools:
+      - name: "check_subscription"
+        purpose: "Check quota usage and limits"
+
+documentation_sources:
+  - type: "ref-tools"
+    module_id: "elevenlabs"
+    coverage: "comprehensive"
+  - type: "youtube"
+    query: "elevenlabs n8n voice agent"
+    indexed_count: 26
+    key_tutorials:
+      - "ElevenLabs Voice Agents Can Now Send SMS"
+      - "FIRST EVER No Code ElevenLabs Voice Agent"
+      - "The EASIEST way to build NO-CODE Elevenlabs Voice Agents"
+      - "How To Connect ElevenLabs Conversational AI to Twilio"
+  - type: "discord"
+    indexed_count: 2
+    
+credentials:
+  stored: true
+  type: "httpHeaderAuth"
+  header_name: "xi-api-key"
+  api_key_format: "sk_*"
+  n8n_credential_id: "eR7srDUHDyZLIZgh"
+  env_file: "workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/env/.env.elevenlabs"
+  
+agents:
+  - id: "agent_3801kdf7fkhcev8tkhpm92d65jws"
+    name: "Client Data Test Agent"
+    purpose: "Testing client data injection"
+  - id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+    name: "Wranngle Lead Qualifier"
+    purpose: "Production lead qualification calls"
+  - id: "agent_8001kdgp7qbyf4wvhs540be78vew"
+    name: "Sarah - Wranngle Receptionist"
+    purpose: "Demo receptionist with SMS booking tool"
+    n8n_workflow: "qcQSo3be6qe79zBn"
+    webhook: "https://n8n.wranngle.com/webhook/sarah-send-sms"
+    
+phone_numbers:
+  - id: "phnum_1901kdgev877fep99ex5fc5abb3m"
+    number: "+18882662193"
+    
+webhooks:
+  - id: "351df617fc4c4e61ab33e91020b890c7"
+    url: "https://n8n.wranngle.com/webhook/call-completed"
+    events: ["transcript", "call_initiation_failure"]
+    secret: "wsec_65d83b3e7da414d625a1553462a6465647476c291101430a0552050143487cc1"
+    
+known_issues:
+  - id: "EL-001"
+    description: "Rate limit 429 on concurrent requests"
+    resolution: "Implement queue with max 5 concurrent (Creator tier)"
+    documented_in: "docs/elevenlabs-twilio-failure-modes.md"
+  - id: "EL-002"
+    description: "Client data variables not injected"
+    resolution: "Use conversation_config_override with dynamic_variables"
+    documented_in: "docs/elevenlabs-twilio-client-data-mvp.md"
+  - id: "EL-003"
+    description: "Webhook signature validation"
+    resolution: "Use x-webhook-secret header with stored secret"
+    
+patterns:
+  - name: "outbound_call"
+    file: "patterns/outbound-call.json"
+    description: "Initiate outbound call with client data"
+  - name: "call_completed_webhook"
+    file: "patterns/call-completed-webhook.json"
+    description: "Handle post-call webhook with transcript"
+  - name: "tts_basic"
+    file: "patterns/tts-basic.json"
+    description: "Simple text-to-speech conversion"
+  - name: "sarah_receptionist"
+    file: "patterns/sarah-receptionist-prompt.md"
+    description: "Optimized receptionist prompt with SMS tool"
+  - name: "sarah_sms_workflow"
+    file: "workflows/voice_ai_agents/sarah-sms-tool.json"
+    description: "n8n webhook workflow for SMS booking tool"
+
+# ============================================
+# AUTOMATED TESTING INFRASTRUCTURE
+# ============================================
+testing:
+  description: "Automated voice agent testing without manual phone calls"
+  api_endpoint: "POST /v1/convai/agents/{agent_id}/simulate-conversation"
+  
+  workflow:
+    id: "IZIj5oh3VwCVJb34"
+    name: "Voice Agent Tester - Automated Simulation"
+    file: "workflows/voice_ai_agents/voice-agent-tester.json"
+    triggers:
+      - type: "manual"
+        description: "Run tests on demand"
+      - type: "schedule"
+        frequency: "every 24 hours"
+        description: "Daily regression testing"
+        
+  scenarios_library: "workflows/voice_ai_agents/test-scenarios.yaml"
+  
+  scenario_categories:
+    - name: "happy_path"
+      description: "Ideal user flows that should succeed"
+      priority: "critical"
+    - name: "edge_case"
+      description: "Unusual but valid user behaviors"
+      priority: "high"
+    - name: "stress_test"
+      description: "Difficult or unusual scenarios"
+      priority: "medium"
+    - name: "tool_validation"
+      description: "Tests tool execution timing and behavior"
+      priority: "critical"
+      
+  evaluation_features:
+    - "Custom evaluation criteria per scenario"
+    - "Tool call validation (expected vs actual)"
+    - "Transcript analysis"
+    - "Success rate tracking"
+    - "Failure alerting via webhook"
+    
+  alerts:
+    webhook: "https://n8n.wranngle.com/webhook/voice-agent-test-alert"
+    notify_on:
+      - "any test failure"
+      - "success rate below 80%"
+      - "critical scenario failure"
+    
+models:
+  tts:
+    - id: "eleven_v3"
+      name: "Eleven v3 (alpha)"
+      languages: 76
+      quality: "highest"
+    - id: "eleven_multilingual_v2"
+      name: "Eleven Multilingual v2"
+      languages: 29
+      quality: "high"
+      recommended: true
+    - id: "eleven_flash_v2_5"
+      name: "Eleven Flash v2.5"
+      languages: 32
+      quality: "good"
+      latency: "lowest"
+    - id: "eleven_turbo_v2_5"
+      name: "Eleven Turbo v2.5"
+      languages: 32
+      quality: "balanced"
+      
+voices:
+  premade:
+    - id: "EXAVITQu4vr4xnSDxMaL"
+      name: "Sarah"
+      description: "Mature, Reassuring, Confident"
+    - id: "CwhRBWXzGAHq8TQ4Fs17"
+      name: "Roger"
+      description: "Laid-Back, Casual, Resonant"
+    - id: "SAz9YHcvj6GT2YYXdXww"
+      name: "River"
+      description: "Relaxed, Neutral, Informative"
+      
+last_updated: "2025-12-27"
+research_depth: "comprehensive"

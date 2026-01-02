@@ -1,0 +1,254 @@
+{
+  "service": "elevenlabs",
+  "last_updated": "2025-12-27",
+  "total_sources": 47,
+  
+  "documentation": {
+    "official": [
+      {
+        "type": "api_reference",
+        "url": "https://elevenlabs.io/docs/api-reference/introduction",
+        "coverage": "comprehensive"
+      },
+      {
+        "type": "agents_platform",
+        "url": "https://elevenlabs.io/docs/agents-platform/overview",
+        "topics": ["agent_creation", "tools", "workflows", "testing"]
+      },
+      {
+        "type": "prompting_guide",
+        "url": "https://elevenlabs.io/docs/agents-platform/best-practices/prompting-guide",
+        "key_insight": "System prompt structure for voice agents"
+      },
+      {
+        "type": "agent_workflows",
+        "url": "https://elevenlabs.io/docs/agents-platform/customization/agent-workflows",
+        "topics": ["workflow_design", "state_management"]
+      },
+      {
+        "type": "tools_integration",
+        "url": "https://elevenlabs.io/docs/conversational-ai/customization/tools",
+        "topics": ["webhook_tools", "mcp_servers", "function_calling"]
+      },
+      {
+        "type": "simulate_conversations",
+        "url": "https://elevenlabs.io/docs/agents-platform/guides/simulate-conversations",
+        "key_insight": "Testing agents without phone calls"
+      },
+      {
+        "type": "agent_analysis",
+        "url": "https://elevenlabs.io/docs/conversational-ai/customization/agent-analysis",
+        "topics": ["conversation_metrics", "quality_analysis"]
+      },
+      {
+        "type": "chat_mode",
+        "url": "https://elevenlabs.io/docs/agents-platform/guides/chat-mode",
+        "key_insight": "Text-only agent interactions"
+      }
+    ],
+    "github": [
+      {
+        "repo": "elevenlabs/elevenlabs-docs",
+        "path": "fern/conversational-ai/pages/customization/client-tools.mdx",
+        "url": "https://github.com/elevenlabs/elevenlabs-docs/blob/main/fern/conversational-ai/pages/customization/client-tools.mdx",
+        "topic": "client_tools"
+      }
+    ]
+  },
+  
+  "youtube_tutorials": [
+    {
+      "title": "ElevenLabs Voice Agents Can Now Send SMS (Game Changer)",
+      "channel": "Bart Slodyczka",
+      "url": "https://youtube.com/watch?v=E2qqwlVBzaE",
+      "relevance": 0.9,
+      "tags": ["voice", "sms", "no-code"]
+    },
+    {
+      "title": "ElevenLabs Voice Agents Are So Easy to Build (No Code!)",
+      "channel": "Nate Herk | AI Automation",
+      "url": "https://youtube.com/watch?v=Je4EAscnKK0",
+      "relevance": 0.89,
+      "tags": ["beginner", "ai-agents", "webhook", "voice"]
+    },
+    {
+      "title": "FIRST EVER No Code ElevenLabs Voice Agent",
+      "channel": "Bart Slodyczka",
+      "url": "https://youtube.com/watch?v=qYuByOme09s",
+      "relevance": 0.88,
+      "tags": ["voice", "no-code", "n8n"]
+    },
+    {
+      "title": "The EASIEST way to build NO-CODE Elevenlabs Voice Agents (n8n tutorial)",
+      "channel": "Bart Slodyczka",
+      "url": "https://youtube.com/watch?v=nmtC9_NyYXc",
+      "relevance": 0.88,
+      "tags": ["beginner", "ai-agents", "rag", "voice", "n8n"]
+    },
+    {
+      "title": "Having an Actual Conversation with Data Using an ElevenLabs Voice Agent and n8n",
+      "channel": "Nate Herk | AI Automation",
+      "url": "https://youtube.com/watch?v=pJYm7MOyMH0",
+      "relevance": 0.85,
+      "tags": ["ai-agents", "webhook", "rag", "voice", "database"]
+    },
+    {
+      "title": "How To Connect ElevenLabs Conversational AI to Twilio (Full Code)",
+      "channel": "Bart Slodyczka",
+      "url": "https://youtube.com/watch?v=_BxzbGh9uvk",
+      "relevance": 0.85,
+      "tags": ["twilio", "voice", "api", "advanced"]
+    },
+    {
+      "title": "I Built an AI Voice Agent That Sells Cars (No Code)",
+      "channel": "Ed Hill | AI Automation",
+      "url": "https://youtube.com/watch?v=bMz98sDcV8k",
+      "relevance": 0.82,
+      "tags": ["voice", "business", "no-code"]
+    },
+    {
+      "title": "How To Do Call Forwarding With ElevenLabs Conversational AI",
+      "channel": "Bart Slodyczka",
+      "url": "https://youtube.com/watch?v=IvsrqaOCPZw",
+      "relevance": 0.80,
+      "tags": ["call_forwarding", "voice"]
+    },
+    {
+      "title": "I Built an AI Voice Travel Agent with ElevenLabs and n8n",
+      "channel": "Nate Herk | AI Automation",
+      "url": "https://youtube.com/watch?v=l93cXz51PDY",
+      "relevance": 0.78,
+      "tags": ["voice", "n8n", "travel"]
+    },
+    {
+      "title": "I Built an AI Voice Agent That Qualifies My Leads (No Code)",
+      "channel": "Ed Hill | AI Automation",
+      "url": "https://youtube.com/watch?v=2q7UTxII16I",
+      "relevance": 0.78,
+      "tags": ["voice", "lead_qualification", "no-code"]
+    },
+    {
+      "title": "I Built an AI Voice Agent That Never Misses a Call (No Code)",
+      "channel": "Ed Hill | AI Automation",
+      "url": "https://youtube.com/watch?v=HGBMr1RQliY",
+      "relevance": 0.77,
+      "tags": ["voice", "inbound", "no-code"]
+    },
+    {
+      "title": "Learn Voice Agents Now, Thank Me Later (Full Beginner's Guide)",
+      "channel": "Nate Herk | AI Automation",
+      "url": "https://youtube.com/watch?v=zWLZ3bVVwD8",
+      "relevance": 0.75,
+      "tags": ["beginner", "course", "voice"]
+    },
+    {
+      "title": "Part 1: How to Build an AI Voice Agent using OpenAI Realtime API",
+      "channel": "Bart Slodyczka",
+      "url": "https://youtube.com/watch?v=AZ0WziqO_QA",
+      "relevance": 0.70,
+      "tags": ["openai", "realtime", "voice", "comparison"]
+    }
+  ],
+  
+  "discord_qa": [
+    {
+      "title": "How to pass binary audio file (elevenlabs music) as input into Analyse Audio node",
+      "author": "enrique_47185",
+      "date": "2025-09-09",
+      "topic": "audio_processing",
+      "url": "https://cdn.discordapp.com/attachments/1095373404300910632/1415002527266504725/image.png"
+    }
+  ],
+  
+  "local_documentation": [
+    {
+      "file": "docs/elevenlabs-twilio-failure-modes.md",
+      "topics": ["error_handling", "rate_limits", "retry_strategies", "call_failures"],
+      "research_sources": 27
+    },
+    {
+      "file": "docs/elevenlabs-twilio-client-data-mvp.md",
+      "topics": ["client_data_injection", "dynamic_variables", "conversation_config_override"]
+    },
+    {
+      "file": "workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/README.md",
+      "topics": ["project_setup", "architecture", "testing"]
+    },
+    {
+      "file": "workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/docs/elevenlabs/api-reference.md",
+      "topics": ["api_endpoints", "authentication", "webhooks"]
+    }
+  ],
+  
+  "existing_workflows": [
+    {
+      "name": "elevenlabs-call-completed",
+      "file": "workflows/voice_ai_agents/elevenlabs-call-completed.json",
+      "purpose": "Handle post-call webhook with transcript"
+    },
+    {
+      "name": "elevenlabs-twilio-bulletproof",
+      "file": "workflows/voice_ai_agents/elevenlabs-twilio-bulletproof.json",
+      "purpose": "Robust outbound calling with error handling"
+    },
+    {
+      "name": "elevenlabs-twilio-client-data",
+      "file": "workflows/voice_ai_agents/elevenlabs-twilio-client-data.json",
+      "purpose": "Client data injection for personalized calls"
+    },
+    {
+      "name": "pipedrive-lead-caller",
+      "file": "workflows/voice_ai_agents/pipedrive-lead-caller.json",
+      "purpose": "Automated lead calling from Pipedrive CRM"
+    }
+  ],
+  
+  "n8n_templates": [
+    {
+      "id": 5008,
+      "name": "AI Cold Calling with Vapi",
+      "relevance": "similar_pattern"
+    },
+    {
+      "id": 4368,
+      "name": "AI Real Estate Agent",
+      "relevance": "voice_data_integration"
+    },
+    {
+      "id": 3741,
+      "name": "Error handling with exponential backoff",
+      "relevance": "retry_patterns"
+    }
+  ],
+  
+  "key_patterns": {
+    "outbound_call_with_client_data": {
+      "description": "Initiate outbound call with personalized data injection",
+      "critical_fields": ["agent_id", "to_number", "from_number_id", "conversation_config_override"],
+      "documented_in": "docs/elevenlabs-twilio-client-data-mvp.md"
+    },
+    "webhook_signature_validation": {
+      "description": "Validate incoming webhook signatures",
+      "header": "x-webhook-secret",
+      "documented_in": "workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/tests/elevenlabs/"
+    },
+    "rate_limit_handling": {
+      "description": "Handle 429 errors with appropriate backoff",
+      "strategies": ["queue_throttling", "exponential_backoff", "concurrent_limit"],
+      "documented_in": "docs/elevenlabs-twilio-failure-modes.md"
+    }
+  },
+  
+  "api_endpoints": {
+    "base_url": "https://api.elevenlabs.io",
+    "outbound_call": "POST /v1/convai/conversation/initiate_outbound_call",
+    "agents": "GET/POST /v1/convai/agents",
+    "conversations": "GET /v1/convai/conversations"
+  },
+  
+  "research_gaps": [
+    "MCP server integration patterns (documentation pending)",
+    "Multi-language agent best practices",
+    "Custom tool integration examples"
+  ]
+}

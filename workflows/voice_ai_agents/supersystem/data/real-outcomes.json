@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-12-30T22:47:41.131Z",
+  "agent_id": "agent_8001kdgp7qbyf4wvhs540be78vew",
+  "agent_name": "[DEV] Sarah - Wranngle Receptionist",
+  "changes_made": {
+    "prompt_before": 15366,
+    "prompt_after": 16739,
+    "chars_added": 1373,
+    "fixes_applied": 5,
+    "fix_names": [
+      "TOPIC_WHIPLASH (context retention)",
+      "CORRECTION_CASCADE (use latest name)",
+      "ANGRY_IMPATIENT (calm professional)",
+      "SPELLED_OUT_NUMBER (parse words)",
+      "TOOL_CONFIRMATION_TRAP (wait for tool)"
+    ]
+  },
+  "verification": {
+    "fix_marker_present": true,
+    "api_update_success": true,
+    "phone_number_ready": "phnum_1901kdgev877fep99ex5fc5abb3m"
+  }
+}

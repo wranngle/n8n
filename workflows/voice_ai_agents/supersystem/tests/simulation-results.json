@@ -1,0 +1,1252 @@
+{
+  "timestamp": "2025-12-30T23:15:58.695Z",
+  "agent_id": "agent_8001kdgp7qbyf4wvhs540be78vew",
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "success_rate": 100
+  },
+  "results": [
+    {
+      "scenario_id": "known-client-greeting",
+      "scenario_name": "Known Client - Personalized Greeting",
+      "category": "pre_call_integration",
+      "priority": "critical",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 19,
+      "duration_ms": 16994,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, this is Dr. Smith from Acme Dental. I've called before.  I'm hoping to schedule another demo for our new office location. Do you remember me?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "It is great to hear from you again, Doctor Smith.  I certainly remember Acme Dental,  and I would be happy to help you set up a demo for your new location. What challenges are you looking to solve at this new office?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Great!  I'm glad you remember us.  We're aiming to streamline our patient scheduling and billing processes at the new location, hoping to avoid the bottlenecks we sometimes experience at our main office.  We also want to ensure a smooth integration with our existing systems. What information do you ",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That makes perfect sense, and we can definitely help streamline those scheduling and billing workflows for your new location. To get started, what is the best callback number for you?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "The best number to reach me at is 555-123-4567. Is there any other information I can provide at this time?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Got it, five five five, one two three, four five six seven.  Since you are expanding, what is your expected monthly call volume for the new office?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "I anticipate around 200-250 calls per month at the new office. Does that help?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That is very helpful, thank you.  Since we have those details, would you like me to text you the booking link to schedule that demo?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, that would be perfect. Thank you.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I will text the booking link to five five five, one two three,  four five six seven. One moment while I send that over.\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it.  You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, I think that's all I need for now.  I appreciate your help, Sarah. I'll book a demo using the link you sent.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're all set, Doctor Smith.  I have your callback number as five five five, one two three, four five six seven,  and I've noted your interest in streamlining scheduling for the new Acme Dental location. That link will let you book a fifteen minute call with our team.  Thanks for calling Wranngle S",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Note: The call has ended.",
+          "tool_calls": []
+        }
+      ]
+    },
+    {
+      "scenario_id": "new-client-discovery",
+      "scenario_name": "New Client - Full Discovery",
+      "category": "pre_call_integration",
+      "priority": "critical",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 19,
+      "duration_ms": 31749,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, I'm Maria.  A friend told me a bit about AI voice agents and how they could help my business. I run a pet grooming business and I'm calling to learn more.  I'm new to all of this,  so any information you can share would be great.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Hi Maria, it is great to meet you.  We specialize in AI voice receptionists that can handle calls for businesses like your pet grooming shop.  To see how we can best help, how are you currently handling your calls?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Right now, it's just me answering the phone,  along with grooming the pets and managing everything else. It gets pretty hectic!  Sometimes I miss calls because I'm in the middle of something, or I have to put people on hold for a long time. It's definitely not the most efficient system.  What kind o",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That sounds like a lot to manage on your own.  Our AI can answer common questions, take messages,  and even send booking links so you can focus on the pets. What are the main challenges you are looking to solve with your phone handling?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "That sounds exactly like what I need!  The biggest challenge is definitely missing calls when I'm with a pet, and then playing phone tag to get back to people.  Also, answering the same questions over and over takes up a lot of my time.  If the AI could handle basic questions about pricing, hours, a",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "It can definitely handle those common questions and send a link for clients to book themselves.  While it doesn't book directly into your calendar yet, it makes the process much smoother for everyone. What is your current monthly call volume like?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hmm, not being able to book directly is a bit of a bummer,  but still, sending the link is better than what I'm doing now.  I would say on average I get around 100 calls per month. Does the pricing depend on the call volume?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That makes sense, and one hundred calls is a great volume for an AI assistant to manage.  Our setup starts at thirty-five hundred dollars with monthly plans from five hundred dollars. Would you like me to text you a link to book a demo call with our team?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Ouch, that sounds a bit pricey for me right now, especially the setup fee.  Are there any options for smaller businesses or payment plans available?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I understand that the initial investment is a significant consideration for a small business.  Our team would be happy to discuss your specific needs and see what options might work best for you during a demo. Would you like me to text you that booking link so you can chat with them?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Okay, a demo couldn't hurt.  Yes, please text me the link.  My number is 555-888-9999. Thanks!",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it. You should see it in a few seconds.  Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, I think that's all for now.  I'll check out the link and see about scheduling a demo. Thanks for your time, Sarah!",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "You're all set.  That link will let you book a fifteen-minute call with our team.  Thanks for calling Wranngle Systems.  Have a great day!",
+          "tool_calls": []
+        }
+      ]
+    },
+    {
+      "scenario_id": "successful-call-orchestration",
+      "scenario_name": "Successful Call - Full Orchestration",
+      "category": "post_call_integration",
+      "priority": "critical",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 20,
+      "duration_ms": 19963,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, thanks for reaching out.  I'm Jake from a law firm, and I'm interested in learning more about AI voice agents.  Could you tell me a bit about what Wranngle Systems offers in that area?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Hi Jake, it is great to meet you.  We provide custom AI voice receptionists specifically designed for law firms to handle calls and scheduling.  How are you currently managing your firm's phone calls?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "It's good to meet you too, Sarah.  We're currently using a traditional phone system with a receptionist,  but we're exploring options to improve efficiency and reduce costs. The receptionist is often busy with other tasks and can't always get to every call right away.  An AI voice receptionist sound",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That makes sense, and an AI can definitely help capture those missed opportunities.  Our systems can answer multiple calls at once, screen inquiries,  and even book consultations directly into your calendar. What is your current monthly call volume like at the firm?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "That sounds promising.  Our monthly call volume varies, but on average, we probably handle around 500-700 calls.  The ability to screen inquiries and book consultations automatically would be a huge time-saver. What kind of integrations do you offer with existing calendar systems and CRM software?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That is a solid volume where an AI can really shine.  We integrate with most major calendar systems and legal CRMs to keep your workflow seamless.  What are the main challenges you are facing with your phone handling right now?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "The biggest challenges are probably missed calls when the receptionist is busy,  and the time it takes to manually screen and route calls. Also after hours coverage can be a hassle.  It would be great to have a system that could handle those tasks automatically. What's the process for setting up and",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "We can definitely solve those after-hours and screening issues for you.  Our team handles the full setup and customizes the AI to follow your firm's specific intake process. Since we have covered your needs, would you like me to share our pricing with you?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, please, I'd be interested in hearing about your pricing structure.  Also, what kind of support and maintenance do you provide after the initial setup?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "For a firm your size, our setup starts at thirty-five hundred dollars,  with monthly service starting at five hundred dollars.  We provide ongoing maintenance and support to ensure your AI receptionist is always performing at its best. Would you like me to text you a link to book a demo call with ou",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, that would be great.   Please send the link to 555-777-1234. Thanks!",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Got it.  I will text the booking link to five five five, seven seven seven, one two three four. Just a moment.\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it.  You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Great, I received it. Thanks!  I think that's all for now. I appreciate you answering my questions.  I'll take a look at the link and schedule a demo if it seems like a good fit.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're very welcome, Jake.  I've noted that you're interested in automating your law firm's intake and after-hours calls to help with your volume of seven hundred monthly calls. That link will let you book a fifteen-minute call with our team to dive deeper.  Thanks for your time today and have a gre",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "failed-call-logging",
+      "scenario_name": "Failed Call - Error Logging",
+      "category": "post_call_integration",
+      "priority": "high",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [],
+        "forbidden": [],
+        "actual": [
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 5,
+      "duration_ms": 4424,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Wrong number, sorry.\n \n==!END_CALL!==",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "No problem at all. Have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "sms-success-notification",
+      "scenario_name": "SMS Success - Slack Notification",
+      "category": "tool_integration",
+      "priority": "critical",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 19,
+      "duration_ms": 17142,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, I'm Tony.  I'm calling about AI voice agents for my restaurant. Can you tell me more?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Hi Tony, it's great to meet you.  We specialize in custom AI voice receptionists that can handle your incoming calls.  What specific challenges are you facing with your restaurant's phone handling?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "I'm looking for something to take orders and answer basic questions.  If you have a booking link, I would like to have it texted to me.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I can certainly help with that, Tony.  To make sure we're a good fit, what's your current daily call volume like at the restaurant?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "...",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Are you still there, Tony?  I was just asking about your daily call volume to see how we can best help.",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "About 50 calls a day.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That is a solid volume to manage.  I can definitely get that booking link sent over to you. What is the best phone number to text that to?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "555-PIZZA (555-749-9211)",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Got it, five five five, seven four nine, nine two one one.  I will text the booking link to that number now, is that okay?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it.  You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, that's all. Thanks.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're all set, Tony.  That link will let you book a fifteen minute call with our team. Thanks for calling Wranngle Systems.  Have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "sms-declined-no-notification",
+      "scenario_name": "SMS Declined - No Trigger",
+      "category": "tool_integration",
+      "priority": "high",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [],
+        "forbidden": [
+          "send_sms"
+        ],
+        "actual": [
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 17,
+      "duration_ms": 17128,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, I'm calling because I'm interested in exploring AI voice agents for my accounting firm. Can you tell me more about what Wranngle Systems offers?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That sounds like a great use case for our technology.  We provide custom AI voice receptionists that handle calls, answer questions, and book appointments for professional services.  What specific challenges are you facing with your phone handling right now?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "We're struggling with call overload during peak tax season.  Our receptionists are constantly tied up, leading to long wait times for clients and potential missed business.  We're also looking for a way to provide more consistent and accurate information to callers, especially regarding frequently a",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I completely understand how tax season can overwhelm a team.  Our AI agents are designed to handle that high volume instantly so no client is left waiting.  What is your current monthly call volume like during those peak times?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "During peak season, we typically handle around 5,000 calls per month.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That is a significant volume,  and exactly where our automation can provide the most relief.  Since we have a good feel for your needs, would you like me to text you a link to book a demo call with our team?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No thanks, I prefer email. Just tell me the URL.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "No problem at all.  You can find the booking link and more information at wranngle dot com. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "That's helpful, thanks. I'll check out the website.  I'm also curious about the level of customization you offer.  Can the AI be trained on our specific tax processes and FAQs?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Absolutely.  We specialize in training our AI on your specific business processes and frequently asked questions to ensure accuracy.  It can handle everything from basic intake to complex scheduling based on your firm's unique rules. Is there anything else I can help you with?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "That's great to know. I'm also curious about pricing.  Can you give me a general idea of the cost?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "For an accounting firm with your volume,  setup starts at three thousand five hundred dollars with monthly service from five hundred dollars.  This covers the custom training on your specific tax processes and FAQs. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Okay, that's helpful. I'll take that into consideration.  I think that's all for now. Thanks for your time.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're very welcome.  You're all set, and you can find everything you need at wranngle dot com whenever you're ready.  Thanks for calling Wranngle Systems and have a great day",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "full-data-extraction",
+      "scenario_name": "Full Data Extraction - All Fields",
+      "category": "data_extraction",
+      "priority": "critical",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 17,
+      "duration_ms": 16695,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, thanks for reaching out.  I'm Sarah Johnson, CEO of TechStart Inc. We're a software company with about 50 employees.  I'm calling to explore AI voice agents for our customer support. We're currently handling around 200 calls a day.  What capabilities do you have and what is your pricing?\n\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "It is great to meet you, Sarah.  Since you are looking to capture those two hundred daily calls and handle after-hours support for TechStart,  our AI can manage everything from basic inquiries to complex scheduling.  For a company of your scale, our setup starts at thirty-five hundred dollars with m",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "That sounds promising.  The starting price of $3500 is acceptable and the $500 monthly cost is in the budget,  which is about $5000/month. Before I book a meeting, can you tell me more about how the after-hours support works?  I'd like to understand how the AI handles those missed calls specifically",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Our AI handles after-hours calls by interacting naturally with your customers to gather their details and specific needs.  It can definitely schedule callbacks or collect information to help your team create support tickets the next morning. Would you like me to text that booking link to you now?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, that's great! Please text me the booking link.  I'd like to schedule a demo for next week if possible.  I'm at sarah@techstart.io. Also, can you give me a number to call if I have any questions?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I can certainly help with that.  What is the best phone number to text the booking link to?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "You can text the booking link to my office line at 555-TECH (555-8324). Thanks!",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I have your number as five five five, eight three two four.  I will text the booking link to that number right now.",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Perfect, thank you! I appreciate your help. I look forward to exploring this further.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it. You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, I think that's all for now. I received the link, thank you!  I'll book a demo for next week. I appreciate your time.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You are all set, Sarah.  That link will let you book a fifteen minute call with our team to discuss TechStart's needs.  Thanks for calling Wranngle Systems and have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "minimal-data-extraction",
+      "scenario_name": "Minimal Data Extraction - Quick Call",
+      "category": "data_extraction",
+      "priority": "high",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 9,
+      "duration_ms": 7277,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi, I want to book a demo.  My name is Bob, phone 555-123-1111. Yes you can text me the link.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it.  You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, that is all. Thanks.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're all set.  That link will let you book a fifteen minute call with our team. Thanks for calling Wranngle Systems. Have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "rapid-fire-questions",
+      "scenario_name": "Rapid Fire Questions",
+      "category": "stress_test",
+      "priority": "medium",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [],
+        "forbidden": [],
+        "actual": [],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 5,
+      "duration_ms": 8147,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "What's your pricing? Do you integrate with Salesforce? How long does setup take?  Can I see a demo? Is there a free trial? What about HIPAA compliance?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I can certainly help with those questions.  First, what type of business are you in?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "...",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Are you still there?  I'd love to help with your questions about pricing and HIPAA compliance once I know a bit more about your business.",
+          "tool_calls": []
+        }
+      ]
+    },
+    {
+      "scenario_id": "long-conversation",
+      "scenario_name": "Extended Conversation - 15+ Turns",
+      "category": "stress_test",
+      "priority": "medium",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 29,
+      "duration_ms": 28272,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, I'm Patricia from LongForm LLC. Thanks for reaching out.\n \nI'm looking into your services and have a few questions before we move forward.  To start, could you tell me a bit about your pricing tiers and what each one includes?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Hi Patricia, I would be happy to share our pricing with you.  First, could you tell me what type of business LongForm LLC is in?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "We're a content creation company, focused on long-form articles and marketing materials.  Depending on the month, we could have very different needs,  so pricing flexibility is key for us. What options do you have for different levels of usage?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That makes sense, Patricia. What is your current monthly call volume like at LongForm LLC?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Our call volume varies quite a bit,  so it's hard to give you an exact number.  Some months we might have very few calls, while others we could have hundreds related to new campaigns or client onboarding. What I am trying to figure out is what the best way to work with you is.\n \nGiven that variabili",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I understand that flexibility is important for your business.  Our setup starts at three thousand five hundred dollars, with monthly plans starting at five hundred dollars.  What specific challenges are you currently facing with your phone handling?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Okay, that's good to know about the setup and starting monthly price.\n \nBefore diving into the monthly plans, can you explain the setup process in a bit more detail?  What all is involved, and how long does it typically take to get everything up and running?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "The setup process involves customizing the AI to your specific business needs and workflows.  It typically takes about one to two weeks to get everything fully operational.  Would you like me to text you a booking link so you can discuss the details with our team?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "One to two weeks isn't bad at all.\n \nBefore I commit to a booking,  I'd like to understand what kind of training is required for the AI. Will my team need to spend a lot of time teaching it our specific industry jargon and internal processes, or is it fairly quick to pick things up?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "The AI is designed to learn your specific jargon and processes quickly during the initial setup phase.  Our team handles most of the heavy lifting to ensure it sounds natural and professional for your clients.  Would you like me to text you a booking link to discuss this further?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "That's good to hear that your team handles most of the training.  What kind of ongoing support options are included after the initial setup?  If we run into issues or need to make adjustments down the road, how easily can we get help?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "We provide ongoing support to ensure your AI continues to meet your needs as your business evolves.  You can easily reach out to our team for any adjustments or technical assistance you might require.  Would you like me to text you a booking link to go over these support details?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Okay, good to know there's ongoing support. What is your cancellation policy?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "We offer flexible terms, but the specific details of our cancellation policy are best discussed during a demo call.  Would you like me to text you a booking link so you can go over that with our team?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "I understand.\n  \nDo you have any customer references or case studies available that I could review?  I'd like to see how your system has worked for other content creation companies,  or businesses with similar needs to ours.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "We have several case studies showing how we help businesses manage fluctuating call volumes effectively.  Our team can share those specific examples with you during a demo.  Would you like me to text you the booking link now?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Alright, I think I have a good understanding now.  Yes, you can send me the SMS for booking.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Great. And what is the best number to text that to?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "...",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I'm sorry, I didn't catch that. Are you still there?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, I'm here.  You can send the SMS to 555-123-4567.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Got it.  I'll text the booking link to five five five, one two three, four five six seven. Just sent it. Should arrive in a few seconds.  Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, I think that's all for now. Thank you for your help, Sarah!",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're all set, Patricia.  That link will let you book a fifteen minute call with our team to discuss your needs at LongForm LLC.  Thanks for calling Wranngle Systems. Have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "garbled-phone-number",
+      "scenario_name": "Garbled Phone Number - Recovery",
+      "category": "error_recovery",
+      "priority": "high",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 23,
+      "duration_ms": 21412,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Hi Sarah, I'm calling about AI voice agents.  My name is Chris.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Hi Chris. I can certainly help with that.  What type of business are you in?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "I'm in the retail business.  We sell sporting goods.  Can you tell me a bit about your AI voice agent offerings?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "We provide custom AI voice receptionists that handle inbound calls, answer questions,  and book appointments. How are you currently managing your phone calls during busy retail hours?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Currently, we have a dedicated receptionist, but during peak hours and lunch breaks,  customers often face long wait times or get sent to voicemail.  This leads to frustration and potentially lost sales. I'm hoping an AI voice agent could alleviate some of that burden. What kind of information can y",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Our AI agents can handle common questions about store hours, locations, and product availability,  while also booking appointments or demos.  It sounds like we could really help reduce those wait times for your sporting goods customers. What's the biggest challenge you're facing with your current ph",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "The biggest challenge is definitely the wait times, especially on weekends.  Customers get tired of waiting and sometimes just hang up.  Also, our receptionist is often tied up with answering basic questions when she could be focusing on other tasks. What kind of integrations do your AI voice agents",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "We can definitely integrate with various scheduling and software platforms to streamline your workflow.  Since you're looking to solve those weekend wait times,  I'd love to get you more details. What is your current monthly call volume like?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "It varies, but on average we get around 500-600 calls per month, with a spike on weekends. What is your phone number?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Our phone number is eight eight eight, two six six,  two one nine three.  Since you're handling around six hundred calls, I'd love to get you scheduled for a demo. Would you like me to text you a booking link?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "It's five five five... uh... one two...  wait, three four... no, one two three four.  And yes, a text with a booking link would be great.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I want to make sure I have that right.  Is your number five five five, one two three four?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "555-123-4567",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Got it.  I will text the booking link to five five five, one two three, four five six seven. Is that correct?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, that's correct. Thank you.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it.  You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, I think that's all for now.  I'll check out the booking link. Thanks for your help!",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're very welcome, Chris.  You're all set, and that link will let you book a fifteen-minute call with our team.  Thanks for calling Wranngle Systems and have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario_id": "interrupted-mid-flow",
+      "scenario_name": "Interrupted Mid-Flow",
+      "category": "error_recovery",
+      "priority": "medium",
+      "status": "completed",
+      "overall_passed": true,
+      "tool_validation": {
+        "passed": true,
+        "expected": [
+          "send_sms"
+        ],
+        "forbidden": [],
+        "actual": [
+          "send_sms",
+          "end_call"
+        ],
+        "missing": [],
+        "unwanted": []
+      },
+      "evaluations": {},
+      "turn_count": 19,
+      "duration_ms": 16028,
+      "retries": 0,
+      "transcript": [
+        {
+          "role": "agent",
+          "message": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yeah, hey, I'm Alex.  I'm looking to get a quote for your services.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "Hi Alex. I can certainly help with that.  What type of business are you in?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "I run a small online retail operation.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "That sounds interesting. How are you currently handling your incoming calls?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "We have a system, but it's not great.  What are your prices like?",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I understand.  Our setup starts at three thousand five hundred dollars, with monthly plans from five hundred. What challenges are you looking to solve with your phone handling?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Just send me the link.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I can certainly do that for you.  What is the best phone number to text the booking link to?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "555-999-0000",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "I have that as five five five, nine nine nine,  zero zero zero zero. Would you like me to text you the booking link now?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "Yes, please.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "send_sms"
+          ]
+        },
+        {
+          "role": "agent",
+          "message": "Just sent it.  You should see it in a few seconds. Is there anything else I can help you with today?",
+          "tool_calls": []
+        },
+        {
+          "role": "user",
+          "message": "No, that's it. Thanks.",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "message": "You're all set, Alex.  That link will let you book a fifteen minute call with our team. Thanks for calling Wranngle Systems.  Have a great day!\n",
+          "tool_calls": []
+        },
+        {
+          "role": "agent",
+          "tool_calls": [
+            "end_call"
+          ]
+        }
+      ]
+    }
+  ]
+}

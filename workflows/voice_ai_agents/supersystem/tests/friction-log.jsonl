@@ -1,0 +1,7 @@
+{"timestamp":"2025-12-30T02:46:35.366Z","type":"PERSISTENT_FAILURE","scenario":"Minimal Data Extraction - Quick Call","description":"Failed verification after auto-fix","missing":["send_sms"],"cycle":2,"resolved":false}
+{"timestamp":"2025-12-30T02:46:35.367Z","type":"GAP_DETECTED","description":"Tool \"send_sms\" not triggered in 2 scenarios","layer":1,"cycle":2,"resolved":false}
+{"timestamp":"2025-12-30T03:32:42.329Z","type":"PERSISTENT_FAILURE","scenario":"Minimal Data Extraction - Quick Call","description":"Failed verification after auto-fix","missing":["send_sms"],"cycle":2,"resolved":false}
+{"timestamp":"2025-12-30T04:10:59.865Z","type":"PERSISTENT_FAILURE","scenario":"Minimal Data Extraction - Quick Call","description":"Failed verification after auto-fix","missing":["send_sms"],"cycle":2,"resolved":false}
+{"timestamp":"2025-12-30T04:38:43.083Z","type":"PERSISTENT_FAILURE","scenario":"Minimal Data Extraction - Quick Call","description":"Failed verification after auto-fix","missing":["send_sms"],"cycle":2,"resolved":false}
+{"timestamp":"2025-12-30T04:44:58.199Z","type":"PERSISTENT_FAILURE","scenario":"Extended Conversation - 15+ Turns","description":"Failed verification after auto-fix","missing":["send_sms"],"cycle":2,"resolved":false}
+{"timestamp":"2025-12-30T04:58:49.371Z","type":"PERSISTENT_FAILURE","scenario":"Extended Conversation - 15+ Turns","description":"Failed verification after auto-fix","missing":["send_sms"],"cycle":2,"resolved":false}

@@ -1,0 +1,70 @@
+{
+  "name": "[DEV] Supersystem - Execution Logger (Test)",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Log Execution",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "log-execution-test",
+      "parameters": {
+        "path": "log-execution-test",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "format-log-entry",
+      "name": "Format Log Entry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract and format log entry from webhook payload\nconst input = $json.body || $json;\n\nconst logEntry = {\n  timestamp: new Date().toISOString(),\n  conversation_id: input.conversation_id || 'unknown',\n  agent_name: input.agent_name || 'unknown',\n  caller_phone: input.caller_phone || '',\n  duration_seconds: input.duration_seconds || 0,\n  outcome: input.outcome || 'unknown',\n  extracted_fields: JSON.stringify(input.extracted_fields || {}),\n  errors: input.errors || ''\n};\n\nreturn { json: logEntry };"
+      }
+    },
+    {
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [440, 0],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, logged: $json, message: 'Test mode - not written to sheet' } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Log Execution": {
+      "main": [
+        [
+          {
+            "node": "Format Log Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Log Entry": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": []
+}

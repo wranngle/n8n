@@ -1,0 +1,30 @@
+{
+  "description": "Gemini generateContent expected response",
+  "required": ["candidates"],
+  "properties": {
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "object",
+            "properties": {
+              "parts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "text": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "finishReason": { "type": "string" }
+        }
+      }
+    },
+    "usageMetadata": { "type": "object" }
+  }
+}

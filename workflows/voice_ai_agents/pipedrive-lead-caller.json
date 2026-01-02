@@ -1,0 +1,284 @@
+{
+  "name": "Pipedrive Lead Auto-Caller",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "New Lead Added",
+      "type": "n8n-nodes-base.pipedriveTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "parameters": {
+        "action": "added",
+        "object": "person"
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "CONFIGURE_ME",
+          "name": "Pipedrive API"
+        }
+      }
+    },
+    {
+      "id": "check-phone",
+      "name": "Has Phone Number?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [470, 300],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "phone-exists",
+              "leftValue": "={{ ($json.current.phone && $json.current.phone[0]) ? $json.current.phone[0].value : '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combineOperation": "all"
+        }
+      }
+    },
+    {
+      "id": "extract-lead-data",
+      "name": "Extract Lead Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [690, 200],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "customer_id",
+              "name": "customer_id",
+              "value": "={{ 'pipedrive_' + $json.current.id }}",
+              "type": "string"
+            },
+            {
+              "id": "customer_name",
+              "name": "customer_name",
+              "value": "={{ $json.current.name }}",
+              "type": "string"
+            },
+            {
+              "id": "customer_first_name",
+              "name": "customer_first_name",
+              "value": "={{ $json.current.first_name || $json.current.name.split(' ')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "phone",
+              "name": "phone",
+              "value": "={{ ($json.current.phone && $json.current.phone[0]) ? $json.current.phone[0].value : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ ($json.current.email && $json.current.email[0]) ? $json.current.email[0].value : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "company_name",
+              "name": "company_name",
+              "value": "={{ $json.current.org_name || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "pipedrive_person_id",
+              "name": "pipedrive_person_id",
+              "value": "={{ $json.current.id }}",
+              "type": "number"
+            },
+            {
+              "id": "lead_source",
+              "name": "lead_source",
+              "value": "pipedrive_auto",
+              "type": "string"
+            },
+            {
+              "id": "account_type",
+              "name": "account_type",
+              "value": "standard",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "initiate-call",
+      "name": "Initiate Voice Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [910, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.wranngle.com/webhook/initiate-call-v2",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "log-success",
+      "name": "Log Call Initiated",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1130, 200],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status",
+              "name": "status",
+              "value": "call_initiated",
+              "type": "string"
+            },
+            {
+              "id": "pipedrive_person_id",
+              "name": "pipedrive_person_id",
+              "value": "={{ $('Extract Lead Data').item.json.pipedrive_person_id }}",
+              "type": "number"
+            },
+            {
+              "id": "call_response",
+              "name": "call_response",
+              "value": "={{ $json.body }}",
+              "type": "object"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "log-no-phone",
+      "name": "Log No Phone",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [690, 400],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "status",
+              "name": "status",
+              "value": "skipped_no_phone",
+              "type": "string"
+            },
+            {
+              "id": "person_id",
+              "name": "person_id",
+              "value": "={{ $json.current.id }}",
+              "type": "number"
+            },
+            {
+              "id": "person_name",
+              "name": "person_name",
+              "value": "={{ $json.current.name }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "New Lead Added": {
+      "main": [
+        [
+          {
+            "node": "Has Phone Number?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Phone Number?": {
+      "main": [
+        [
+          {
+            "node": "Extract Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log No Phone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Initiate Voice Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Voice Call": {
+      "main": [
+        [
+          {
+            "node": "Log Call Initiated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {}
+}

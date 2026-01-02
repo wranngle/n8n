@@ -1,0 +1,166 @@
+{
+  "name": "[DEV] Supersystem - Autonomous Sleep Loop",
+  "id": "SjItj6uzYSr9rotM",
+  "nodes": [
+    {
+      "id": "schedule-trigger",
+      "name": "Nightly @ Midnight",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 200],
+      "parameters": {
+        "rule": {
+          "interval": [{"field": "cronExpression", "expression": "0 0 * * *"}]
+        }
+      }
+    },
+    {
+      "id": "webhook-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 400],
+      "webhookId": "autonomous-sleep-loop",
+      "parameters": {
+        "path": "autonomous-sleep-loop",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "init-loop",
+      "name": "Initialize Loop",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Initialize the autonomous improvement loop\nconst input = $input.first().json.body || $input.first().json || {};\n\nconst config = {\n  max_cycles: input.max_cycles || 5,\n  current_cycle: 1,\n  test_limit: input.test_limit || 100,\n  batch_size: input.batch_size || 50,\n  eval_webhook: 'https://n8n.wranngle.com/webhook/parallel-eval-runner-v6',\n  autofix_webhook: 'https://n8n.wranngle.com/webhook/autorefinement-trigger',\n  agent_id: input.agent_id || 'agent_8001kdgp7qbyf4wvhs540be78vew',\n  started_at: new Date().toISOString(),\n  trigger_source: input.trigger_source || 'scheduled',\n  history: []\n};\n\nreturn [{ json: config }];"
+      }
+    },
+    {
+      "id": "run-evaluations",
+      "name": "Run Evaluations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Call the parallel evaluation runner\nconst config = $input.first().json;\n\ntry {\n  const evalResponse = await this.helpers.httpRequest({\n    method: 'POST',\n    url: config.eval_webhook,\n    body: { limit: config.test_limit, batch_size: config.batch_size },\n    headers: { 'Content-Type': 'application/json' },\n    json: true,\n    timeout: 300000\n  });\n  \n  const cycleResult = {\n    cycle: config.current_cycle,\n    pass_rate: evalResponse.summary?.pass_rate || '0%',\n    passed: evalResponse.summary?.passed || 0,\n    failed: evalResponse.summary?.failed || 0,\n    needs_fix: evalResponse.needs_autocorrection || false,\n    timestamp: new Date().toISOString()\n  };\n  \n  config.history.push(cycleResult);\n  config.latest_result = evalResponse;\n  config.needs_autocorrection = evalResponse.needs_autocorrection || false;\n  config.current_pass_rate = evalResponse.summary?.pass_rate || '0%';\n  \n  return [{ json: config }];\n} catch (error) {\n  config.error = error.message;\n  config.needs_autocorrection = false;\n  return [{ json: config }];\n}"
+      }
+    },
+    {
+      "id": "check-needs-fix",
+      "name": "Needs Autofix?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [660, 300],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {"outputKey": "needs_fix", "conditions": {"combinator": "and", "conditions": [{"leftValue": "={{ $json.needs_autocorrection }}", "operator": "equals", "rightValue": true}, {"leftValue": "={{ $json.current_cycle }}", "operator": "lte", "rightValue": "={{ $json.max_cycles }}"}]}},
+            {"outputKey": "max_cycles", "conditions": {"combinator": "and", "conditions": [{"leftValue": "={{ $json.needs_autocorrection }}", "operator": "equals", "rightValue": true}, {"leftValue": "={{ $json.current_cycle }}", "operator": "gt", "rightValue": "={{ $json.max_cycles }}"}]}}
+          ],
+          "fallbackOutput": "perfect"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "trigger-autofix",
+      "name": "Trigger Autorefinement",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 200],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Trigger the autorefinement workflow with failure data\nconst config = $input.first().json;\nconst evalResult = config.latest_result;\n\nconst failures = [];\nif (evalResult.failures_by_category) {\n  for (const [category, categoryFailures] of Object.entries(evalResult.failures_by_category)) {\n    failures.push(...categoryFailures.slice(0, 5));\n  }\n}\n\ntry {\n  const autofixResponse = await this.helpers.httpRequest({\n    method: 'POST',\n    url: config.autofix_webhook,\n    body: {\n      failures: failures,\n      agent_id: config.agent_id,\n      total_tests: evalResult.summary?.total_tests || 0,\n      passed_tests: evalResult.summary?.passed || 0,\n      cycle: config.current_cycle\n    },\n    headers: { 'Content-Type': 'application/json' },\n    json: true,\n    timeout: 120000\n  });\n  \n  config.autofix_result = autofixResponse;\n  config.autofix_success = autofixResponse.status === 'success';\n  \n} catch (error) {\n  config.autofix_error = error.message;\n  config.autofix_success = false;\n}\n\nconfig.current_cycle += 1;\nreturn [{ json: config }];"
+      }
+    },
+    {
+      "id": "wait-propagation",
+      "name": "Wait 60s for Agent Sync",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1100, 200],
+      "parameters": {"amount": 60, "unit": "seconds"}
+    },
+    {
+      "id": "loop-back",
+      "name": "Loop Back to Eval",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1320, 200],
+      "parameters": {}
+    },
+    {
+      "id": "final-summary-perfect",
+      "name": "Build Summary: Perfect",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 400],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const config = $input.first().json;\nconst summary = {\n  status: 'PERFECT',\n  emoji: '🎉',\n  message: `100% pass rate achieved in ${config.current_cycle} cycle(s)!`,\n  agent_id: config.agent_id,\n  final_pass_rate: config.current_pass_rate,\n  total_cycles: config.current_cycle,\n  started_at: config.started_at,\n  completed_at: new Date().toISOString(),\n  history: config.history,\n  trigger_source: config.trigger_source\n};\nreturn [{ json: summary }];"
+      }
+    },
+    {
+      "id": "final-summary-max",
+      "name": "Build Summary: Max Cycles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 500],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const config = $input.first().json;\nconst summary = {\n  status: 'MAX_CYCLES_REACHED',\n  emoji: '⚠️',\n  message: `Max ${config.max_cycles} cycles reached. Manual review needed.`,\n  agent_id: config.agent_id,\n  final_pass_rate: config.current_pass_rate,\n  total_cycles: config.max_cycles,\n  started_at: config.started_at,\n  completed_at: new Date().toISOString(),\n  history: config.history,\n  remaining_failures: config.latest_result?.failure_count || 0,\n  trigger_source: config.trigger_source\n};\nreturn [{ json: summary }];"
+      }
+    },
+    {
+      "id": "slack-final",
+      "name": "Slack: Final Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 450],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/PLACEHOLDER' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"blocks\":[{\"type\":\"header\",\"text\":{\"type\":\"plain_text\",\"text\":\"{{ $json.emoji }} AUTONOMOUS SLEEP LOOP {{ $json.status }}\",\"emoji\":true}},{\"type\":\"section\",\"fields\":[{\"type\":\"mrkdwn\",\"text\":\"*Status:*\\n{{ $json.status }}\"},{\"type\":\"mrkdwn\",\"text\":\"*Final Pass Rate:*\\n{{ $json.final_pass_rate }}\"}]},{\"type\":\"section\",\"fields\":[{\"type\":\"mrkdwn\",\"text\":\"*Total Cycles:*\\n{{ $json.total_cycles }}\"},{\"type\":\"mrkdwn\",\"text\":\"*Trigger:*\\n{{ $json.trigger_source }}\"}]},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Summary:*\\n{{ $json.message }}\"}},{\"type\":\"divider\"},{\"type\":\"context\",\"elements\":[{\"type\":\"mrkdwn\",\"text\":\"Agent: {{ $json.agent_id }} | Started: {{ $json.started_at }} | Completed: {{ $json.completed_at }}\"}]}]}",
+        "options": {}
+      }
+    },
+    {
+      "id": "respond-final",
+      "name": "Respond: Final",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 450],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Slack: Final Result').item.json }}"
+      }
+    }
+  ],
+  "connections": {
+    "Nightly @ Midnight": {"main": [[{"node": "Initialize Loop", "type": "main", "index": 0}]]},
+    "Manual Trigger": {"main": [[{"node": "Initialize Loop", "type": "main", "index": 0}]]},
+    "Initialize Loop": {"main": [[{"node": "Run Evaluations", "type": "main", "index": 0}]]},
+    "Run Evaluations": {"main": [[{"node": "Needs Autofix?", "type": "main", "index": 0}]]},
+    "Needs Autofix?": {"main": [[{"node": "Trigger Autorefinement", "type": "main", "index": 0}], [{"node": "Build Summary: Max Cycles", "type": "main", "index": 0}], [{"node": "Build Summary: Perfect", "type": "main", "index": 0}]]},
+    "Trigger Autorefinement": {"main": [[{"node": "Wait 60s for Agent Sync", "type": "main", "index": 0}]]},
+    "Wait 60s for Agent Sync": {"main": [[{"node": "Loop Back to Eval", "type": "main", "index": 0}]]},
+    "Loop Back to Eval": {"main": [[{"node": "Run Evaluations", "type": "main", "index": 0}]]},
+    "Build Summary: Perfect": {"main": [[{"node": "Slack: Final Result", "type": "main", "index": 0}]]},
+    "Build Summary: Max Cycles": {"main": [[{"node": "Slack: Final Result", "type": "main", "index": 0}]]},
+    "Slack: Final Result": {"main": [[{"node": "Respond: Final", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "tags": [{"name": "DEV"}, {"name": "supersystem"}, {"name": "autonomous"}],
+  "meta": {
+    "instanceId": "n8n.wranngle.com",
+    "created": "2026-01-01",
+    "purpose": "Autonomous self-improvement loop - runs evals, auto-fixes failures, loops until 100%"
+  }
+}

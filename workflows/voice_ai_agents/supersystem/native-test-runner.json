@@ -1,0 +1,183 @@
+{
+  "name": "[DEV] Supersystem - Native Test Runner",
+  "nodes": [
+    {
+      "id": "schedule-trigger",
+      "name": "Every 4 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 4
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "run-tests",
+      "name": "Run All Tests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/convai/agents/={{ $env.ELEVENLABS_AGENT_ID }}/run-tests",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "={{ $env.ELEVENLABS_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "poll-results",
+      "name": "Poll for Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Poll for test invocation completion\nconst invocationId = $input.first().json.invocation_id;\nconst apiKey = $env.ELEVENLABS_API_KEY;\nconst maxAttempts = 60;\nconst pollInterval = 5000;\n\nlet result = null;\nfor (let i = 0; i < maxAttempts; i++) {\n  const response = await fetch(\n    `https://api.elevenlabs.io/v1/convai/test-invocations/${invocationId}`,\n    { headers: { 'xi-api-key': apiKey } }\n  );\n  result = await response.json();\n  \n  if (result.status === 'completed' || result.status === 'done') {\n    break;\n  }\n  if (result.status === 'failed' || result.status === 'error') {\n    break;\n  }\n  \n  await new Promise(r => setTimeout(r, pollInterval));\n}\n\nconst tests = result.test_results || result.results || [];\nconst passed = tests.filter(t => t.passed || t.status === 'passed').length;\nconst failed = tests.length - passed;\n\nreturn [{\n  json: {\n    invocation_id: invocationId,\n    status: result.status,\n    total: tests.length,\n    passed,\n    failed,\n    pass_rate: tests.length > 0 ? ((passed / tests.length) * 100).toFixed(1) : 0,\n    failures: tests.filter(t => !t.passed && t.status !== 'passed').map(t => ({\n      test_id: t.test_id || t.id,\n      name: t.name,\n      reason: t.failure_reason || t.reason\n    })),\n    timestamp: new Date().toISOString()\n  }\n}];"
+      }
+    },
+    {
+      "id": "check-failures",
+      "name": "Has Failures?",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [660, 0],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "failures",
+              "conditions": {
+                "options": { "version": 2 },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.failed }}",
+                    "rightValue": 0,
+                    "operator": { "type": "number", "operation": "gt" }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "success",
+              "conditions": {
+                "options": { "version": 2 },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.failed }}",
+                    "rightValue": 0,
+                    "operator": { "type": "number", "operation": "equals" }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "trigger-autorefinement",
+      "name": "Trigger Autorefinement",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -80],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.N8N_WEBHOOK_BASE }}/webhook/autorefinement-trigger",
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 10000
+        }
+      }
+    },
+    {
+      "id": "slack-failure",
+      "name": "Slack: Test Failures",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1100, -80],
+      "parameters": {
+        "operation": "sendMessage",
+        "channelId": { "__rl": true, "value": "voice-agent-alerts", "mode": "name" },
+        "message": ":warning: *ElevenLabs Test Run Complete*\n\nPassed: {{ $json.passed }}/{{ $json.total }} ({{ $json.pass_rate }}%)\nFailed: {{ $json.failed }}\n\nTriggering autorefinement...",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": { "id": "slack-credential-id", "name": "Slack API" }
+      }
+    },
+    {
+      "id": "slack-success",
+      "name": "Slack: All Passed",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [880, 80],
+      "parameters": {
+        "operation": "sendMessage",
+        "channelId": { "__rl": true, "value": "voice-agent-alerts", "mode": "name" },
+        "message": ":white_check_mark: *ElevenLabs Test Run: 100% PASS*\n\nAll {{ $json.total }} tests passed!\nTimestamp: {{ $json.timestamp }}",
+        "otherOptions": {}
+      },
+      "credentials": {
+        "slackApi": { "id": "slack-credential-id", "name": "Slack API" }
+      }
+    }
+  ],
+  "connections": {
+    "Every 4 Hours": {
+      "main": [[{ "node": "Run All Tests", "type": "main", "index": 0 }]]
+    },
+    "Run All Tests": {
+      "main": [[{ "node": "Poll for Results", "type": "main", "index": 0 }]]
+    },
+    "Poll for Results": {
+      "main": [[{ "node": "Has Failures?", "type": "main", "index": 0 }]]
+    },
+    "Has Failures?": {
+      "main": [
+        [{ "node": "Trigger Autorefinement", "type": "main", "index": 0 }],
+        [{ "node": "Slack: All Passed", "type": "main", "index": 0 }]
+      ]
+    },
+    "Trigger Autorefinement": {
+      "main": [[{ "node": "Slack: Test Failures", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {}
+}

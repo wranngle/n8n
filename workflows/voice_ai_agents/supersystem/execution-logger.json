@@ -1,0 +1,121 @@
+{
+  "name": "[DEV] Supersystem - Execution Logger",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Log Execution",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "log-execution",
+      "parameters": {
+        "path": "log-execution",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "format-log-entry",
+      "name": "Format Log Entry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract and format log entry from webhook payload\nconst input = $json.body || $json;\n\nconst logEntry = {\n  timestamp: new Date().toISOString(),\n  conversation_id: input.conversation_id || 'unknown',\n  agent_name: input.agent_name || 'unknown',\n  caller_phone: input.caller_phone || '',\n  duration_seconds: input.duration_seconds || 0,\n  outcome: input.outcome || 'unknown',\n  extracted_fields: JSON.stringify(input.extracted_fields || {}),\n  errors: input.errors || ''\n};\n\nreturn { json: logEntry };"
+      }
+    },
+    {
+      "id": "append-to-sheet",
+      "name": "Append to Execution Logs",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 0],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $vars.SUPERSYSTEM_SHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Execution Logs",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $json.timestamp }}",
+            "conversation_id": "={{ $json.conversation_id }}",
+            "agent_name": "={{ $json.agent_name }}",
+            "caller_phone": "={{ $json.caller_phone }}",
+            "duration_seconds": "={{ $json.duration_seconds }}",
+            "outcome": "={{ $json.outcome }}",
+            "extracted_fields": "={{ $json.extracted_fields }}",
+            "errors": "={{ $json.errors }}"
+          }
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "{{ $vars.GOOGLE_SHEETS_CREDENTIAL_ID }}",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 0],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, logged: $json, timestamp: $now.toISO() } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Log Execution": {
+      "main": [
+        [
+          {
+            "node": "Format Log Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Log Entry": {
+      "main": [
+        [
+          {
+            "node": "Append to Execution Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Execution Logs": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": []
+}

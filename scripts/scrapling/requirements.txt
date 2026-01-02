@@ -1,0 +1,7 @@
+# Scrapling - High-performance web scraping
+# https://github.com/D4Vinci/Scrapling
+scrapling>=0.2.9
+
+# Additional dependencies
+python-dotenv>=1.0.0
+aiofiles>=24.1.0
