@@ -1,0 +1,108 @@
+# Voice Agent Local Tests (Node.js)
+# Runs the test suite directly using ElevenLabs Simulate Conversation API
+#
+# Setup Requirements:
+# 1. Add repository secret: ELEVENLABS_API_KEY
+
+name: Voice Agent Local Tests
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      test_filter:
+        description: 'Run specific tests (comma-separated IDs, or "all")'
+        required: false
+        default: 'all'
+
+  # Schedule: Daily at 6 AM UTC
+  schedule:
+    - cron: '0 6 * * *'
+
+  # Trigger on changes to agent prompts or test files
+  push:
+    branches: [main]
+    paths:
+      - 'workflows/voice_ai_agents/*.js'
+      - 'workflows/voice_ai_agents/*.md'
+
+jobs:
+  run-tests:
+    name: Run Voice Agent Simulation Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Tests
+        id: test
+        working-directory: workflows/voice_ai_agents
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          # Run tests (API key loaded from environment)
+          node run-tests.js || exit_code=$?
+
+          # Exit with test result
+          exit ${exit_code:-0}
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_number }}
+          path: workflows/voice_ai_agents/test-results-stream.json
+          retention-days: 30
+
+      - name: Generate Summary
+        if: always()
+        working-directory: workflows/voice_ai_agents
+        run: |
+          if [ -f test-results-stream.json ]; then
+            echo "## Voice Agent Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # Parse results using jq
+            TOTAL=$(jq '.summary.total' test-results-stream.json)
+            PASSED=$(jq '.summary.passed' test-results-stream.json)
+            FAILED=$(jq '.summary.failed' test-results-stream.json)
+            RATE=$(jq '.summary.success_rate' test-results-stream.json)
+
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Tests | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "| Success Rate | ${RATE}% |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            # List failed tests
+            if [ "$FAILED" -gt 0 ]; then
+              echo "### Failed Tests" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              jq -r '.results[] | select(.overall_passed == false) | "- **\(.scenario_name)** (\(.scenario_id))"' test-results-stream.json >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: Check Quality Gate
+        if: always()
+        working-directory: workflows/voice_ai_agents
+        run: |
+          if [ -f test-results-stream.json ]; then
+            RATE=$(jq '.summary.success_rate' test-results-stream.json)
+
+            # Fail if success rate is below 80%
+            if [ "$RATE" -lt 80 ]; then
+              echo "::error::Quality gate failed: Success rate ${RATE}% is below 80%"
+              exit 1
+            fi
+
+            echo "Quality gate passed: ${RATE}% success rate"
+          fi
