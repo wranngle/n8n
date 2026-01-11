@@ -1,0 +1,80 @@
+# Evaluation Configuration: Client Data Lookup (Eval-Ready)
+# Workflow ID: oik6SebewNAh1cV5
+# Complexity: Minimal (3 nodes)
+
+workflow_id: "oik6SebewNAh1cV5"
+workflow_name: "[DEV] Supersystem - Client Data Lookup (Eval-Ready)"
+webhook_path: "client-data-lookup-eval"
+
+# Workflow Structure:
+# Webhook: Client Lookup → Simulate Client Lookup (Code) → Respond with Client Data
+
+evaluation:
+  pass_threshold: 80
+  max_retries: 2
+  timeout_ms: 30000
+
+test_cases:
+  - id: TC001
+    name: "Valid Client Lookup"
+    description: "Standard client data retrieval"
+    input:
+      phone: "+15551234567"
+      session_id: "eval-001"
+    expected:
+      status: 200
+      response_contains:
+        - "client"
+        - "data"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 3000
+    weight: 35
+
+  - id: TC002
+    name: "Response Structure Validation"
+    description: "Verify response contains required fields"
+    input:
+      phone: "+15559876543"
+      session_id: "eval-002"
+    expected:
+      status: 200
+    assertions:
+      - type: json_schema
+        required_fields:
+          - success
+          - data
+          - timestamp
+    weight: 30
+
+  - id: TC003
+    name: "Performance Under Load"
+    description: "Response time validation"
+    input:
+      phone: "+15550001111"
+      session_id: "eval-003"
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 2000
+    weight: 20
+
+  - id: TC004
+    name: "Edge Case - Special Characters"
+    description: "Test with international phone format"
+    input:
+      phone: "+442071234567"
+      session_id: "eval-004"
+    expected:
+      status: 200
+    weight: 15
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - pipedrive_api_key
+  notes: "Evaluation-ready variant - identical to Test but with stricter assertions"

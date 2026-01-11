@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * AIRTIGHT Test Orchestrator
+ * AIRTIGHT Test Orchestrator v1.1
  * 
  * Runs ALL test layers in parallel for comprehensive voice agent validation:
  * 
@@ -9,6 +9,7 @@
  * Layer 8: n8n Workflow Evaluations (dataset-driven, CI/CD ready)
  * 
  * Created: 2025-12-30
+ * Security: 2026-01-09 - Fixed Promise.allSettled, added error resilience
  */
 
 const { spawn } = require('child_process');
@@ -246,23 +247,61 @@ ${C.white}${C.bright}╔══════════════════�
   let results;
   
   if (options.parallel) {
-    // Run all layers in parallel
+    // Run all layers in parallel using Promise.allSettled for error resilience
+    // This ensures we get results from ALL layers even if one fails
     console.log(`${C.cyan}Starting all layers in parallel...${C.reset}\n`);
     
-    const [layer1_6, layer7, layer8] = await Promise.all([
+    const layerPromises = [
       options.skipEngine ? Promise.resolve({ layer: '1-6', skipped: true }) : runSupersystemEngine({ quiet: true, ...options }),
       options.skipElevenlabs ? Promise.resolve({ layer: '7', skipped: true }) : runElevenLabsTests(options),
       options.skipN8n ? Promise.resolve({ layer: '8', skipped: true }) : runN8nEvaluations(options),
-    ]);
+    ];
     
-    results = { layer1_6, layer7, layer8 };
+    const settled = await Promise.allSettled(layerPromises);
+    
+    // Extract results, converting rejections to error objects
+    const extractResult = (result, layerNum, layerName) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        return {
+          layer: layerNum,
+          name: layerName,
+          success: false,
+          error: result.reason?.message || String(result.reason),
+          duration_ms: 0,
+        };
+      }
+    };
+    
+    results = {
+      layer1_6: extractResult(settled[0], '1-6', 'Supersystem Engine'),
+      layer7: extractResult(settled[1], '7', 'ElevenLabs Native Tests'),
+      layer8: extractResult(settled[2], '8', 'n8n Workflow Evaluations'),
+    };
   } else {
-    // Run sequentially
+    // Run sequentially with try-catch for each layer
     console.log(`${C.cyan}Running layers sequentially...${C.reset}\n`);
     
-    const layer1_6 = options.skipEngine ? { layer: '1-6', skipped: true } : await runSupersystemEngine(options);
-    const layer7Result = options.skipElevenlabs ? { layer: '7', skipped: true } : await runElevenLabsTests(options);
-    const layer8Result = options.skipN8n ? { layer: '8', skipped: true } : await runN8nEvaluations(options);
+    let layer1_6, layer7Result, layer8Result;
+    
+    try {
+      layer1_6 = options.skipEngine ? { layer: '1-6', skipped: true } : await runSupersystemEngine(options);
+    } catch (e) {
+      layer1_6 = { layer: '1-6', name: 'Supersystem Engine', success: false, error: e.message };
+    }
+    
+    try {
+      layer7Result = options.skipElevenlabs ? { layer: '7', skipped: true } : await runElevenLabsTests(options);
+    } catch (e) {
+      layer7Result = { layer: '7', name: 'ElevenLabs Native Tests', success: false, error: e.message };
+    }
+    
+    try {
+      layer8Result = options.skipN8n ? { layer: '8', skipped: true } : await runN8nEvaluations(options);
+    } catch (e) {
+      layer8Result = { layer: '8', name: 'n8n Workflow Evaluations', success: false, error: e.message };
+    }
     
     results = { layer1_6, layer7: layer7Result, layer8: layer8Result };
   }

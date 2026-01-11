@@ -1,0 +1,112 @@
+# Evaluation Configuration: Pipedrive Lead Auto-Caller
+# Workflow ID: qQmGqBM1pe4QUI05
+# Complexity: Low (6 nodes)
+
+workflow_id: "qQmGqBM1pe4QUI05"
+workflow_name: "[DEV] Pipedrive Lead Auto-Caller"
+trigger_type: "pipedrive_trigger"
+
+# Workflow Structure:
+# New Lead Added (Pipedrive Trigger) → Has Phone Number? (IF)
+#   → [true] Extract Lead Data → Initiate Voice Call → Log Call Initiated
+#   → [false] Log No Phone
+
+# Note: This workflow uses Pipedrive Trigger, not webhook
+# Evaluation requires simulating Pipedrive lead events
+
+evaluation:
+  pass_threshold: 80
+  max_retries: 2
+  timeout_ms: 45000
+  mode: "simulated_trigger"
+
+test_cases:
+  - id: TC001
+    name: "Lead with Valid Phone"
+    description: "Test processing a lead that has a phone number"
+    input:
+      event_type: "added.deal"
+      deal:
+        id: 12345
+        title: "Test Lead - Auto Caller"
+        person_id: 67890
+        person_phone: "+13075551234"
+        person_name: "John Smith"
+        org_name: "Test Company"
+    expected:
+      path: "true_branch"
+      response_contains:
+        - "call"
+        - "initiated"
+    assertions:
+      - type: branch_taken
+        value: "true"
+      - type: node_executed
+        value: "Initiate Voice Call"
+    weight: 35
+
+  - id: TC002
+    name: "Lead without Phone"
+    description: "Test processing a lead without phone number"
+    input:
+      event_type: "added.deal"
+      deal:
+        id: 12346
+        title: "No Phone Lead"
+        person_id: 67891
+        person_name: "Jane Doe"
+        org_name: "No Phone Corp"
+    expected:
+      path: "false_branch"
+    assertions:
+      - type: branch_taken
+        value: "false"
+      - type: node_executed
+        value: "Log No Phone"
+    weight: 25
+
+  - id: TC003
+    name: "Lead with International Phone"
+    description: "Test with international phone format"
+    input:
+      event_type: "added.deal"
+      deal:
+        id: 12347
+        title: "International Lead"
+        person_id: 67892
+        person_phone: "+442071234567"
+        person_name: "Alice London"
+        org_name: "UK Company Ltd"
+    expected:
+      path: "true_branch"
+    assertions:
+      - type: node_executed
+        value: "Initiate Voice Call"
+    weight: 20
+
+  - id: TC004
+    name: "Lead with Empty Phone String"
+    description: "Test edge case where phone exists but is empty string"
+    input:
+      event_type: "added.deal"
+      deal:
+        id: 12348
+        title: "Empty Phone Lead"
+        person_id: 67893
+        person_phone: ""
+        person_name: "Bob Empty"
+    expected:
+      path: "false_branch"
+    assertions:
+      - type: branch_taken
+        value: "false"
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - pipedrive_api_key
+    - elevenlabs_api_key
+  integration_type: "crm_automation"
+  notes: "Auto-calls leads from Pipedrive - requires both Pipedrive and ElevenLabs credentials"

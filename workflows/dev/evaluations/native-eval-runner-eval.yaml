@@ -1,0 +1,96 @@
+# Evaluation Configuration: Native Evaluation Runner
+# Workflow ID: mwepwjfX27x4uTMu
+# Complexity: Medium (8 nodes)
+
+workflow_id: "mwepwjfX27x4uTMu"
+workflow_name: "[DEV] Supersystem - Native Evaluation Runner"
+trigger_type: "evaluation_trigger"
+
+# Workflow Structure:
+# When fetching a dataset row (EvaluationTrigger) → Prepare Test Payload (Code)
+#   → Create Test in ElevenLabs (HTTP) → Run Tests (HTTP) → Wait 5s
+#   → Get Test Results (HTTP) → Evaluate Result (Code) → Evaluation
+
+# Purpose: Uses n8n's native evaluation system to test ElevenLabs agents
+
+evaluation:
+  pass_threshold: 80
+  max_retries: 1
+  timeout_ms: 120000
+  mode: "native_evaluation"
+
+# Note: This workflow uses n8n's native evaluation trigger
+# Testing requires simulating evaluation dataset rows
+
+test_cases:
+  - id: TC001
+    name: "Standard Evaluation Dataset Row"
+    description: "Test processing a single dataset row"
+    input:
+      dataset_row:
+        agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+        test_scenario: "greeting_response"
+        expected_behavior: "Greet caller professionally"
+        test_message: "Hello, I need help"
+    expected:
+      status: 200
+    assertions:
+      - type: node_executed
+        value: "Evaluation"
+      - type: response_time_ms
+        max: 90000
+    weight: 35
+
+  - id: TC002
+    name: "Evaluation with Pass Result"
+    description: "Test that produces a passing evaluation"
+    input:
+      dataset_row:
+        agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+        test_scenario: "simple_response"
+        expected_behavior: "Respond within 3 seconds"
+        test_message: "Hi"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.evaluation_passed"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "Evaluation with Fail Result"
+    description: "Test that captures a failing evaluation"
+    input:
+      dataset_row:
+        agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+        test_scenario: "impossible_requirement"
+        expected_behavior: "Complete impossible task"
+        test_message: "Do the impossible"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.evaluation_passed"
+        value: false
+    weight: 20
+
+  - id: TC004
+    name: "Evaluation Timeout Handling"
+    description: "Test handling when ElevenLabs test times out"
+    input:
+      dataset_row:
+        agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+        test_scenario: "timeout_test"
+        expected_behavior: "Handle gracefully"
+        timeout_simulation: true
+    expected:
+      status: 200
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies: []
+  integration_type: "n8n_native_evaluation"
+  notes: "Uses n8n's built-in evaluation system - requires evaluation dataset"

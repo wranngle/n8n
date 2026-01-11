@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ultrathink Self-Improving Test Engine v1.0
+ * Ultrathink Self-Improving Test Engine v1.1
  * 
  * Every simulation cycle must be productive:
  * - VALIDATE a capability → Confidence gained
@@ -8,6 +8,9 @@
  * - IMPROVE the system → Value created
  * 
  * No simulation ends with just "FAIL" - it ends with an ACTION.
+ * 
+ * SECURITY: All credentials must be provided via environment variables.
+ * NEVER commit API keys to source control.
  */
 
 const https = require('https');
@@ -15,15 +18,30 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 
-// Configuration
+// Configuration - ALL CREDENTIALS FROM ENVIRONMENT
 const CONFIG = {
-  ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY || 'sk_733d2a2707d99f6bcdb9cc330570deea72390b20b6b2915e',
-  DEFAULT_AGENT_ID: 'agent_8001kdgp7qbyf4wvhs540be78vew',
-  SUPERSYSTEM_BASE: 'https://n8n.wranngle.com/webhook',
-  BATCH_SIZE: 5,  // Small batches for analysis
-  MAX_CYCLES: 10,
-  DELAY_BETWEEN_SIMS_MS: 3000,
+  ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY,
+  DEFAULT_AGENT_ID: process.env.ELEVENLABS_AGENT_ID || 'agent_8001kdgp7qbyf4wvhs540be78vew',
+  SUPERSYSTEM_BASE: process.env.SUPERSYSTEM_BASE || 'https://n8n.wranngle.com/webhook',
+  BATCH_SIZE: parseInt(process.env.BATCH_SIZE, 10) || 5,
+  MAX_CYCLES: parseInt(process.env.MAX_CYCLES, 10) || 10,
+  DELAY_BETWEEN_SIMS_MS: parseInt(process.env.DELAY_BETWEEN_SIMS_MS, 10) || 3000,
+  REQUEST_TIMEOUT_MS: parseInt(process.env.REQUEST_TIMEOUT_MS, 10) || 30000,
 };
+
+// Validate required credentials at startup
+function validateConfig() {
+  if (!CONFIG.ELEVENLABS_API_KEY) {
+    console.error(`${C.red}${C.bright}FATAL: ELEVENLABS_API_KEY environment variable is required${C.reset}`);
+    console.error(`${C.yellow}Set it via: export ELEVENLABS_API_KEY=your_key_here${C.reset}`);
+    process.exit(1);
+  }
+  
+  if (CONFIG.ELEVENLABS_API_KEY.startsWith('sk_') && CONFIG.ELEVENLABS_API_KEY.length < 20) {
+    console.error(`${C.red}FATAL: ELEVENLABS_API_KEY appears to be invalid${C.reset}`);
+    process.exit(1);
+  }
+}
 
 const WEBHOOKS = {
   client_lookup: '/client-lookup-test',
@@ -43,15 +61,25 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const log = (msg, color = '') => console.log(`${color}${msg}${C.reset}`);
 const logPhase = (phase, msg) => console.log(`\n${C.cyan}${C.bright}[${phase}]${C.reset} ${msg}`);
 
-// State tracking
-const state = {
-  cycle: 0,
-  totalSimulations: 0,
-  outcomes: { validated: 0, gaps: 0, bugs: 0, improved: 0 },
-  coverage: { client_lookup: 0, execution_logger: 0, slack_notifier: 0, orchestrator: 0 },
-  frictions: [],
-  improvements: [],
-};
+/**
+ * Create isolated test state (factory pattern for test isolation)
+ * Each test run gets its own state object to prevent cross-contamination
+ */
+function createTestState() {
+  return {
+    cycle: 0,
+    totalSimulations: 0,
+    outcomes: { validated: 0, gaps: 0, bugs: 0, improved: 0 },
+    coverage: { client_lookup: 0, execution_logger: 0, slack_notifier: 0, orchestrator: 0 },
+    frictions: [],
+    improvements: [],
+    parseErrors: [], // Track parse errors instead of silently swallowing
+  };
+}
+
+// Legacy global state for backwards compatibility (will be removed in v2.0)
+// New code should use createTestState() and pass state explicitly
+let state = createTestState();
 
 /**
  * PHASE 1: CALIBRATE - Verify prerequisites
@@ -130,13 +158,29 @@ async function executeSimulation(scenario) {
       res.on('end', () => {
         const turns = [];
         let analysis = null;
+        const parseErrors = []; // Track errors instead of swallowing
+        
         for (const line of data.split('\n').filter(l => l.trim())) {
           try {
             let parsed = JSON.parse(line);
             if (typeof parsed === 'string') parsed = JSON.parse(parsed);
             if (parsed.simulated_conversation) turns.push(...parsed.simulated_conversation);
             if (parsed.analysis) analysis = parsed.analysis;
-          } catch {}
+          } catch (e) {
+            // Log parse errors for debugging instead of silently swallowing
+            parseErrors.push({
+              line: line.substring(0, 100),
+              error: e.message,
+            });
+          }
+        }
+        
+        // Log parse errors if in debug mode
+        if (parseErrors.length > 0 && process.env.DEBUG) {
+          console.warn(`${C.yellow}Warning: ${parseErrors.length} JSON parse errors in simulation response${C.reset}`);
+          parseErrors.slice(0, 3).forEach(pe => 
+            console.warn(`  ${C.dim}${pe.error}: ${pe.line}...${C.reset}`)
+          );
         }
         
         // Extract tool calls
@@ -630,12 +674,19 @@ function loadScenarios() {
  * MAIN LOOP - The self-improving engine
  */
 async function main() {
+  // SECURITY: Validate credentials before any operations
+  validateConfig();
+  
   console.log(`
 ${C.cyan}${C.bright}╔═══════════════════════════════════════════════════════════════════╗
-║     ULTRATHINK SELF-IMPROVING TEST ENGINE v1.0                    ║
+║     ULTRATHINK SELF-IMPROVING TEST ENGINE v1.1                    ║
 ║     Every cycle is productive. Every failure has an action.       ║
+║     SECURITY: Credentials loaded from environment only            ║
 ╚═══════════════════════════════════════════════════════════════════╝${C.reset}
 `);
+
+  // Create isolated state for this run (factory pattern for test isolation)
+  const state = createTestState();
 
   // Load all scenarios
   const allScenarios = loadScenarios();

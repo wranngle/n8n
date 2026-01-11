@@ -1,0 +1,121 @@
+# Evaluation Configuration: Parallel Evaluation Runner v6
+# Workflow ID: M7ZmLGCxyVOn5QJ6
+# Complexity: Low (6 nodes)
+
+workflow_id: "M7ZmLGCxyVOn5QJ6"
+workflow_name: "[DEV] Supersystem - Parallel Evaluation Runner v6"
+webhook_path: "parallel-eval-runner"
+
+# Workflow Structure:
+# Start Evaluation (Webhook) → Load Test Dataset (Code) → Split Into Batches
+#   → Execute Batch (Code) → Aggregate All Results (Code) → Respond With Results
+
+# Note: This is a meta-evaluation workflow - it runs evaluations on other workflows
+# Testing this workflow requires careful handling to avoid infinite loops
+
+evaluation:
+  pass_threshold: 90
+  max_retries: 1
+  timeout_ms: 60000
+  mode: "meta_evaluator"
+
+test_cases:
+  - id: TC001
+    name: "Simple Test Dataset"
+    description: "Test with a simple 3-item test dataset"
+    input:
+      workflow_id: "test-workflow"
+      test_cases:
+        - id: "T1"
+          input: { value: 1 }
+          expected: { status: 200 }
+        - id: "T2"
+          input: { value: 2 }
+          expected: { status: 200 }
+        - id: "T3"
+          input: { value: 3 }
+          expected: { status: 200 }
+    expected:
+      status: 200
+      response_contains:
+        - "results"
+        - "passed"
+        - "failed"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 30000
+      - type: json_path
+        path: "$.total_tests"
+        value: 3
+    weight: 35
+
+  - id: TC002
+    name: "Empty Test Dataset"
+    description: "Test handling of empty test dataset"
+    input:
+      workflow_id: "test-workflow"
+      test_cases: []
+    expected:
+      status: 200
+      response_contains:
+        - "results"
+    assertions:
+      - type: json_path
+        path: "$.total_tests"
+        value: 0
+    weight: 20
+
+  - id: TC003
+    name: "Large Batch Processing"
+    description: "Test with larger dataset to verify batching"
+    input:
+      workflow_id: "test-workflow"
+      test_cases:
+        - { id: "B1", input: { v: 1 }, expected: { s: 200 } }
+        - { id: "B2", input: { v: 2 }, expected: { s: 200 } }
+        - { id: "B3", input: { v: 3 }, expected: { s: 200 } }
+        - { id: "B4", input: { v: 4 }, expected: { s: 200 } }
+        - { id: "B5", input: { v: 5 }, expected: { s: 200 } }
+        - { id: "B6", input: { v: 6 }, expected: { s: 200 } }
+        - { id: "B7", input: { v: 7 }, expected: { s: 200 } }
+        - { id: "B8", input: { v: 8 }, expected: { s: 200 } }
+        - { id: "B9", input: { v: 9 }, expected: { s: 200 } }
+        - { id: "B10", input: { v: 10 }, expected: { s: 200 } }
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 45000
+      - type: json_path
+        path: "$.total_tests"
+        value: 10
+    weight: 25
+
+  - id: TC004
+    name: "Aggregation Accuracy"
+    description: "Verify result aggregation math is correct"
+    input:
+      workflow_id: "test-workflow"
+      test_cases:
+        - { id: "A1", input: {}, expected: { pass: true } }
+        - { id: "A2", input: {}, expected: { pass: false } }
+        - { id: "A3", input: {}, expected: { pass: true } }
+        - { id: "A4", input: {}, expected: { pass: true } }
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.summary.total"
+        value: 4
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - n8n_api_key
+  integration_type: "meta_evaluator"
+  notes: "This workflow evaluates other workflows - test carefully to avoid recursion"
+  special_handling: "Do not use this workflow to evaluate itself"

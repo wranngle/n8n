@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Layer 7: ElevenLabs Native Test Integration
+ * Layer 7: ElevenLabs Native Test Integration v1.1
  *
  * Converts supersystem scenarios to ElevenLabs-native tests
  * visible in the ElevenLabs dashboard Tests tab.
@@ -13,6 +13,7 @@
  *
  * Created: 2025-12-30
  * Fixed: 2025-12-30 - Corrected API endpoints from 404-returning paths
+ * Security: 2026-01-09 - Added timeouts, exponential backoff, safe YAML
  */
 
 const fs = require('fs');
@@ -27,6 +28,9 @@ const CONFIG = {
   API_BASE: 'https://api.elevenlabs.io/v1',
   SCENARIOS_FILE: path.join(__dirname, 'simulation-scenarios.yaml'),
   RESULTS_DIR: path.join(__dirname, 'elevenlabs-test-results'),
+  REQUEST_TIMEOUT_MS: parseInt(process.env.REQUEST_TIMEOUT_MS, 10) || 30000,
+  MAX_RETRIES: parseInt(process.env.MAX_RETRIES, 10) || 3,
+  BASE_RETRY_DELAY_MS: parseInt(process.env.BASE_RETRY_DELAY_MS, 10) || 1000,
 };
 
 // CORRECT API Endpoints
@@ -49,6 +53,90 @@ const C = {
   cyan: '\x1b[36m',
   magenta: '\x1b[35m',
 };
+
+/**
+ * Validate required configuration at startup
+ */
+function validateConfig() {
+  if (!CONFIG.ELEVENLABS_API_KEY) {
+    console.error(`${C.red}${C.bright}FATAL: ELEVENLABS_API_KEY environment variable required${C.reset}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Fetch with timeout and exponential backoff retry
+ * @param {string} url - Request URL
+ * @param {object} options - Fetch options
+ * @param {number} maxRetries - Max retry attempts (default: CONFIG.MAX_RETRIES)
+ * @returns {Promise<Response>}
+ */
+async function fetchWithRetry(url, options = {}, maxRetries = CONFIG.MAX_RETRIES) {
+  let lastError;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      
+      // Handle rate limiting with retry
+      if (response.status === 429 && attempt < maxRetries) {
+        const retryAfter = response.headers.get('retry-after');
+        const delay = retryAfter 
+          ? parseInt(retryAfter, 10) * 1000 
+          : CONFIG.BASE_RETRY_DELAY_MS * Math.pow(2, attempt) + Math.random() * 1000;
+        console.log(`${C.yellow}Rate limited, retrying in ${Math.round(delay)}ms...${C.reset}`);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+      
+      return response;
+    } catch (e) {
+      clearTimeout(timeout);
+      lastError = e;
+      
+      if (e.name === 'AbortError') {
+        lastError = new Error(`Request timeout after ${CONFIG.REQUEST_TIMEOUT_MS}ms: ${url}`);
+      }
+      
+      // Retry on network errors
+      if (attempt < maxRetries && e.name !== 'AbortError') {
+        const delay = CONFIG.BASE_RETRY_DELAY_MS * Math.pow(2, attempt) + Math.random() * 1000;
+        console.log(`${C.yellow}Request failed, retrying in ${Math.round(delay)}ms: ${e.message}${C.reset}`);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+/**
+ * Load scenarios from YAML file with safe parsing
+ * Uses JSON_SCHEMA to prevent code execution attacks
+ */
+function loadScenarios() {
+  const content = fs.readFileSync(CONFIG.SCENARIOS_FILE, 'utf8');
+  
+  // Use safe schema to prevent YAML deserialization attacks
+  const data = yaml.load(content, { 
+    schema: yaml.JSON_SCHEMA,  // Safe: no custom types, no code execution
+    filename: CONFIG.SCENARIOS_FILE, // For better error messages
+  });
+  
+  if (!data || !Array.isArray(data.scenarios)) {
+    throw new Error(`Invalid scenarios file: expected 'scenarios' array in ${CONFIG.SCENARIOS_FILE}`);
+  }
+  
+  return data.scenarios;
+}
 
 /**
  * Convert a supersystem scenario to ElevenLabs native test format
@@ -164,7 +252,7 @@ async function createTest(agentId, testConfig) {
     requestBody.dynamic_variables = testConfig.dynamic_variables;
   }
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'POST',
     headers: {
       'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
@@ -193,7 +281,7 @@ async function runTests(agentId, testIds = null) {
     requestBody.tests = testIds.map(id => ({ test_id: id }));
   }
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'POST',
     headers: {
       'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
@@ -223,7 +311,7 @@ async function listTests(agentId = null) {
     url += `?agent_id=${agentId}`;
   }
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'GET',
     headers: {
       'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
@@ -245,7 +333,7 @@ async function listTests(agentId = null) {
 async function getTestInvocation(invocationId) {
   const url = ENDPOINTS.getInvocation(invocationId);
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'GET',
     headers: {
       'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
@@ -270,7 +358,7 @@ async function listTestInvocations(agentId = null, pageSize = 30) {
     url += `&agent_id=${agentId}`;
   }
 
-  const response = await fetch(url, {
+  const response = await fetchWithRetry(url, {
     method: 'GET',
     headers: {
       'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
@@ -287,15 +375,6 @@ async function listTestInvocations(agentId = null, pageSize = 30) {
 
 // Backwards compatibility alias
 const getTestResults = getTestInvocation;
-
-/**
- * Load scenarios from YAML file
- */
-function loadScenarios() {
-  const content = fs.readFileSync(CONFIG.SCENARIOS_FILE, 'utf8');
-  const data = yaml.load(content);
-  return data.scenarios;
-}
 
 /**
  * Create all tests from scenarios

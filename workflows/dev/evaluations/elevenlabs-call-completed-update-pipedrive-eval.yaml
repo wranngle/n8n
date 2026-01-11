@@ -1,0 +1,112 @@
+# Evaluation Configuration: ElevenLabs Call Completed - Update Pipedrive
+# Workflow ID: cEORduJCqCVDOKce
+# Complexity: High (11 nodes)
+
+workflow_id: "cEORduJCqCVDOKce"
+workflow_name: "[DEV] ElevenLabs Call Completed - Update Pipedrive"
+webhook_path: "elevenlabs-call-completed"
+
+# Workflow Structure:
+# ElevenLabs Webhook → Check Event Type (Switch)
+#   → [call.completed] Parse Call Data (Code) → Route CRM Decision (Switch)
+#     → [has_id] Add Note to Pipedrive → Update Person Status → Respond Success
+#     → [no_id] Log Missing ID → Respond No ID
+#   → [call.failed] Parse Failure Data → Respond Failure Logged
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 45000
+  mode: "crm_integration"
+
+test_cases:
+  - id: TC001
+    name: "Successful Call with CRM ID"
+    description: "Test processing completed call with Pipedrive person ID"
+    input:
+      event: "call.completed"
+      conversation_id: "conv-crm-001"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      call_data:
+        duration_seconds: 180
+        outcome: "success"
+        disposition: "appointment_scheduled"
+        pipedrive_person_id: 12345
+    expected:
+      status: 200
+      response_contains:
+        - "note_added"
+        - "person_updated"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.pipedrive_updated"
+        value: true
+    weight: 30
+
+  - id: TC002
+    name: "Call Missing Pipedrive ID"
+    description: "Test handling when Pipedrive person ID is missing"
+    input:
+      event: "call.completed"
+      conversation_id: "conv-no-id"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      call_data:
+        duration_seconds: 90
+        outcome: "success"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.missing_id_logged"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "Failed Call Event"
+    description: "Test processing a failed call event"
+    input:
+      event: "call.failed"
+      conversation_id: "conv-failed"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      error_code: "busy_signal"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.failure_logged"
+        value: true
+    weight: 25
+
+  - id: TC004
+    name: "Pipedrive Note Content"
+    description: "Verify note content includes call details"
+    input:
+      event: "call.completed"
+      conversation_id: "conv-note-test"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      call_data:
+        duration_seconds: 240
+        outcome: "success"
+        disposition: "follow_up_scheduled"
+        pipedrive_person_id: 67890
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.note_includes_duration"
+        value: true
+      - type: json_path
+        path: "$.note_includes_disposition"
+        value: true
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - pipedrive_api_key
+    - elevenlabs_api_key
+  integration_type: "crm_webhook"
+  notes: "Processes ElevenLabs call completion webhooks and updates Pipedrive"

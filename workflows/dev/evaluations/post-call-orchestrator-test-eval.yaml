@@ -1,0 +1,108 @@
+# Evaluation Configuration: Post-Call Orchestrator (Test)
+# Workflow ID: 8qlDREZy5qtEGkNK
+# Complexity: Medium (8 nodes)
+
+workflow_id: "8qlDREZy5qtEGkNK"
+workflow_name: "[DEV] Supersystem - Post-Call Orchestrator (Test)"
+webhook_path: "post-call-orchestrator-test"
+
+# Workflow Structure:
+# Webhook: Post-Call → Parse Post-Call Event (Code) → Build Fan-Out Payloads (Code)
+#   → [parallel] Call Execution Logger + Call Slack Notifier
+#   → Wait for All Subworkflows (Merge) → Aggregate Results (Code) → Respond with Summary
+
+# Purpose: Orchestrates post-call processing with fan-out to multiple subworkflows
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 45000
+  mode: "orchestrator"
+
+test_cases:
+  - id: TC001
+    name: "Successful Call Event"
+    description: "Test post-processing for a successful call"
+    input:
+      event_type: "call.completed"
+      call_id: "call-test-001"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      duration_seconds: 180
+      outcome: "success"
+      disposition: "appointment_scheduled"
+      caller_phone: "+13075551234"
+    expected:
+      status: 200
+      response_contains:
+        - "summary"
+        - "logged"
+        - "notified"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 30000
+    weight: 35
+
+  - id: TC002
+    name: "Failed Call Event"
+    description: "Test post-processing for a failed call"
+    input:
+      event_type: "call.failed"
+      call_id: "call-test-002"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      error_code: "busy_signal"
+      caller_phone: "+13075555678"
+    expected:
+      status: 200
+      response_contains:
+        - "error"
+    assertions:
+      - type: json_path
+        path: "$.logged"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "Parallel Execution Verification"
+    description: "Verify both subworkflows are called"
+    input:
+      event_type: "call.completed"
+      call_id: "call-parallel-test"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      duration_seconds: 60
+      outcome: "success"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.execution_logger.called"
+        value: true
+      - type: json_path
+        path: "$.slack_notifier.called"
+        value: true
+    weight: 25
+
+  - id: TC004
+    name: "Partial Subworkflow Failure"
+    description: "Test handling when one subworkflow fails"
+    input:
+      event_type: "call.completed"
+      call_id: "call-partial-fail"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      simulate_slack_failure: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.partial_success"
+        value: true
+    weight: 15
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - elevenlabs_api_key
+  integration_type: "orchestrator_fanout"
+  notes: "Fan-out pattern - depends on Execution Logger and Slack Notifier subworkflows"
