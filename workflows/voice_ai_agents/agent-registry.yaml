@@ -1,9 +1,15 @@
-# Voice Agent Registry v1.0
+# Voice Agent Registry v2.0
 # Master index of all voice agents and their test scenarios
 # Used by Voice Agent Tester v2.0 for multi-agent testing
+#
+# Directory Structure (post-reorganization):
+#   agents/sarah/       - Production B2B Sales SDR
+#   pipelines/          - n8n workflow definitions
+#   supersystem/        - Autonomous evaluation framework
+#   Note: Historical agents archived in git history (old/ directory removed 2026-01-19)
 
-version: "1.0"
-last_updated: "2025-12-28"
+version: "2.0"
+last_updated: "2026-01-19"
 
 # Default settings applied to all agents unless overridden
 defaults:
@@ -30,41 +36,41 @@ agents:
 
   sarah-wranngle:
     id: "agent_8001kdgp7qbyf4wvhs540be78vew"
-    name: "Sarah - Wranngle Receptionist"
+    name: "Sarah - Wranngle Lead Specialist v2.0"
     phase: PROD
     phone: "+18882662193"
-    scenario_file: "test-scenarios.yaml"
-    description: "Main Wranngle lead qualification and demo booking agent"
+    config_file: "agents/sarah/config.json"
+    prompt_file: "agents/sarah/system-prompt.md"
+    spec_file: "agents/sarah/tech-spec.md"
+    scenario_file: "agents/sarah/tests/scenarios.yaml"
+    description: "B2B Sales SDR for The 24/7 Filter - after-hours AI hotlines"
     sms_tool_url: "https://n8n.wranngle.com/webhook/send-sms"
     tags:
       - production
       - lead-qualification
       - sms-enabled
+      - b2b-sales
+    industries:
+      - hvac
+      - plumbing
+      - property_management
+      - legal
+    intake_schema_mapping:
+      volume: "q06_runs_per_period"
+      current_solution: "q13_common_failures"
+      authority: "decision_maker"
     critical_scenarios:
       - happy-path-booking
       - premature-confirm
       - tool-retry
+      - emergency-redirect
+      - objection-handling
 
   # -----------------------------------------
   # DEVELOPMENT AGENTS
   # -----------------------------------------
-
-  sewy-garage:
-    id: "agent_8801kdhbm6ane7wbxrq0vfenmsj9"
-    name: "SEWY Garage Doors - Sarah"
-    phase: DEV
-    phone: null  # Not yet assigned
-    scenario_file: "sewy-garage/test-scenarios.yaml"
-    description: "Garage door repair booking agent for Southeastern Wyoming"
-    sms_tool_url: null  # Using mock endpoint
-    tags:
-      - development
-      - client-agent
-      - sms-enabled
-    critical_scenarios:
-      - sewy-happy-repair
-      - sewy-premature-confirm
-      - sewy-tool-retry
+  # Note: SEWY Garage agent (agent_8801kdhbm6ane7wbxrq0vfenmsj9) archived 2026-01-19
+  #       Historical config available in git history at commit bc93520
 
   wranngle-lead-qualifier:
     id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"

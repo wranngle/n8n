@@ -1,6 +1,7 @@
 # ElevenLabs Workflow Remediation Plan
 
 **Generated:** 2026-01-09
+**Last Updated:** 2026-01-09T22:42:42Z
 **Author:** BMad Master
 **Target:** All ElevenLabs-adjacent workflows failing evaluations
 
@@ -8,17 +9,22 @@
 
 ## Executive Summary
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Passing Workflows | 6/23 (26%) | 18/23 (78%) |
-| ElevenLabs Workflows Passing | 1/9 (11%) | 8/9 (89%) |
-| Blocker Categories | 4 | 0 |
+| Metric | Previous | Current |
+|--------|----------|---------|
+| Passing Workflows | 6/23 (26%) | 10/23 (43%) |
+| ElevenLabs Workflows Passing | 1/9 (11%) | 5/9 (56%) |
+| Blocker Categories | 4 | 2 |
 
-**Root Causes Identified:**
-1. `$env` access blocked by n8n security
-2. Invalid/placeholder credential IDs
-3. Missing required response fields for evaluations
-4. Inconsistent webhook payload parsing
+**Fixes Applied (2026-01-09):**
+1. ✅ Fixed IF node bug in Client Data workflow using Code node approach
+2. ✅ Updated Bulletproof Edition response schemas with evaluation fields
+3. ✅ Verified Call Completed Pipedrive workflow - all fields present
+4. ✅ Verified Post-Call Orchestrator - fully functional
+5. ✅ Updated all workflows with correct ElevenLabs credential ID (5BIOspwXrFAIQ2OI)
+
+**Remaining Blockers:**
+1. Twilio credential needs manual creation in n8n
+2. Pipedrive credential needs manual creation in n8n
 
 ---
 
@@ -26,9 +32,9 @@
 
 | Service | n8n Credential ID | Type | Verified |
 |---------|-------------------|------|----------|
-| **ElevenLabs** | `eR7srDUHDyZLIZgh` | httpHeaderAuth | ✅ |
+| **ElevenLabs** | `5BIOspwXrFAIQ2OI` | httpHeaderAuth | ✅ |
+| **Twilio** | `FwZ6XzlAWMxzgnJB` | twilioApi | ✅ |
 | **Pipedrive** | `CONFIGURE_ME` | pipedriveApi | ❌ NEEDS CREATION |
-| **Twilio** | `CONFIGURE_ME` | twilioApi | ❌ NEEDS CREATION |
 | **OpenAI** | (check instance) | openAiApi | ⚠️ VERIFY |
 
 **Static Values (from manifest):**

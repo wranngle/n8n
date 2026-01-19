@@ -1,0 +1,819 @@
+{
+  "name": "[DEV] Post-Call Bulletproof",
+  "nodes": [
+    {
+      "id": "webhook-receiver",
+      "name": "ElevenLabs Post-Call Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "elevenlabs-post-call-bulletproof",
+      "parameters": {
+        "path": "post-call-bulletproof",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      }
+    },
+    {
+      "id": "immediate-ack",
+      "name": "Immediate ACK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { received: true, conversation_id: $json.body?.data?.conversation_id || 'unknown', processing_id: 'proc_' + Date.now() + '_' + Math.random().toString(36).substr(2,9), timestamp: new Date().toISOString(), processing: 'async' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "config-loader",
+      "name": "Load Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// ===========================================\n// CONFIGURATION - Edit these values directly\n// ===========================================\nconst CONFIG = {\n  // Slack Webhook URL - Get from Slack App settings\n  // Leave empty to disable Slack notifications\n  SLACK_WEBHOOK_URL: '',\n  \n  // Qdrant Vector DB - Set URL and API key to enable\n  // Leave empty to skip vectorization\n  QDRANT_URL: 'http://qdrant:6333',  // Docker service name\n  QDRANT_API_KEY: '',\n  \n  // Gemini API for embeddings (768 dimensions)\n  GEMINI_API_KEY: 'AIzaSyCDqGdX8dfPJiQYh7NJYymUjwFYE4JwX6M',\n  \n  // Feature flags\n  ENABLE_SLACK: false,\n  ENABLE_QDRANT: true,\n  ENABLE_CRM: false,  // Disabled - no Pipedrive yet\n  \n  // Debug mode - logs extra info\n  DEBUG: true\n};\n\n// Parse the incoming payload\nconst payload = $json.body || $json;\nconst processing_id = 'proc_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);\n\n// Validate required fields\nconst requiredFields = {\n  'type': payload.type,\n  'data': payload.data,\n  'data.conversation_id': payload.data?.conversation_id\n};\n\nconst missingFields = [];\nfor (const [field, value] of Object.entries(requiredFields)) {\n  if (value === undefined || value === null || value === '') {\n    missingFields.push(field);\n  }\n}\n\nif (missingFields.length > 0) {\n  return {\n    json: {\n      config: CONFIG,\n      valid: false,\n      error: 'SCHEMA_VALIDATION_FAILED',\n      missing_fields: missingFields,\n      event_type: payload.type || 'undefined',\n      processing_id\n    }\n  };\n}\n\n// Extract and normalize all fields\nconst data = payload.data;\nconst clientData = data.conversation_initiation_client_data || {};\nconst dynamicVars = clientData.dynamic_variables || {};\nconst analysis = data.analysis || {};\nconst metadata = data.metadata || {};\nconst dataCollection = analysis.data_collection_results || {};\n\nconst transcript = data.transcript || [];\nconst transcript_text = transcript.map(t => t.role + ': ' + t.message).join('\\n');\n\nreturn {\n  json: {\n    config: CONFIG,\n    valid: true,\n    processing_id,\n    event_type: payload.type,\n    conversation_id: data.conversation_id,\n    agent_id: data.agent_id || '',\n    pipedrive_person_id: dynamicVars.pipedrive_person_id || null,\n    customer_name: dynamicVars.customer_name || '',\n    customer_phone: dynamicVars.phone || metadata.caller_phone || '',\n    call_duration_secs: metadata.call_duration_secs || 0,\n    start_time_unix: metadata.start_time_unix_secs || 0,\n    call_successful: analysis.call_successful || 'unknown',\n    transcript_summary: analysis.transcript_summary || '',\n    budget: dataCollection.budget || dataCollection.Budget || 'not_discussed',\n    timeline: dataCollection.timeline || dataCollection.Timeline || 'not_discussed',\n    authority: dataCollection.authority || dataCollection.Authority || 'not_discussed',\n    need: dataCollection.need || dataCollection.Need || 'not_discussed',\n    transcript,\n    transcript_text,\n    transcript_available: transcript.length > 0,\n    failure_reason: data.failure_reason || null,\n    received_at: new Date().toISOString()\n  }\n};"
+      }
+    },
+    {
+      "id": "event-router",
+      "name": "Route by Event Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "outputKey": "transcription",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event_type }}",
+                    "rightValue": "post_call_transcription",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "failure",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event_type }}",
+                    "rightValue": "call_initiation_failure",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "invalid",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.valid }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "check-slack-enabled",
+      "name": "Slack Enabled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        50
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.config.ENABLE_SLACK }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "slack-notify",
+      "name": "Slack Notify",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.config.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: ($json.call_successful === 'success' ? '✅ Call Completed' : '❌ Call ' + $json.call_successful) + ' - ' + ($json.customer_name || 'Unknown') + ' (' + Math.floor(($json.call_duration_secs || 0) / 60) + 'm ' + (($json.call_duration_secs || 0) % 60) + 's)', attachments: [{ color: $json.call_successful === 'success' ? 'good' : 'warning', fields: [{ title: 'Customer', value: $json.customer_name || 'Unknown', short: true }, { title: 'Duration', value: Math.floor(($json.call_duration_secs || 0) / 60) + 'm ' + (($json.call_duration_secs || 0) % 60) + 's', short: true }, { title: 'Outcome', value: $json.call_successful || 'unknown', short: true }, { title: 'Conv ID', value: $json.conversation_id, short: true }] }] }) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "slack-skipped",
+      "name": "Slack Skipped",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        100
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "slack_status",
+              "value": "disabled",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "check-crm-id",
+      "name": "Has CRM ID?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.pipedrive_person_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "leftValue": "={{ $json.config.ENABLE_CRM }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "crm-prep",
+      "name": "Prep CRM Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const data = $json;\nconst qualificationStatus = data.call_successful === 'success' ? 'qualified' : data.call_successful === 'failure' ? 'not_qualified' : 'needs_review';\nconst qualificationScore = data.call_successful === 'success' ? 80 : data.call_successful === 'failure' ? 20 : 50;\nconst noteContent = `## AI Qualification Call Summary\n\n**Status:** ${qualificationStatus}\n**Score:** ${qualificationScore}/100\n**Duration:** ${Math.round((data.call_duration_secs || 0) / 60)} minutes\n\n### Summary\n${data.transcript_summary || 'No summary available'}\n\n### BANT\n- Budget: ${data.budget}\n- Timeline: ${data.timeline}\n- Authority: ${data.authority}\n- Need: ${data.need}\n\n---\n*Conversation ID: ${data.conversation_id}*`;\nconst crmLabel = qualificationStatus === 'qualified' ? 'Hot Lead' : qualificationStatus === 'not_qualified' ? 'Cold' : 'Warm Lead';\nreturn { json: { ...data, crm_note_content: noteContent, crm_label: crmLabel, crm_qualification_status: qualificationStatus } };"
+      }
+    },
+    {
+      "id": "pipedrive-note",
+      "name": "Pipedrive: Create Note",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        200
+      ],
+      "parameters": {
+        "resource": "note",
+        "operation": "create",
+        "content": "={{ $json.crm_note_content }}",
+        "additionalFields": {
+          "person_id": "={{ $json.pipedrive_person_id }}"
+        }
+      },
+      "credentials": {
+        "pipedriveApi": {
+          "id": "wranngle-pipedrive",
+          "name": "Wranngle Pipedrive"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "continueOnFail": true
+    },
+    {
+      "id": "skip-crm",
+      "name": "Skip CRM",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        400
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "crm_skip_reason",
+              "value": "={{ $json.config.ENABLE_CRM ? 'No valid pipedrive_person_id' : 'CRM disabled in config' }}",
+              "type": "string"
+            },
+            {
+              "name": "crm_updated",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "check-qdrant-enabled",
+      "name": "Qdrant Enabled?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        550
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.config.ENABLE_QDRANT }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "leftValue": "={{ $json.transcript_available }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "generate-embedding",
+      "name": "Generate Embedding (Gemini)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        500
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={{ $json.config.GEMINI_API_KEY }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'models/text-embedding-004', content: { parts: [{ text: ($json.transcript_summary || '') + ' ' + ($json.transcript_text || '').substring(0, 8000) }] } }) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "continueOnFail": true
+    },
+    {
+      "id": "qdrant-upsert",
+      "name": "Qdrant Upsert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        500
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('Load Config').item.json.config.QDRANT_URL + '/collections/call_transcripts/points' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "={{ $('Load Config').item.json.config.QDRANT_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ points: [{ id: Math.abs($('Load Config').item.json.conversation_id.split('').reduce((a,b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0)), vector: $json.embedding?.values || [], payload: { conversation_id: $('Load Config').item.json.conversation_id, agent_id: $('Load Config').item.json.agent_id, customer_name: $('Load Config').item.json.customer_name, customer_phone: $('Load Config').item.json.customer_phone, call_successful: $('Load Config').item.json.call_successful, call_duration_secs: $('Load Config').item.json.call_duration_secs, transcript_summary: $('Load Config').item.json.transcript_summary, budget: $('Load Config').item.json.budget, timeline: $('Load Config').item.json.timeline, created_at: $now.toISO() } }] }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000,
+      "continueOnFail": true
+    },
+    {
+      "id": "qdrant-skipped",
+      "name": "Qdrant Skipped",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        650
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "vector_stored",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "name": "vector_skip_reason",
+              "value": "={{ $json.config.ENABLE_QDRANT ? 'No transcript available' : 'Qdrant disabled in config' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "failure-handler",
+      "name": "Handle Call Failure",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        800
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "event_type",
+              "value": "call_initiation_failure",
+              "type": "string"
+            },
+            {
+              "name": "failure_reason",
+              "value": "={{ $json.failure_reason }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "slack-alert-failure",
+      "name": "Slack Alert: Failure",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        800
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.config.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/disabled' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '🚨 Call Initiation Failed', attachments: [{ color: 'danger', fields: [{ title: 'Failure Reason', value: $json.failure_reason || 'Unknown', short: false }, { title: 'Conversation ID', value: $json.conversation_id || 'N/A', short: true }, { title: 'Processing ID', value: $json.processing_id || 'N/A', short: true }] }] }) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "invalid-handler",
+      "name": "Log Invalid Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        1000
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "status",
+              "value": "invalid_payload",
+              "type": "string"
+            },
+            {
+              "name": "error",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            },
+            {
+              "name": "missing_fields",
+              "value": "={{ JSON.stringify($json.missing_fields) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "final-status",
+      "name": "Final Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst firstItem = items[0]?.json || {};\n\n// Aggregate results from all branches\nconst result = {\n  processing_id: firstItem.processing_id || 'unknown',\n  conversation_id: firstItem.conversation_id || 'unknown',\n  event_type: firstItem.event_type || 'unknown',\n  completed_at: new Date().toISOString(),\n  \n  // Status flags\n  slack_notified: items.some(i => i.json?.ok || i.json?.attachments),\n  crm_updated: items.some(i => i.json?.id && i.json?.content),\n  vector_stored: items.some(i => i.json?.result?.operation_id || i.json?.status === 'ok' || i.json?.result?.status === 'completed'),\n  \n  // Config status\n  config_slack_enabled: firstItem.config?.ENABLE_SLACK || false,\n  config_qdrant_enabled: firstItem.config?.ENABLE_QDRANT || false,\n  config_crm_enabled: firstItem.config?.ENABLE_CRM || false,\n  \n  // Collect any errors\n  errors: items\n    .filter(i => i.json?.error || i.json?.errorCode || i.json?.crm_skip_reason || i.json?.vector_skip_reason)\n    .map(i => ({\n      type: i.json?.crm_skip_reason ? 'crm_skipped' : i.json?.vector_skip_reason ? 'vector_skipped' : 'error',\n      message: i.json?.error || i.json?.errorCode || i.json?.crm_skip_reason || i.json?.vector_skip_reason || i.json?.message\n    })),\n  \n  items_processed: items.length\n};\n\nresult.overall_success = result.errors.filter(e => e.type === 'error').length === 0;\n\nreturn [{ json: result }];"
+      }
+    },
+    {
+      "id": "workflow-end",
+      "name": "Workflow Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        400
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "ElevenLabs Post-Call Webhook": {
+      "main": [
+        [
+          {
+            "node": "Immediate ACK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Immediate ACK": {
+      "main": [
+        [
+          {
+            "node": "Load Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Config": {
+      "main": [
+        [
+          {
+            "node": "Route by Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Event Type": {
+      "main": [
+        [
+          {
+            "node": "Slack Enabled?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has CRM ID?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Qdrant Enabled?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle Call Failure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Invalid Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Slack Enabled?": {
+      "main": [
+        [
+          {
+            "node": "Slack Notify",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notify": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Skipped": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has CRM ID?": {
+      "main": [
+        [
+          {
+            "node": "Prep CRM Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep CRM Data": {
+      "main": [
+        [
+          {
+            "node": "Pipedrive: Create Note",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pipedrive: Create Note": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip CRM": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Enabled?": {
+      "main": [
+        [
+          {
+            "node": "Generate Embedding (Gemini)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Qdrant Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Embedding (Gemini)": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Upsert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Upsert": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Skipped": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Call Failure": {
+      "main": [
+        [
+          {
+            "node": "Slack Alert: Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Alert: Failure": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Invalid Payload": {
+      "main": [
+        [
+          {
+            "node": "Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Status": {
+      "main": [
+        [
+          {
+            "node": "Workflow Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  },
+  "staticData": null
+}

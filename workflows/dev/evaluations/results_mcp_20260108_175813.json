@@ -1,0 +1,258 @@
+﻿[
+    {
+        "passed":  false,
+        "workflow_id":  "D4GGMXFGC1PLOUT0",
+        "complexity":  "minimal",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T17:58:12Z",
+        "workflow_name":  "Get ElevenLabs Agent",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Valid Agent Retrieval",
+                                 "error":  {
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "description":  "Invalid API key",
+                                               "timestamp":  1767913089677,
+                                               "context":  {
+                                                               "itemIndex":  0,
+                                                               "request":  {
+                                                                               "headers":  {
+                                                                                               "xi-api-key":  "sk_733d2a2707d99f6bcdb9cc330570deea72390b20b6b2915e",
+                                                                                               "accept":  "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7"
+                                                                                           },
+                                                                               "method":  "GET",
+                                                                               "uri":  "https://api.elevenlabs.io/v1/convai/agents/agent_5701kdgf9s4vfe9rhe68ntjrms9g",
+                                                                               "gzip":  true,
+                                                                               "rejectUnauthorized":  true,
+                                                                               "followRedirect":  true,
+                                                                               "resolveWithFullResponse":  true,
+                                                                               "followAllRedirects":  true,
+                                                                               "timeout":  300000,
+                                                                               "encoding":  null,
+                                                                               "json":  false,
+                                                                               "useStream":  true
+                                                                           }
+                                                           },
+                                               "functionality":  "regular",
+                                               "name":  "NodeApiError",
+                                               "node":  {
+                                                            "id":  "get-agent",
+                                                            "name":  "Get ElevenLabs Agent",
+                                                            "type":  "n8n-nodes-base.httpRequest",
+                                                            "typeVersion":  4.2,
+                                                            "position":  [
+                                                                             460,
+                                                                             300
+                                                                         ],
+                                                            "parameters":  {
+                                                                               "preBuiltAgentsCalloutHttpRequest":  "",
+                                                                               "curlImport":  "",
+                                                                               "method":  "GET",
+                                                                               "url":  "=https://api.elevenlabs.io/v1/convai/agents/{{ $json.body.agent_id || \u0027agent_5701kdgf9s4vfe9rhe68ntjrms9g\u0027 }}",
+                                                                               "authentication":  "none",
+                                                                               "provideSslCertificates":  false,
+                                                                               "sendQuery":  false,
+                                                                               "sendHeaders":  true,
+                                                                               "specifyHeaders":  "keypair",
+                                                                               "headerParameters":  {
+                                                                                                        "parameters":  [
+                                                                                                                           {
+                                                                                                                               "name":  "xi-api-key",
+                                                                                                                               "value":  "sk_733d2a2707d99f6bcdb9cc330570deea72390b20b6b2915e"
+                                                                                                                           }
+                                                                                                                       ]
+                                                                                                    },
+                                                                               "sendBody":  false,
+                                                                               "options":  {
+                                                                                               "response":  {
+                                                                                                                "response":  {
+                                                                                                                                 "fullResponse":  true,
+                                                                                                                                 "neverError":  false,
+                                                                                                                                 "responseFormat":  "autodetect"
+                                                                                                                             }
+                                                                                                            }
+                                                                                           },
+                                                                               "infoMessage":  ""
+                                                                           }
+                                                        },
+                                               "messages":  [
+                                                                "401 - \"{\\\"detail\\\":{\\\"status\\\":\\\"invalid_api_key\\\",\\\"message\\\":\\\"Invalid API key\\\"}}\""
+                                                            ],
+                                               "httpCode":  "401",
+                                               "message":  "Authorization failed - please check your credentials",
+                                               "stack":  "NodeApiError: Authorization failed - please check your credentials\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/HttpRequest/V3/HttpRequestV3.node.ts:859:16)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  40
+                             },
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Default Agent (no ID)",
+                                 "error":  {
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "description":  "Invalid API key",
+                                               "timestamp":  1767913089942,
+                                               "context":  {
+                                                               "itemIndex":  0,
+                                                               "request":  {
+                                                                               "headers":  {
+                                                                                               "xi-api-key":  "sk_733d2a2707d99f6bcdb9cc330570deea72390b20b6b2915e",
+                                                                                               "accept":  "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7"
+                                                                                           },
+                                                                               "method":  "GET",
+                                                                               "uri":  "https://api.elevenlabs.io/v1/convai/agents/agent_5701kdgf9s4vfe9rhe68ntjrms9g",
+                                                                               "gzip":  true,
+                                                                               "rejectUnauthorized":  true,
+                                                                               "followRedirect":  true,
+                                                                               "resolveWithFullResponse":  true,
+                                                                               "followAllRedirects":  true,
+                                                                               "timeout":  300000,
+                                                                               "encoding":  null,
+                                                                               "json":  false,
+                                                                               "useStream":  true
+                                                                           }
+                                                           },
+                                               "functionality":  "regular",
+                                               "name":  "NodeApiError",
+                                               "node":  {
+                                                            "id":  "get-agent",
+                                                            "name":  "Get ElevenLabs Agent",
+                                                            "type":  "n8n-nodes-base.httpRequest",
+                                                            "typeVersion":  4.2,
+                                                            "position":  [
+                                                                             460,
+                                                                             300
+                                                                         ],
+                                                            "parameters":  {
+                                                                               "preBuiltAgentsCalloutHttpRequest":  "",
+                                                                               "curlImport":  "",
+                                                                               "method":  "GET",
+                                                                               "url":  "=https://api.elevenlabs.io/v1/convai/agents/{{ $json.body.agent_id || \u0027agent_5701kdgf9s4vfe9rhe68ntjrms9g\u0027 }}",
+                                                                               "authentication":  "none",
+                                                                               "provideSslCertificates":  false,
+                                                                               "sendQuery":  false,
+                                                                               "sendHeaders":  true,
+                                                                               "specifyHeaders":  "keypair",
+                                                                               "headerParameters":  {
+                                                                                                        "parameters":  [
+                                                                                                                           {
+                                                                                                                               "name":  "xi-api-key",
+                                                                                                                               "value":  "sk_733d2a2707d99f6bcdb9cc330570deea72390b20b6b2915e"
+                                                                                                                           }
+                                                                                                                       ]
+                                                                                                    },
+                                                                               "sendBody":  false,
+                                                                               "options":  {
+                                                                                               "response":  {
+                                                                                                                "response":  {
+                                                                                                                                 "fullResponse":  true,
+                                                                                                                                 "neverError":  false,
+                                                                                                                                 "responseFormat":  "autodetect"
+                                                                                                                             }
+                                                                                                            }
+                                                                                           },
+                                                                               "infoMessage":  ""
+                                                                           }
+                                                        },
+                                               "messages":  [
+                                                                "401 - \"{\\\"detail\\\":{\\\"status\\\":\\\"invalid_api_key\\\",\\\"message\\\":\\\"Invalid API key\\\"}}\""
+                                                            ],
+                                               "httpCode":  "401",
+                                               "message":  "Authorization failed - please check your credentials",
+                                               "stack":  "NodeApiError: Authorization failed - please check your credentials\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/HttpRequest/V3/HttpRequestV3.node.ts:859:16)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  30
+                             }
+                         ]
+    },
+    {
+        "passed":  true,
+        "workflow_id":  "NBvO92RVDa8pCK0d",
+        "complexity":  "minimal",
+        "score":  100,
+        "evaluated_at":  "2026-01-08T17:58:12Z",
+        "workflow_name":  "Client Data Lookup (Test)",
+        "test_results":  [
+                             {
+                                 "status":  "pass",
+                                 "score":  50,
+                                 "name":  "Valid Lookup",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "Ar2lX0cprjeWB4Kd",
+        "complexity":  "minimal",
+        "score":  50,
+        "evaluated_at":  "2026-01-08T17:58:13Z",
+        "workflow_name":  "Execution Logger (Test)",
+        "test_results":  [
+                             {
+                                 "status":  "partial",
+                                 "score":  25,
+                                 "name":  "Log Entry",
+                                 "details":  "Fields found: 1 / 2",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  true,
+        "workflow_id":  "ITUFwZq7ixgjTZMJ",
+        "complexity":  "minimal",
+        "score":  100,
+        "evaluated_at":  "2026-01-08T17:58:13Z",
+        "workflow_name":  "Slack Notifier (Test)",
+        "test_results":  [
+                             {
+                                 "status":  "pass",
+                                 "score":  50,
+                                 "name":  "Format Message",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  true,
+        "workflow_id":  "paneUFRzPscNvih2",
+        "complexity":  "minimal",
+        "score":  100,
+        "evaluated_at":  "2026-01-08T17:58:13Z",
+        "workflow_name":  "Pipeline Test - Webhook Processor",
+        "test_results":  [
+                             {
+                                 "status":  "pass",
+                                 "score":  50,
+                                 "name":  "Process Webhook Data",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "oik6SebewNAh1cV5",
+        "complexity":  "minimal",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T17:58:13Z",
+        "workflow_name":  "Client Data Lookup (Eval-Ready)",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Valid Lookup",
+                                 "error":  "Only workflows with the following trigger nodes can be executed: Schedule Trigger, Webhook Trigger, Form Trigger, Chat Trigger.",
+                                 "max_score":  50
+                             }
+                         ]
+    }
+]

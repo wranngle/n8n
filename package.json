@@ -1,0 +1,22 @@
+{
+  "name": "n8n-workflow-development",
+  "version": "2.0.0",
+  "description": "n8n Workflow Development Command Center - Hook-driven deterministic methodology",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test:hooks": "node .claude/hooks/session-init.js",
+    "verify": "node -e \"require('./.claude/hooks/hook-utils.js')\""
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "wranngle",
+  "license": "MIT",
+  "devDependencies": {
+    "yaml": "^2.8.2"
+  }
+}

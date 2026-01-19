@@ -1,0 +1,158 @@
+# BMM Workflow Status - n8n
+# Generated: 2026-01-07
+# Track: BMad Method (Brownfield)
+
+# STATUS DEFINITIONS:
+# ==================
+# Initial Status (before completion):
+#   - required: Must be completed to progress
+#   - optional: Can be completed but not required
+#   - recommended: Strongly suggested but not required
+#   - conditional: Required only if certain conditions met
+#
+# Completion Status:
+#   - {file-path}: File created/found
+#   - skipped: Optional/conditional workflow that was skipped
+
+generated: "2026-01-07"
+project: "n8n"
+project_type: "n8n workflow development methodology"
+selected_track: "bmad-method"
+field_type: "brownfield"
+workflow_path: "method-brownfield.yaml"
+
+# Existing Assets (found during init scan)
+existing_assets:
+  - type: "methodology"
+    path: "CLAUDE.md"
+    description: "Comprehensive n8n workflow development protocol (21 steps, 6 phases)"
+  - type: "skills"
+    path: ".claude/skills/"
+    description: "11 specialized n8n development skills"
+  - type: "hooks"
+    path: ".claude/hooks/"
+    description: "15+ hook scripts for workflow governance"
+  - type: "governance"
+    path: "workflows/governance.yaml"
+    description: "Workflow deployment phase tracking"
+  - type: "knowledge_base"
+    path: "context/"
+    description: "YouTube (10,279), Discord (2,930), patterns indexed"
+  - type: "integrations"
+    path: ".claude/directives/integrations/"
+    description: "ElevenLabs, Twilio integration frameworks"
+
+workflow_status:
+  # Phase 0: Documentation (Brownfield prerequisite)
+  phase_0_documentation:
+    name: "Documentation"
+    note: "Prerequisite for brownfield - analyze existing codebase"
+    workflows:
+      - id: "document-project"
+        status: "docs/"
+        agent: "analyst"
+        command: "/bmad:bmm:workflows:document-project"
+        output: "docs/"
+        completed_at: "2026-01-07"
+        notes: "Generated BMM documentation: index.md, project-overview.md, architecture.md, source-tree-analysis.md, development-guide.md"
+
+  # Phase 1: Analysis (Optional)
+  phase_1_analysis:
+    name: "Analysis"
+    optional: true
+    note: "User-selected discovery workflows"
+    workflows:
+      - id: "brainstorm-project"
+        status: "optional"
+        agent: "analyst"
+        command: "/bmad:bmm:workflows:brainstorming"
+        output: null
+      - id: "research"
+        status: "optional"
+        agent: "analyst"
+        command: "/bmad:bmm:workflows:research"
+        output: null
+      - id: "product-brief"
+        status: "optional"
+        agent: "analyst"
+        command: "/bmad:bmm:workflows:create-product-brief"
+        output: null
+
+  # Phase 2: Planning
+  phase_2_planning:
+    name: "Planning"
+    required: true
+    workflows:
+      - id: "prd"
+        status: "_bmad-output/planning-artifacts/prd.md"
+        agent: "pm"
+        command: "/bmad:bmm:workflows:create-prd"
+        output: "_bmad-output/planning-artifacts/prd.md"
+        completed_at: "2026-01-07"
+        notes: "Product Requirements Document with 70 FRs, 26 NFRs, 5 user journeys"
+      - id: "create-ux-design"
+        status: "conditional"
+        condition: "if_has_ui"
+        agent: "ux-designer"
+        command: "/bmad:bmm:workflows:create-ux-design"
+        output: null
+        notes: "Determined after PRD - needed if building UI components"
+
+  # Phase 3: Solutioning
+  phase_3_solutioning:
+    name: "Solutioning"
+    required: true
+    workflows:
+      - id: "create-architecture"
+        status: "required"
+        agent: "architect"
+        command: "/bmad:bmm:workflows:create-architecture"
+        output: null
+        notes: "System architecture document"
+      - id: "create-epics-and-stories"
+        status: "required"
+        agent: "pm"
+        command: "/bmad:bmm:workflows:create-epics-and-stories"
+        output: null
+        notes: "Break down PRD into implementable epics and stories"
+      - id: "test-design"
+        status: "optional"
+        agent: "tea"
+        command: "/bmad:bmm:workflows:testarch-test-design"
+        output: null
+        notes: "System-level testability review"
+      - id: "implementation-readiness"
+        status: "required"
+        agent: "architect"
+        command: "/bmad:bmm:workflows:check-implementation-readiness"
+        output: null
+        notes: "Gate check - validates PRD + Architecture + Epics alignment"
+
+  # Phase 4: Implementation
+  phase_4_implementation:
+    name: "Implementation"
+    required: true
+    workflows:
+      - id: "sprint-planning"
+        status: "required"
+        agent: "sm"
+        command: "/bmad:bmm:workflows:sprint-planning"
+        output: null
+        notes: "Creates sprint plan - subsequent work tracked in sprint-status.yaml"
+
+# Next Action
+next_workflow:
+  id: "create-architecture"
+  name: "Create Architecture"
+  agent: "architect"
+  command: "/bmad:bmm:workflows:create-architecture"
+  reason: "Phase 3 Solutioning - create system architecture document"
+
+# Notes
+notes:
+  - "This project has extensive existing documentation in CLAUDE.md"
+  - "Document-project workflow COMPLETED on 2026-01-07"
+  - "Generated 5 BMM documentation files in docs/ folder"
+  - "n8n-mcp integration provides 39 tools, 528 nodes, 2709 templates"
+  - "PRD workflow COMPLETED on 2026-01-07 - 70 FRs, 26 NFRs, 5 user journeys"
+  - "Next: Run create-architecture workflow for Phase 3 Solutioning"
