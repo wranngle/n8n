@@ -39,11 +39,10 @@ agents:
     name: "Sarah - Wranngle Lead Specialist v2.0"
     phase: PROD
     phone: "+18882662193"
-    config_file: "agents/sarah/config.json"
-    prompt_file: "agents/sarah/system-prompt.md"
-    spec_file: "agents/sarah/tech-spec.md"
-    scenario_file: "agents/sarah/tests/scenarios.yaml"
+    scenario_file: "supersystem/scenarios/sarah.yaml"
     description: "B2B Sales SDR for The 24/7 Filter - after-hours AI hotlines"
+    # Cloud-managed: Query via mcp__elevenlabs-mcp__get_agent
+    # Archived local files: old/agents/sarah/
     sms_tool_url: "https://n8n.wranngle.com/webhook/send-sms"
     tags:
       - production
