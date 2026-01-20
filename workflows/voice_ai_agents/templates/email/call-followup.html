@@ -1,0 +1,42 @@
+<!--
+  Call Follow-up Email Template
+
+  Variables:
+  - {{first_name}} - Customer's first name
+  - {{call_summary}} - Brief summary of the call
+  - {{next_steps}} - Recommended next steps
+  - {{calendar_link}} - Link to book a follow-up
+  - {{agent_name}} - Name of the AI agent (e.g., Sarah)
+-->
+<h2>Thanks for chatting with us, {{first_name}}!</h2>
+
+<p>
+  It was great speaking with you today. Here's a quick summary of our conversation:
+</p>
+
+<div class="info-box">
+  <strong>Call Summary:</strong><br>
+  {{call_summary}}
+</div>
+
+<p><strong>Next Steps:</strong></p>
+<p>{{next_steps}}</p>
+
+<p>
+  Want to continue the conversation? Book a time that works for you:
+</p>
+
+<p style="text-align: center;">
+  <a href="{{calendar_link}}" class="btn">Schedule a Follow-up</a>
+</p>
+
+<p>
+  If you have any questions in the meantime, just reply to this email or give us a call -
+  {{agent_name}} or one of our team members will be happy to help.
+</p>
+
+<p>
+  Best regards,<br>
+  <strong>{{agent_name}}</strong><br>
+  Wranngle AI Assistant
+</p>
