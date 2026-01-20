@@ -44,6 +44,52 @@ agents:
     # Cloud-managed: Query via mcp__elevenlabs-mcp__get_agent
     # Archived local files: old/agents/sarah/
     sms_tool_url: "https://n8n.wranngle.com/webhook/send-sms"
+    client_lookup_webhook: "https://n8n.wranngle.com/webhook/client-initiation-data"
+    dynamic_variables:
+      # Regular variables (visible to LLM)
+      - name: customer_name
+        type: string
+        description: "Full name of the caller from CRM"
+      - name: customer_first_name
+        type: string
+        description: "First name only for personalized greeting"
+      - name: company
+        type: string
+        description: "Company/organization name"
+      - name: industry
+        type: string
+        description: "Industry sector (hvac, plumbing, legal, etc.)"
+      - name: account_tier
+        type: string
+        description: "Customer tier: New, Bronze, Silver, Gold"
+      - name: call_history
+        type: string
+        description: "Summary of previous interactions"
+      - name: interaction_count
+        type: number
+        description: "Number of previous calls/interactions"
+      - name: last_topic
+        type: string
+        description: "Topic of last interaction"
+      - name: notes
+        type: string
+        description: "Important notes about the caller (sanitized)"
+      - name: lookup_success
+        type: boolean
+        description: "Whether data enrichment succeeded"
+      - name: data_source
+        type: string
+        description: "Data source used: pipedrive, sheets, cache, none"
+      # Secret variables (hidden from LLM, available in tools)
+      - name: secret__pipedrive_person_id
+        type: number
+        description: "Pipedrive person ID (not sent to LLM)"
+      - name: secret__pipedrive_org_id
+        type: number
+        description: "Pipedrive organization ID (not sent to LLM)"
+      - name: secret__google_sheet_row
+        type: number
+        description: "Google Sheets row number (not sent to LLM)"
     tags:
       - production
       - lead-qualification
