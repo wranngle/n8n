@@ -1,0 +1,118 @@
+# Evaluation Configuration: Autorefinement Orchestrator v2
+# Workflow ID: zeQNX4g5mQlE4EQ0
+# Complexity: Medium (8 nodes)
+
+workflow_id: "zeQNX4g5mQlE4EQ0"
+workflow_name: "[DEV] Supersystem - Autorefinement Orchestrator v2"
+webhook_path: "autorefinement-v2"
+
+# Workflow Structure:
+# Receive Failures → Analyze Failures with Gemini (HTTP) → Parse Gemini Response (Code)
+#   → Check If Should Patch (Code) → Get Current Agent Config (HTTP)
+#   → Prepare Agent Patch (Code) → Apply Agent Patch (HTTP) → Respond With Result
+
+# Purpose: v2 of autorefinement with conditional patching logic
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 60000
+  mode: "ai_integration"
+
+test_cases:
+  - id: TC001
+    name: "Patch-Worthy Failures"
+    description: "Test with failures that warrant a patch"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - conversation_id: "conv-001"
+          failure_type: "intent_not_recognized"
+          severity: "high"
+          frequency: 5
+        - conversation_id: "conv-002"
+          failure_type: "wrong_tool_called"
+          severity: "medium"
+          frequency: 3
+    expected:
+      status: 200
+      response_contains:
+        - "patch_applied"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.patched"
+        value: true
+    weight: 35
+
+  - id: TC002
+    name: "Minor Failures - Skip Patch"
+    description: "Test with minor failures that don't warrant a patch"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - conversation_id: "conv-003"
+          failure_type: "slow_response"
+          severity: "low"
+          frequency: 1
+    expected:
+      status: 200
+      response_contains:
+        - "no_patch"
+    assertions:
+      - type: json_path
+        path: "$.patched"
+        value: false
+      - type: json_path
+        path: "$.reason"
+        exists: true
+    weight: 25
+
+  - id: TC003
+    name: "Gemini Analysis Quality"
+    description: "Verify Gemini provides actionable recommendations"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - conversation_id: "conv-004"
+          failure_type: "context_lost"
+          transcript_snippet: "User: I already told you my name is John"
+          severity: "high"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.gemini_analysis"
+        exists: true
+      - type: response_time_ms
+        max: 45000
+    weight: 20
+
+  - id: TC004
+    name: "Agent Config Preservation"
+    description: "Verify patch doesn't overwrite unrelated config"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - failure_type: "greeting_issue"
+          severity: "high"
+      preserve_check:
+        - "voice_id"
+        - "language"
+        - "tools"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.preserved_fields"
+        exists: true
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - gemini_api_key
+  integration_type: "ai_self_improvement"
+  notes: "v2 adds conditional patching - only patches when above threshold"

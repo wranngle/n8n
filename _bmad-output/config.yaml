@@ -1,0 +1,43 @@
+# BMM Project Configuration - n8n
+# Generated: 2026-01-07
+# This project uses the global BMAD installation at ~/.claude/_bmad
+
+project_name: "n8n"
+project_type: "n8n workflow development methodology"
+field_type: "brownfield"
+selected_track: "bmad-method"
+
+# User Configuration
+user_name: "wranngle"
+user_skill_level: "advanced"
+communication_language: "English"
+document_output_language: "English"
+
+# Output Paths (relative to project root)
+output_folder: "_bmad-output"
+planning_artifacts: "_bmad-output/planning-artifacts"
+implementation_artifacts: "_bmad-output/implementation-artifacts"
+project_knowledge: "context"
+
+# Global BMAD Reference
+bmad_installation: "C:/Users/root/.claude/_bmad"
+
+# Project-Specific Settings
+existing_methodology: true
+methodology_file: "CLAUDE.md"
+
+# Integration Notes
+integrations:
+  - name: "n8n-mcp"
+    status: "connected"
+    tools: 39
+    nodes: 528
+    templates: 2709
+  - name: "elevenlabs-mcp"
+    status: "connected"
+  - name: "twilio"
+    status: "via n8n nodes"
+
+# TEA Settings (if using test workflows)
+tea_use_mcp_enhancements: false
+tea_use_playwright_utils: false

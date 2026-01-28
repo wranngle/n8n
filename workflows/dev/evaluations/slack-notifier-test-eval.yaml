@@ -1,0 +1,95 @@
+# Evaluation Configuration: Slack Notifier (Test)
+# Workflow ID: ITUFwZq7ixgjTZMJ
+# Complexity: Minimal (3 nodes)
+
+workflow_id: "ITUFwZq7ixgjTZMJ"
+workflow_name: "[DEV] Supersystem - Slack Notifier (Test)"
+webhook_path: "slack-notifier-test"
+
+# Workflow Structure:
+# Webhook: Slack Notify Test → Format Slack Message (Code) → Respond with Formatted Message
+
+evaluation:
+  pass_threshold: 80
+  max_retries: 2
+  timeout_ms: 15000
+
+test_cases:
+  - id: TC001
+    name: "Standard Notification"
+    description: "Test formatting a standard Slack notification"
+    input:
+      channel: "#test-channel"
+      message: "Test notification from SRIS"
+      severity: "info"
+    expected:
+      status: 200
+      response_contains:
+        - "formatted"
+        - "message"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 2000
+    weight: 30
+
+  - id: TC002
+    name: "Alert Notification"
+    description: "Test formatting an alert-level notification"
+    input:
+      channel: "#alerts"
+      message: "Critical: Workflow failure detected"
+      severity: "critical"
+      workflow_id: "failed-workflow-001"
+    expected:
+      status: 200
+      response_contains:
+        - "critical"
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "Notification with Attachments"
+    description: "Test with Slack attachment fields"
+    input:
+      channel: "#reports"
+      message: "Daily Report"
+      severity: "info"
+      attachments:
+        - title: "Execution Summary"
+          fields:
+            - name: "Total"
+              value: "150"
+            - name: "Failed"
+              value: "3"
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 3000
+    weight: 25
+
+  - id: TC004
+    name: "Missing Channel Parameter"
+    description: "Test error handling for missing channel"
+    input:
+      message: "Orphan message"
+      severity: "info"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.success"
+        exists: true
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - slack_api_token
+  notes: "Message formatting only - doesn't actually send to Slack in test mode"

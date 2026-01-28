@@ -1,0 +1,124 @@
+# Sarah v2.0 Agent Evaluation Configuration
+# Agent ID: agent_8001kdgp7qbyf4wvhs540be78vew
+# Purpose: Validate B2B Sales SDR transformation
+
+agent_id: "agent_8001kdgp7qbyf4wvhs540be78vew"
+agent_name: "[PROD] Sarah - Wranngle Lead Specialist v2.0"
+evaluation_type: "voice_agent_simulation"
+
+# Link to test scenarios
+test_scenarios_file: "../../voice_ai_agents/test-scenarios-sarah-v2.yaml"
+
+# Simulation settings
+simulation:
+  api_endpoint: "https://api.elevenlabs.io/v1/convai/agents/{agent_id}/simulate_conversation"
+  llm: "gpt-4o"
+  temperature: 0.7
+  default_max_turns: 15
+  timeout_ms: 120000
+
+# Evaluation thresholds
+thresholds:
+  overall_pass: 0.80
+  critical_pass: 1.0  # All critical scenarios must pass
+  category_weights:
+    call_direction: 1.2
+    value_proposition: 1.1
+    demo_close: 1.1
+    forbidden_language: 1.2
+    emergency: 1.3
+    pain_agitation: 1.0
+    discovery: 1.0
+    pricing: 0.9
+    objection_handling: 0.9
+    word_economy: 0.7
+    closing: 0.8
+    tool_failure: 1.0
+
+# Critical scenarios that MUST pass
+critical_scenarios:
+  - outbound-awareness-hvac
+  - forbidden-language-technical
+  - emergency-redirect-flood
+  - emergency-redirect-medical
+  - demo-close-yes
+
+# Test execution batches (to avoid rate limits)
+execution:
+  batch_size: 3
+  batch_delay_ms: 2000
+  retry_on_rate_limit: true
+  max_retries: 2
+
+# Alerting
+alerting:
+  webhook_url: "https://n8n.wranngle.com/webhook/sarah-v2-eval-alert"
+  notify_on:
+    - critical_failure
+    - overall_score_below: 0.80
+  slack_channel: "#voice-agent-evals"
+
+# Scoring breakdown
+scoring:
+  criteria_weights:
+    severity_critical: 1.5
+    severity_high: 1.2
+    severity_normal: 1.0
+
+  evaluation_formula: |
+    scenario_score = sum(criterion.weight * criterion.passed) / sum(criterion.weight)
+    category_score = avg(scenario_scores_in_category) * category_weight
+    overall_score = sum(category_scores) / sum(category_weights)
+
+# Expected v2.0 improvements to validate
+v2_validation_checklist:
+  - id: voice_change
+    description: "Voice changed from default to Lily (pFZP5JQG7iQjIQuC4Bku)"
+    validation_type: "agent_config"
+
+  - id: call_direction_awareness
+    description: "Agent handles outbound vs inbound appropriately"
+    validation_type: "simulation"
+    scenarios: ["outbound-awareness-hvac", "inbound-awareness-inquiry"]
+
+  - id: value_prop_delivery
+    description: "Value proposition delivered in first 10 seconds"
+    validation_type: "simulation"
+    scenarios: ["hook-delivery-cold-call"]
+
+  - id: industry_pain_agitation
+    description: "Industry-specific pain statements used"
+    validation_type: "simulation"
+    scenarios: ["pain-agitation-hvac", "pain-agitation-plumbing", "pain-agitation-property-management"]
+
+  - id: demo_close_protocol
+    description: "Demo close and SMS delivery working"
+    validation_type: "simulation"
+    scenarios: ["demo-close-yes", "demo-close-maybe", "demo-close-no"]
+
+  - id: forbidden_language_enforcement
+    description: "Technical jargon forbidden"
+    validation_type: "simulation"
+    scenarios: ["forbidden-language-technical"]
+
+  - id: emergency_protocol
+    description: "Emergency redirect to 911"
+    validation_type: "simulation"
+    scenarios: ["emergency-redirect-flood", "emergency-redirect-medical"]
+
+# Metadata
+metadata:
+  version: "2.0"
+  created: "2026-01-13"
+  author: "Claude Code"
+  description: "Comprehensive evaluation suite for Sarah v2.0 B2B Sales SDR agent"
+  dependencies:
+    - elevenlabs_api_key
+  notes: |
+    This evaluation validates the complete transformation of Sarah from
+    generic receptionist to specialized B2B Sales SDR. Key focus areas:
+    - Call direction awareness (critical for outbound)
+    - Industry-specific messaging
+    - Demo close conversion
+    - Forbidden language compliance
+    - Emergency safety protocols

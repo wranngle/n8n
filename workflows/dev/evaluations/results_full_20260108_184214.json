@@ -1,0 +1,533 @@
+﻿[
+    {
+        "passed":  false,
+        "workflow_id":  "wZryG5tdRBFZUNMF",
+        "complexity":  "low",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:40:35Z",
+        "workflow_name":  "SEWY Garage Doors SMS Tool",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "SMS Format Check",
+                                 "error":  {
+                                               "level":  "error",
+                                               "shouldReport":  true,
+                                               "tags":  {
+                                                            "credentialType":  "twilioApi"
+                                                        },
+                                               "extra":  {
+
+                                                         },
+                                               "message":  "Found credential with no ID.",
+                                               "stack":  "Error: Found credential with no ID.\n    at CredentialsHelper.getCredentials (/usr/local/lib/node_modules/n8n/src/credentials-helper.ts:258:10)\n    at CredentialsHelper.getDecrypted (/usr/local/lib/node_modules/n8n/src/credentials-helper.ts:339:34)\n    at ExecuteContext._getCredentials (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/node-execution-context/node-execution-context.ts:375:70)\n    at ExecuteContext.getCredentials (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/node-execution-context/base-execute-context.ts:105:21)\n    at ExecuteContext.twilioApiRequest (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Twilio/GenericFunctions.ts:22:33)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Twilio/Twilio.node.ts:291:49)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:31)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:22)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:38\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "qQmGqBM1pe4QUI05",
+        "complexity":  "low",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:40:35Z",
+        "workflow_name":  "Pipedrive Lead Auto-Caller",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Lead Processing",
+                                 "error":  "Only workflows with the following trigger nodes can be executed: Schedule Trigger, Webhook Trigger, Form Trigger, Chat Trigger.",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  true,
+        "workflow_id":  "M7ZmLGCxyVOn5QJ6",
+        "complexity":  "low",
+        "score":  100,
+        "evaluated_at":  "2026-01-08T18:41:35Z",
+        "workflow_name":  "Parallel Evaluation Runner v6",
+        "test_results":  [
+                             {
+                                 "status":  "pass",
+                                 "score":  50,
+                                 "name":  "Parallel Execution",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "dKJYSCGIORtUsTSM",
+        "complexity":  "medium",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:41:35Z",
+        "workflow_name":  "Autorefinement Orchestrator",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Orchestration Init",
+                                 "error":  {
+                                               "cause":  [
+                                                             {
+                                                                 "name":  "xi-api-key",
+                                                                 "value":  "={{ $env.ELEVENLABS_API_KEY }}"
+                                                             }
+                                                         ],
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "timestamp":  1767915692340,
+                                               "context":  {
+                                                               "causeDetailed":  "If you need access please contact the administrator to remove the environment variable âN8N_BLOCK_ENV_ACCESS_IN_NODEâ",
+                                                               "runIndex":  0,
+                                                               "itemIndex":  0,
+                                                               "parameter":  "headerParameters.parameters"
+                                                           },
+                                               "functionality":  "regular",
+                                               "name":  "ExpressionError",
+                                               "message":  "access to env vars denied",
+                                               "stack":  "ExpressionError: access to env vars denied\n    at Object.get (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/workflow-data-proxy-env-provider.ts:63:12)\n    at Proxy.eval (eval at getFunction (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+tournament@1.0.6/node_modules/@n8n/tournament/src/FunctionEvaluator.ts:13:16), \u003canonymous\u003e:6:50)\n    at FunctionEvaluator.evaluate (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+tournament@1.0.6/node_modules/@n8n/tournament/src/FunctionEvaluator.ts:20:13)\n    at Tournament.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+tournament@1.0.6/node_modules/@n8n/tournament/src/index.ts:45:25)\n    at evaluateExpression (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression-evaluator-proxy.ts:24:9)\n    at Expression.renderExpression (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:335:29)\n    at Expression.resolveSimpleParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:316:28)\n    at resolveParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:498:16)\n    at Expression.getParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:555:22)\n    at resolveParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:482:17)"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "mwepwjfX27x4uTMu",
+        "complexity":  "medium",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:41:35Z",
+        "workflow_name":  "Native Evaluation Runner",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Evaluation Run",
+                                 "error":  "Only workflows with the following trigger nodes can be executed: Schedule Trigger, Webhook Trigger, Form Trigger, Chat Trigger.",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "8qlDREZy5qtEGkNK",
+        "complexity":  "medium",
+        "score":  50,
+        "evaluated_at":  "2026-01-08T18:41:35Z",
+        "workflow_name":  "Post-Call Orchestrator (Test)",
+        "test_results":  [
+                             {
+                                 "status":  "partial",
+                                 "score":  25,
+                                 "name":  "Post-Call Processing",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "zeQNX4g5mQlE4EQ0",
+        "complexity":  "medium",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:41:35Z",
+        "workflow_name":  "Autorefinement Orchestrator v2",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "V2 Orchestration",
+                                 "error":  {
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "description":  "User not found.",
+                                               "timestamp":  1767915693019,
+                                               "context":  {
+                                                               "itemIndex":  0,
+                                                               "request":  {
+                                                                               "body":  {
+                                                                                            "model":  "google/gemini-3-pro",
+                                                                                            "messages":  [
+                                                                                                             {
+                                                                                                                 "role":  "system",
+                                                                                                                 "content":  "You are an expert at analyzing voice agent test failures and suggesting prompt improvements. Analyze the failures and return a JSON object with: {\"analysis\": \"summary of issues\", \"prompt_patches\": [\"specific text to add or modify in the agent prompt\"], \"confidence\": 0.0-1.0}"
+                                                                                                             },
+                                                                                                             {
+                                                                                                                 "role":  "user",
+                                                                                                                 "content":  "Analyze these test failures and suggest prompt improvements:\n\n"
+                                                                                                             }
+                                                                                                         ],
+                                                                                            "temperature":  0.3
+                                                                                        },
+                                                                               "headers":  {
+                                                                                               "authorization":  "**hidden**",
+                                                                                               "content-type":  "application/json",
+                                                                                               "accept":  "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7"
+                                                                                           },
+                                                                               "method":  "POST",
+                                                                               "uri":  "https://openrouter.ai/api/v1/chat/completions",
+                                                                               "gzip":  true,
+                                                                               "rejectUnauthorized":  true,
+                                                                               "followRedirect":  true,
+                                                                               "resolveWithFullResponse":  true,
+                                                                               "followAllRedirects":  true,
+                                                                               "timeout":  60000,
+                                                                               "encoding":  null,
+                                                                               "json":  false,
+                                                                               "useStream":  true
+                                                                           }
+                                                           },
+                                               "functionality":  "regular",
+                                               "name":  "NodeApiError",
+                                               "node":  {
+                                                            "id":  "analyze-failures",
+                                                            "name":  "Analyze Failures with Gemini",
+                                                            "type":  "n8n-nodes-base.httpRequest",
+                                                            "typeVersion":  4.2,
+                                                            "position":  [
+                                                                             220,
+                                                                             300
+                                                                         ],
+                                                            "parameters":  {
+                                                                               "preBuiltAgentsCalloutHttpRequest":  "",
+                                                                               "curlImport":  "",
+                                                                               "method":  "POST",
+                                                                               "url":  "https://openrouter.ai/api/v1/chat/completions",
+                                                                               "authentication":  "none",
+                                                                               "provideSslCertificates":  false,
+                                                                               "sendQuery":  false,
+                                                                               "sendHeaders":  true,
+                                                                               "specifyHeaders":  "keypair",
+                                                                               "headerParameters":  {
+                                                                                                        "parameters":  [
+                                                                                                                           {
+                                                                                                                               "name":  "Authorization",
+                                                                                                                               "value":  "Bearer sk-or-v1-1a0e17a0d0c0b4e4b4e4b4e4b4e4b4e4b4e4b4e4b4e4b4e4b4e4b4e4b4e4b4e4"
+                                                                                                                           },
+                                                                                                                           {
+                                                                                                                               "name":  "Content-Type",
+                                                                                                                               "value":  "application/json"
+                                                                                                                           }
+                                                                                                                       ]
+                                                                                                    },
+                                                                               "sendBody":  true,
+                                                                               "contentType":  "json",
+                                                                               "specifyBody":  "json",
+                                                                               "jsonBody":  "={\n  \"model\": \"google/gemini-3-pro\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an expert at analyzing voice agent test failures and suggesting prompt improvements. Analyze the failures and return a JSON object with: {\\\"analysis\\\": \\\"summary of issues\\\", \\\"prompt_patches\\\": [\\\"specific text to add or modify in the agent prompt\\\"], \\\"confidence\\\": 0.0-1.0}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Analyze these test failures and suggest prompt improvements:\\n\\n{{ JSON.stringify($json.body.failures) }}\"\n    }\n  ],\n  \"temperature\": 0.3\n}",
+                                                                               "options":  {
+                                                                                               "timeout":  60000
+                                                                                           },
+                                                                               "infoMessage":  ""
+                                                                           }
+                                                        },
+                                               "messages":  [
+                                                                "401 - \"{\\\"error\\\":{\\\"message\\\":\\\"User not found.\\\",\\\"code\\\":401}}\""
+                                                            ],
+                                               "httpCode":  "401",
+                                               "message":  "Authorization failed - please check your credentials",
+                                               "stack":  "NodeApiError: Authorization failed - please check your credentials\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/HttpRequest/V3/HttpRequestV3.node.ts:859:16)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "5eowJIoZFZOSG85m",
+        "complexity":  "medium",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:41:36Z",
+        "workflow_name":  "ElevenLabs Twilio Outbound with Client Data",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Outbound Call Init",
+                                 "error":  {
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "timestamp":  1767915693148,
+                                               "context":  {
+
+                                                           },
+                                               "functionality":  "regular",
+                                               "name":  "NodeOperationError",
+                                               "node":  {
+                                                            "parameters":  {
+                                                                               "preBuiltAgentsCalloutHttpRequest":  "",
+                                                                               "curlImport":  "",
+                                                                               "method":  "POST",
+                                                                               "url":  "https://api.elevenlabs.io/v1/convai/twilio/outbound-call",
+                                                                               "authentication":  "genericCredentialType",
+                                                                               "genericAuthType":  "httpHeaderAuth",
+                                                                               "provideSslCertificates":  false,
+                                                                               "sendQuery":  false,
+                                                                               "sendHeaders":  true,
+                                                                               "specifyHeaders":  "keypair",
+                                                                               "headerParameters":  {
+                                                                                                        "parameters":  [
+                                                                                                                           {
+                                                                                                                               "name":  "Content-Type",
+                                                                                                                               "value":  "application/json"
+                                                                                                                           }
+                                                                                                                       ]
+                                                                                                    },
+                                                                               "sendBody":  true,
+                                                                               "contentType":  "json",
+                                                                               "specifyBody":  "json",
+                                                                               "jsonBody":  "={{ JSON.stringify($json.payload) }}",
+                                                                               "options":  {
+                                                                                               "response":  {
+                                                                                                                "response":  {
+                                                                                                                                 "fullResponse":  true,
+                                                                                                                                 "neverError":  false,
+                                                                                                                                 "responseFormat":  "autodetect"
+                                                                                                                             }
+                                                                                                            }
+                                                                                           },
+                                                                               "infoMessage":  ""
+                                                                           },
+                                                            "id":  "call-elevenlabs",
+                                                            "name":  "ElevenLabs: Initiate Outbound Call",
+                                                            "type":  "n8n-nodes-base.httpRequest",
+                                                            "typeVersion":  4.2,
+                                                            "position":  [
+                                                                             688,
+                                                                             304
+                                                                         ]
+                                                        },
+                                               "messages":  [
+
+                                                            ],
+                                               "message":  "Credentials not found",
+                                               "stack":  "NodeOperationError: Credentials not found\n    at ExecuteContext._getCredentials (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/node-execution-context/node-execution-context.ts:339:10)\n    at ExecuteContext.getCredentials (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/node-execution-context/base-execute-context.ts:105:21)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/HttpRequest/V3/HttpRequestV3.node.ts:175:35)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:31)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:22)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:38\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "5hvmE72qa4VYyPOK",
+        "complexity":  "high",
+        "score":  50,
+        "evaluated_at":  "2026-01-08T18:41:36Z",
+        "workflow_name":  "Transcript Field Extractor - AI Agent",
+        "test_results":  [
+                             {
+                                 "status":  "partial",
+                                 "score":  25,
+                                 "name":  "Transcript Extraction",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "54sXqqJVSctlSF6V",
+        "complexity":  "high",
+        "score":  50,
+        "evaluated_at":  "2026-01-08T18:41:36Z",
+        "workflow_name":  "Transcript Field Extractor v2",
+        "test_results":  [
+                             {
+                                 "status":  "partial",
+                                 "score":  25,
+                                 "name":  "V2 Extraction",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "c9dFlI51VhvANoEj",
+        "complexity":  "high",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:41:36Z",
+        "workflow_name":  "Autorefinement Orchestrator v2 (LangChain)",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "LangChain Refinement",
+                                 "error":  "Workflow is not available for execution via MCP. Enable access in the workflow settings to make it available.",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "KoQChBtjUa5F9bZg",
+        "complexity":  "high",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:42:06Z",
+        "workflow_name":  "SRIS - Verification Loop",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Verification Cycle",
+                                 "error":  {
+                                               "level":  "error",
+                                               "tags":  {
+
+                                                        },
+                                               "message":  "Invalid JSON in response body",
+                                               "stack":  "Error: Invalid JSON in response body\n    at jsonParse (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/utils.ts:170:10)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/HttpRequest/V3/HttpRequestV3.node.ts:931:34)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "RjLiUAiuUs5XPvBj",
+        "complexity":  "high",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:42:06Z",
+        "workflow_name":  "SRIS - ElevenLabs Conversation Evaluator",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Conversation Evaluation",
+                                 "error":  {
+                                               "cause":  [
+                                                             {
+                                                                 "name":  "xi-api-key",
+                                                                 "value":  "={{ $env.ELEVENLABS_API_KEY }}"
+                                                             },
+                                                             {
+                                                                 "name":  "Content-Type",
+                                                                 "value":  "application/json"
+                                                             }
+                                                         ],
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "timestamp":  1767915724054,
+                                               "context":  {
+                                                               "causeDetailed":  "If you need access please contact the administrator to remove the environment variable âN8N_BLOCK_ENV_ACCESS_IN_NODEâ",
+                                                               "runIndex":  0,
+                                                               "itemIndex":  0,
+                                                               "parameter":  "headerParameters.parameters"
+                                                           },
+                                               "functionality":  "regular",
+                                               "name":  "ExpressionError",
+                                               "message":  "access to env vars denied",
+                                               "stack":  "ExpressionError: access to env vars denied\n    at Object.get (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/workflow-data-proxy-env-provider.ts:63:12)\n    at Proxy.eval (eval at getFunction (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+tournament@1.0.6/node_modules/@n8n/tournament/src/FunctionEvaluator.ts:13:16), \u003canonymous\u003e:6:50)\n    at FunctionEvaluator.evaluate (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+tournament@1.0.6/node_modules/@n8n/tournament/src/FunctionEvaluator.ts:20:13)\n    at Tournament.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/@n8n+tournament@1.0.6/node_modules/@n8n/tournament/src/index.ts:45:25)\n    at evaluateExpression (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression-evaluator-proxy.ts:24:9)\n    at Expression.renderExpression (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:335:29)\n    at Expression.resolveSimpleParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:316:28)\n    at resolveParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:498:16)\n    at Expression.getParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:555:22)\n    at resolveParameterValue (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/expression.ts:482:17)"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "4TqaQ6kORDzZVwVP",
+        "complexity":  "high",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:42:14Z",
+        "workflow_name":  "SRIS - Master Orchestrator",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Master Orchestration",
+                                 "error":  {
+                                               "level":  "error",
+                                               "tags":  {
+
+                                                        },
+                                               "message":  "Invalid JSON in response body",
+                                               "stack":  "Error: Invalid JSON in response body\n    at jsonParse (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-workflow@file+packages+workflow/node_modules/n8n-workflow/src/utils.ts:170:10)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/HttpRequest/V3/HttpRequestV3.node.ts:931:34)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:8)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:11)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:27\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "cEORduJCqCVDOKce",
+        "complexity":  "high",
+        "score":  50,
+        "evaluated_at":  "2026-01-08T18:42:14Z",
+        "workflow_name":  "ElevenLabs Call Completed - Update Pipedrive",
+        "test_results":  [
+                             {
+                                 "status":  "partial",
+                                 "score":  25,
+                                 "name":  "Pipedrive Update",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "NcP4oEeS3xolYXzC",
+        "complexity":  "high",
+        "score":  50,
+        "evaluated_at":  "2026-01-08T18:42:14Z",
+        "workflow_name":  "ElevenLabs Twilio Outbound - Bulletproof",
+        "test_results":  [
+                             {
+                                 "status":  "partial",
+                                 "score":  25,
+                                 "name":  "Bulletproof Call",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "SjItj6uzYSr9rotM",
+        "complexity":  "high",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:42:14Z",
+        "workflow_name":  "Autonomous Sleep Loop",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Sleep Loop Init",
+                                 "error":  "Workflow is not available for execution via MCP. Enable access in the workflow settings to make it available.",
+                                 "max_score":  50
+                             }
+                         ]
+    },
+    {
+        "passed":  false,
+        "workflow_id":  "KrqpJuyN8pjTouAo",
+        "complexity":  "high",
+        "score":  0,
+        "evaluated_at":  "2026-01-08T18:42:14Z",
+        "workflow_name":  "Voice Agent Tester v2.0",
+        "test_results":  [
+                             {
+                                 "status":  "fail",
+                                 "score":  0,
+                                 "name":  "Voice Test Suite",
+                                 "error":  {
+                                               "level":  "warning",
+                                               "tags":  {
+
+                                                        },
+                                               "message":  "You need to define at least one pair of fields in \"Fields to Match\" to match on",
+                                               "stack":  "Error: You need to define at least one pair of fields in \"Fields to Match\" to match on\n    at checkMatchFieldsInput (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Merge/v3/helpers/utils.ts:311:9)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Merge/v3/actions/mode/combineByFields.ts:280:37)\n    at ExecuteContext.router (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Merge/v3/actions/router.ts:16:56)\n    at ExecuteContext.execute (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-nodes-base@file+packages+nodes-base_@aws-sdk+credential-providers@3.808.0_asn1.js@5_8da18263ca0574b0db58d4fefd8173ce/node_modules/n8n-nodes-base/nodes/Merge/v3/MergeV3.node.ts:27:23)\n    at WorkflowExecute.executeNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1045:31)\n    at WorkflowExecute.runNode (/usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1226:22)\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:1662:38\n    at /usr/local/lib/node_modules/n8n/node_modules/.pnpm/n8n-core@file+packages+core_@opentelemetry+api@1.9.0_@opentelemetry+sdk-trace-base@1.30_ec37920eb95917b28efaa783206b20f3/node_modules/n8n-core/src/execution-engine/workflow-execute.ts:2274:11"
+                                           },
+                                 "max_score":  50
+                             }
+                         ]
+    }
+]

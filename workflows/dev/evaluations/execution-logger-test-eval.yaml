@@ -1,0 +1,96 @@
+# Evaluation Configuration: Execution Logger (Test)
+# Workflow ID: Ar2lX0cprjeWB4Kd
+# Complexity: Minimal (3 nodes)
+
+workflow_id: "Ar2lX0cprjeWB4Kd"
+workflow_name: "[DEV] Supersystem - Execution Logger (Test)"
+webhook_path: "execution-logger-test"
+
+# Workflow Structure:
+# Webhook: Log Execution → Format Log Entry (Code) → Respond Success
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 15000
+
+test_cases:
+  - id: TC001
+    name: "Standard Log Entry"
+    description: "Test logging a successful workflow execution"
+    input:
+      workflow_id: "test-workflow-001"
+      execution_id: "exec-12345"
+      status: "success"
+      duration_ms: 1500
+      timestamp: "2026-01-08T12:00:00Z"
+    expected:
+      status: 200
+      response_contains:
+        - "logged"
+        - "success"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 2000
+    weight: 30
+
+  - id: TC002
+    name: "Error Log Entry"
+    description: "Test logging a failed workflow execution"
+    input:
+      workflow_id: "test-workflow-002"
+      execution_id: "exec-67890"
+      status: "error"
+      error_message: "Connection timeout"
+      duration_ms: 30000
+      timestamp: "2026-01-08T12:05:00Z"
+    expected:
+      status: 200
+      response_contains:
+        - "logged"
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "Minimal Log Entry"
+    description: "Test with minimum required fields"
+    input:
+      workflow_id: "test-workflow-003"
+      status: "success"
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 1500
+    weight: 20
+
+  - id: TC004
+    name: "Log Entry with Metadata"
+    description: "Test with additional metadata fields"
+    input:
+      workflow_id: "test-workflow-004"
+      execution_id: "exec-metadata"
+      status: "success"
+      duration_ms: 500
+      metadata:
+        node_count: 5
+        retry_count: 0
+        trigger_type: "webhook"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 25
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies: []
+  notes: "Internal logging utility - no external dependencies"

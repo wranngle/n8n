@@ -1,0 +1,46 @@
+<!--
+  Meeting Confirmation Email Template
+
+  Variables:
+  - {{first_name}} - Customer's first name
+  - {{meeting_date}} - Date of the meeting (e.g., "Tuesday, January 21, 2026")
+  - {{meeting_time}} - Time of the meeting (e.g., "2:00 PM EST")
+  - {{meeting_link}} - Video call link
+  - {{meeting_id}} - Meeting/calendar event ID
+  - {{agenda}} - Meeting agenda/topics
+  - {{calendar_ics}} - Link to .ics calendar file
+-->
+<h2>You're all set, {{first_name}}!</h2>
+
+<p>
+  Your demo has been scheduled. We're looking forward to showing you what Wranngle can do!
+</p>
+
+<div class="info-box">
+  <strong>📅 Meeting Details</strong><br><br>
+  <strong>Date:</strong> {{meeting_date}}<br>
+  <strong>Time:</strong> {{meeting_time}}<br>
+  <strong>Duration:</strong> 30 minutes
+</div>
+
+<p style="text-align: center;">
+  <a href="{{meeting_link}}" class="btn">Join Meeting</a>
+  <a href="{{calendar_ics}}" class="btn btn-secondary">Add to Calendar</a>
+</p>
+
+<p><strong>What we'll cover:</strong></p>
+<ul>
+  <li>Overview of Wranngle's AI voice agents</li>
+  <li>Live demo tailored to your use case</li>
+  <li>Q&A and next steps</li>
+</ul>
+
+<p>
+  <strong>Need to reschedule?</strong><br>
+  No problem! <a href="{{reschedule_link}}">Click here to pick a new time</a>.
+</p>
+
+<p>
+  See you soon!<br>
+  <strong>The Wranngle Team</strong>
+</p>

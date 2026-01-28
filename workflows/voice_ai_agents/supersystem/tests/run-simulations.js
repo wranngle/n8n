@@ -24,9 +24,20 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 
+// Load from centralized credential store
+function loadApiKey() {
+  const envPath = require('path').join(process.env.USERPROFILE || process.env.HOME, '.claude', '.env');
+  if (require('fs').existsSync(envPath)) {
+    const content = require('fs').readFileSync(envPath, 'utf8');
+    const match = content.match(/ELEVENLABS_API_KEY=([^\r\n]+)/);
+    if (match) return match[1].trim();
+  }
+  return process.env.ELEVENLABS_API_KEY;
+}
+
 // Configuration (env vars for CI/CD, fallback for local dev)
 const CONFIG = {
-  ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY || 'sk_733d2a2707d99f6bcdb9cc330570deea72390b20b6b2915e',
+  ELEVENLABS_API_KEY: loadApiKey() || process.env.ELEVENLABS_API_KEY,
   DEFAULT_AGENT_ID: process.env.SARAH_AGENT_ID || 'agent_8001kdgp7qbyf4wvhs540be78vew',
   MAX_RETRIES: 2,
   INITIAL_DELAY_MS: 5000,

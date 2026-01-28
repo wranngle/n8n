@@ -1,0 +1,98 @@
+# Evaluation Configuration: Southeastern Wyoming Garage Doors SMS Tool
+# Workflow ID: wZryG5tdRBFZUNMF
+# Complexity: Low (4 nodes)
+
+workflow_id: "wZryG5tdRBFZUNMF"
+workflow_name: "[DEV] Southeastern Wyoming Garage Doors SMS Tool"
+webhook_path: "sewy-sms-tool"
+
+# Workflow Structure:
+# ElevenLabs Tool Webhook → Extract Tool Parameters (Set) → Send SMS via Twilio → Respond to Webhook
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 30000
+
+# Note: This workflow is triggered by ElevenLabs voice agent tools
+# Test mode should use mock Twilio responses to avoid sending real SMS
+
+test_cases:
+  - id: TC001
+    name: "Valid SMS Request"
+    description: "Test sending SMS with valid phone and message"
+    input:
+      tool_call_id: "tool-001"
+      function_name: "send_sms"
+      parameters:
+        to_phone: "+13075551234"
+        message: "Your appointment is confirmed for tomorrow at 2pm"
+    expected:
+      status: 200
+      response_contains:
+        - "success"
+        - "sms"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 10000
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 35
+
+  - id: TC002
+    name: "Missing Phone Number"
+    description: "Test error handling when phone number is missing"
+    input:
+      tool_call_id: "tool-002"
+      function_name: "send_sms"
+      parameters:
+        message: "Test message without phone"
+    expected:
+      status: 200
+      response_contains:
+        - "error"
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: false
+    weight: 25
+
+  - id: TC003
+    name: "Invalid Phone Format"
+    description: "Test with non-E.164 phone format"
+    input:
+      tool_call_id: "tool-003"
+      function_name: "send_sms"
+      parameters:
+        to_phone: "(307) 555-1234"
+        message: "Test with badly formatted phone"
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 5000
+    weight: 20
+
+  - id: TC004
+    name: "Long Message Handling"
+    description: "Test with message exceeding SMS character limit"
+    input:
+      tool_call_id: "tool-004"
+      function_name: "send_sms"
+      parameters:
+        to_phone: "+13075559999"
+        message: "This is a very long message that exceeds the standard SMS character limit of 160 characters. It should be handled properly by the workflow, either by truncating, splitting into multiple messages, or returning an appropriate error."
+    expected:
+      status: 200
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - twilio_credentials
+  integration_type: "elevenlabs_voice_agent_tool"
+  notes: "SMS tool for SEWY voice agent - requires Twilio credentials"

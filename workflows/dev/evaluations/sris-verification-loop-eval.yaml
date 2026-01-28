@@ -1,0 +1,104 @@
+# Evaluation Configuration: SRIS - Verification Loop
+# Workflow ID: KoQChBtjUa5F9bZg
+# Complexity: High (10 nodes)
+
+workflow_id: "KoQChBtjUa5F9bZg"
+workflow_name: "[DEV] SRIS - Verification Loop"
+webhook_path: "sris-verification"
+
+# Workflow Structure:
+# Verification Trigger → Parse Verification Request (Code) → Wait Cooldown
+#   → Re-Evaluate Target (HTTP) → Compare Metrics (Code) → Check Outcome (Switch)
+#     → [improved] Log Success → Respond Result
+#     → [degraded] Rollback Fix (TODO) → Respond Result
+#     → [unchanged] Log Unchanged → Respond Result
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 1
+  timeout_ms: 120000
+  mode: "verification_loop"
+
+test_cases:
+  - id: TC001
+    name: "Improvement Detected"
+    description: "Test flow when metrics improve after fix"
+    input:
+      target_type: "voice_agent"
+      target_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      baseline_metrics:
+        success_rate: 0.75
+        avg_duration: 180
+      fix_applied_at: "2026-01-08T10:00:00Z"
+    expected:
+      status: 200
+      response_contains:
+        - "outcome"
+        - "improved"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.verification_complete"
+        value: true
+    weight: 30
+
+  - id: TC002
+    name: "Degradation Detected"
+    description: "Test flow when metrics degrade after fix"
+    input:
+      target_type: "voice_agent"
+      target_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      baseline_metrics:
+        success_rate: 0.90
+        avg_duration: 120
+      simulate_degradation: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.outcome"
+        value: "degraded"
+      - type: json_path
+        path: "$.rollback_triggered"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "No Change Detected"
+    description: "Test flow when metrics remain unchanged"
+    input:
+      target_type: "voice_agent"
+      target_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      baseline_metrics:
+        success_rate: 0.80
+      simulate_unchanged: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.outcome"
+        value: "unchanged"
+    weight: 20
+
+  - id: TC004
+    name: "Cooldown Period Respected"
+    description: "Verify wait node pauses before re-evaluation"
+    input:
+      target_type: "voice_agent"
+      target_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      cooldown_seconds: 5
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        min: 5000
+    weight: 25
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - n8n_api_key
+  integration_type: "sris_core"
+  notes: "Core SRIS component - verifies fixes after autorefinement"

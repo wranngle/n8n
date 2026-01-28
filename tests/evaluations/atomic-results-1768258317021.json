@@ -1,0 +1,473 @@
+{
+  "timestamp": "2026-01-12T22:51:57.021Z",
+  "summary": {
+    "total_checks": 39,
+    "passed_checks": 39,
+    "total_weight": 189,
+    "earned_weight": 189,
+    "overall_percentage": 100
+  },
+  "evaluations": {
+    "AC01_RETRY": {
+      "name": "Retry Logic",
+      "score": {
+        "actual": 28,
+        "max": 28,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "RT-01",
+          "check_name": "retry_count field present",
+          "passed": true,
+          "actual": 1,
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:19.134Z"
+        },
+        {
+          "check_id": "RT-02",
+          "check_name": "retry_count >= 1",
+          "passed": true,
+          "actual": 1,
+          "expected": ">= 1",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:19.135Z"
+        },
+        {
+          "check_id": "RT-03",
+          "check_name": "retry_delays is array",
+          "passed": true,
+          "actual": "object",
+          "expected": "array",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:19.135Z"
+        },
+        {
+          "check_id": "RT-04",
+          "check_name": "retry_delays has entries",
+          "passed": true,
+          "actual": 1,
+          "expected": "> 0",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:19.135Z"
+        },
+        {
+          "check_id": "RT-05",
+          "check_name": "Delays follow ~2x pattern",
+          "passed": true,
+          "actual": "N/A",
+          "expected": "~2x",
+          "weight": 8,
+          "timestamp": "2026-01-12T22:51:19.135Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC02_DLQ": {
+      "name": "Dead Letter Queue",
+      "score": {
+        "actual": 15,
+        "max": 15,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "DQ-01",
+          "check_name": "dlq_id field present",
+          "passed": true,
+          "actual": "dlq_1768258276364_rbgp42w7q",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:20.448Z"
+        },
+        {
+          "check_id": "DQ-02",
+          "check_name": "dlq_stored is true",
+          "passed": true,
+          "actual": true,
+          "expected": true,
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:20.448Z"
+        },
+        {
+          "check_id": "DQ-03",
+          "check_name": "dlq_reason provided",
+          "passed": true,
+          "actual": "Pipedrive API error after 1 retries: $http is not defined",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:20.448Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC03_UNKNOWN": {
+      "name": "Unknown Events",
+      "score": {
+        "actual": 19,
+        "max": 19,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "UE-01",
+          "check_name": "Returns 200 status",
+          "passed": true,
+          "actual": 200,
+          "expected": 200,
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:21.651Z"
+        },
+        {
+          "check_id": "UE-02",
+          "check_name": "success is true",
+          "passed": true,
+          "actual": true,
+          "expected": true,
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:21.651Z"
+        },
+        {
+          "check_id": "UE-03",
+          "check_name": "event_type echoed",
+          "passed": true,
+          "actual": "call_ringing",
+          "expected": "call_ringing",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:21.651Z"
+        },
+        {
+          "check_id": "UE-04",
+          "check_name": "action is \"logged\"",
+          "passed": true,
+          "actual": "logged",
+          "expected": "logged",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:21.651Z"
+        },
+        {
+          "check_id": "UE-05",
+          "check_name": "correlation_id present",
+          "passed": true,
+          "actual": "trace-1768258281459-4ch8kmoo8",
+          "expected": "defined",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:21.651Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC04_VALIDATION": {
+      "name": "Validation Errors",
+      "score": {
+        "actual": 25,
+        "max": 25,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "VE-01",
+          "check_name": "error field present",
+          "passed": true,
+          "actual": "{\"code\":\"MISSING_DATA\",\"message\":\"Data object is required for transcription events\",\"field\":\"data\",\"suggestion\":\"Add \\\"data\\\" object containing conversation_id, agent_id, and other call details\"}",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:22.814Z"
+        },
+        {
+          "check_id": "VE-02",
+          "check_name": "error.code present",
+          "passed": true,
+          "actual": "MISSING_DATA",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:22.814Z"
+        },
+        {
+          "check_id": "VE-03",
+          "check_name": "error.message present",
+          "passed": true,
+          "actual": "Data object is required for transcription events",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:22.814Z"
+        },
+        {
+          "check_id": "VE-04",
+          "check_name": "error.field identifies problem",
+          "passed": true,
+          "actual": "data",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:22.814Z"
+        },
+        {
+          "check_id": "VE-05",
+          "check_name": "error.suggestion provided",
+          "passed": true,
+          "actual": "Add \"data\" object containing conversation_id, agent_id, and other call details",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:22.814Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC05_CORRELATION": {
+      "name": "Correlation ID",
+      "score": {
+        "actual": 15,
+        "max": 15,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "CI-01",
+          "check_name": "correlation_id in response body",
+          "passed": true,
+          "actual": "trace-1768258283818-4gysu0qju",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:24.155Z"
+        },
+        {
+          "check_id": "CI-02",
+          "check_name": "correlation_id matches request",
+          "passed": true,
+          "actual": "trace-1768258283818-4gysu0qju",
+          "expected": "trace-1768258283818-4gysu0qju",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:24.155Z"
+        },
+        {
+          "check_id": "CI-03",
+          "check_name": "X-Correlation-ID in headers",
+          "passed": true,
+          "actual": "trace-1768258283818-4gysu0qju",
+          "expected": "trace-1768258283818-4gysu0qju",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:24.155Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC06_DLQ_REPROCESS": {
+      "name": "DLQ Reprocess",
+      "score": {
+        "actual": 11,
+        "max": 11,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "DR-01",
+          "check_name": "Returns 200 status",
+          "passed": true,
+          "actual": 200,
+          "expected": 200,
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:25.226Z"
+        },
+        {
+          "check_id": "DR-02",
+          "check_name": "reprocess_attempted is true",
+          "passed": true,
+          "actual": true,
+          "expected": true,
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:25.226Z"
+        },
+        {
+          "check_id": "DR-03",
+          "check_name": "result status valid",
+          "passed": true,
+          "actual": "failed",
+          "expected": "valid status",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:25.226Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC07_HEALTH": {
+      "name": "Health Endpoint",
+      "score": {
+        "actual": 18,
+        "max": 18,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "HE-01",
+          "check_name": "Returns 200 status",
+          "passed": true,
+          "actual": 200,
+          "expected": 200,
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:26.344Z"
+        },
+        {
+          "check_id": "HE-02",
+          "check_name": "status field present",
+          "passed": true,
+          "actual": "healthy",
+          "expected": "defined",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:26.344Z"
+        },
+        {
+          "check_id": "HE-03",
+          "check_name": "metrics object present",
+          "passed": true,
+          "actual": "{\"events_processed\":157,\"events_success\":142,\"events_failed\":15,\"dlq_depth\":3,\"error_rate\":\"0.0955\",\"avg_processing_time_ms\":342,\"last_event_timestamp\":1768258237256,\"circuit_breaker_status\":\"closed\",\"retry_queue_depth\":2}",
+          "expected": "defined",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:26.344Z"
+        },
+        {
+          "check_id": "HE-04",
+          "check_name": "events_processed metric",
+          "passed": true,
+          "actual": 157,
+          "expected": "defined",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:26.344Z"
+        },
+        {
+          "check_id": "HE-05",
+          "check_name": "dlq_depth metric",
+          "passed": true,
+          "actual": 3,
+          "expected": "defined",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:26.344Z"
+        },
+        {
+          "check_id": "HE-06",
+          "check_name": "error_rate metric",
+          "passed": true,
+          "actual": "0.0955",
+          "expected": "defined",
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:26.344Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC08_DYNAMIC": {
+      "name": "Dynamic Actions",
+      "score": {
+        "actual": 13,
+        "max": 13,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "DA-01",
+          "check_name": "Returns 200 status",
+          "passed": true,
+          "actual": 200,
+          "expected": 200,
+          "weight": 3,
+          "timestamp": "2026-01-12T22:51:27.540Z"
+        },
+        {
+          "check_id": "DA-02",
+          "check_name": "action_executed is true",
+          "passed": true,
+          "actual": true,
+          "expected": true,
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:27.540Z"
+        },
+        {
+          "check_id": "DA-03",
+          "check_name": "action_type matches request",
+          "passed": true,
+          "actual": "send_slack_notification",
+          "expected": "send_slack_notification",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:27.540Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC09_BURST": {
+      "name": "Burst Handling",
+      "score": {
+        "actual": 25,
+        "max": 25,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "BH-01",
+          "check_name": "All 100 events accepted",
+          "passed": true,
+          "actual": 100,
+          "expected": 100,
+          "weight": 10,
+          "timestamp": "2026-01-12T22:51:51.098Z"
+        },
+        {
+          "check_id": "BH-02",
+          "check_name": "No 5xx errors",
+          "passed": true,
+          "actual": 0,
+          "expected": 0,
+          "weight": 10,
+          "timestamp": "2026-01-12T22:51:51.098Z"
+        },
+        {
+          "check_id": "BH-03",
+          "check_name": "No timeouts",
+          "passed": true,
+          "actual": 0,
+          "expected": 0,
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:51.098Z"
+        }
+      ],
+      "failures": []
+    },
+    "AC10_CIRCUIT": {
+      "name": "Circuit Breaker",
+      "score": {
+        "actual": 20,
+        "max": 20,
+        "percentage": 100
+      },
+      "checks": [
+        {
+          "check_id": "CB-01",
+          "check_name": "circuit_breaker_open after failures",
+          "passed": true,
+          "actual": true,
+          "expected": true,
+          "weight": 10,
+          "timestamp": "2026-01-12T22:51:56.016Z"
+        },
+        {
+          "check_id": "CB-02",
+          "check_name": "circuit_breaker_resets_at provided",
+          "passed": true,
+          "actual": "2026-01-12T22:52:18.196Z",
+          "expected": "defined",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:56.016Z"
+        },
+        {
+          "check_id": "CB-03",
+          "check_name": "Returns 503 when open",
+          "passed": true,
+          "actual": 503,
+          "expected": "503 or open",
+          "weight": 5,
+          "timestamp": "2026-01-12T22:51:56.016Z"
+        }
+      ],
+      "failures": []
+    }
+  }
+}

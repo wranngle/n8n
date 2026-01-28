@@ -1,0 +1,123 @@
+# Evaluation Configuration: ElevenLabs Twilio Outbound Call with Client Data
+# Workflow ID: 5eowJIoZFZOSG85m
+# Complexity: Medium (9 nodes)
+
+workflow_id: "5eowJIoZFZOSG85m"
+workflow_name: "[DEV] ElevenLabs Twilio Outbound Call with Client Data"
+webhook_paths:
+  call: "elevenlabs-outbound-call"
+  sms: "elevenlabs-send-sms"
+
+# Workflow Structure (two flows):
+# Flow 1 - Call:
+#   Webhook: Initiate Call → Build Client Data Payload (Code) → ElevenLabs: Initiate Outbound Call (HTTP)
+#     → Check Call Initiated (IF) → Respond Success / Respond Error
+# Flow 2 - SMS:
+#   Webhook: Send SMS → Twilio SMS via HTTP → SMS Response
+
+evaluation:
+  pass_threshold: 80
+  max_retries: 2
+  timeout_ms: 45000
+  mode: "dual_webhook"
+
+test_cases:
+  # Call Flow Tests
+  - id: TC001
+    name: "Successful Outbound Call"
+    description: "Test initiating outbound call with client data"
+    webhook: "call"
+    input:
+      to_phone: "+13075551234"
+      client_data:
+        name: "John Smith"
+        company: "Test Corp"
+        appointment_time: "2026-01-09T14:00:00Z"
+        service_type: "garage_door_repair"
+    expected:
+      status: 200
+      response_contains:
+        - "call_id"
+        - "initiated"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 30
+
+  - id: TC002
+    name: "Call Initiation Failure"
+    description: "Test handling when ElevenLabs call fails"
+    webhook: "call"
+    input:
+      to_phone: "+10000000000"
+      client_data:
+        name: "Invalid Number Test"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: false
+      - type: json_path
+        path: "$.error"
+        exists: true
+    weight: 20
+
+  # SMS Flow Tests
+  - id: TC003
+    name: "Successful SMS Send"
+    description: "Test SMS sending via Twilio"
+    webhook: "sms"
+    input:
+      to_phone: "+13075559999"
+      message: "Your appointment is confirmed for tomorrow at 2pm"
+    expected:
+      status: 200
+      response_contains:
+        - "sent"
+        - "sms"
+    assertions:
+      - type: status_code
+        value: 200
+    weight: 25
+
+  - id: TC004
+    name: "SMS with Long Message"
+    description: "Test handling of long SMS messages"
+    webhook: "sms"
+    input:
+      to_phone: "+13075558888"
+      message: "This is a longer message that tests how the workflow handles SMS messages that exceed the standard 160 character limit for a single SMS segment."
+    expected:
+      status: 200
+    weight: 15
+
+  - id: TC005
+    name: "Client Data Injection"
+    description: "Verify client data is properly injected into call"
+    webhook: "call"
+    input:
+      to_phone: "+13075557777"
+      client_data:
+        name: "Jane Doe"
+        company: "Acme Corp"
+        custom_field: "Special instructions for the agent"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.client_data_injected"
+        value: true
+    weight: 10
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - twilio_credentials
+    - elevenlabs_api_key
+  integration_type: "voice_outbound"
+  notes: "Dual-webhook workflow - call initiation and SMS tool for voice agent"

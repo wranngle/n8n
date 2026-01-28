@@ -1,0 +1,480 @@
+# Workflow Evaluation Registry
+# =============================
+# Central registry of all DEV workflows with their evaluation configurations.
+# Used by SRIS Master Orchestrator to run systematic evaluations.
+
+version: "1.4"
+created: "2026-01-08"
+last_updated: "2026-01-09T00:05:00Z"
+
+# SRIS Integration
+sris:
+  orchestrator_id: "4TqaQ6kORDzZVwVP"
+  evaluator_id: "RjLiUAiuUs5XPvBj"
+  verification_loop_id: "KoQChBtjUa5F9bZg"
+
+# Workflow Evaluation Configurations
+workflows:
+
+  # === MINIMAL COMPLEXITY (2-3 nodes) ===
+  
+  D4GGMXFGC1PLOUT0:
+    name: "[DEV] Get ElevenLabs Agent"
+    complexity: minimal
+    node_count: 3
+    eval_status: passed
+    eval_config: "get-elevenlabs-agent-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies:
+      - elevenlabs_api_key
+    last_eval: "2026-01-08T17:59:21Z"
+    last_score: 100
+    mcp_enabled: true
+
+  NBvO92RVDa8pCK0d:
+    name: "[DEV] Supersystem - Client Data Lookup (Test)"
+    complexity: minimal
+    node_count: 3
+    eval_status: passed
+    eval_config: "client-data-lookup-test-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies:
+      - pipedrive_api_key
+    last_eval: "2026-01-08T17:59:21Z"
+    last_score: 100
+    mcp_enabled: true
+    
+  oik6SebewNAh1cV5:
+    name: "[DEV] Supersystem - Client Data Lookup (Eval-Ready)"
+    complexity: minimal
+    node_count: 3
+    eval_status: passed
+    eval_config: "client-data-lookup-eval-ready-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies:
+      - pipedrive_api_key
+    last_eval: "2026-01-09T00:03:18Z"
+    last_score: 100
+    mcp_enabled: true
+
+  Ar2lX0cprjeWB4Kd:
+    name: "[DEV] Supersystem - Execution Logger (Test)"
+    complexity: minimal
+    node_count: 3
+    eval_status: passed
+    eval_config: "execution-logger-test-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies: []
+    last_eval: "2026-01-09T00:03:14Z"
+    last_score: 100
+    mcp_enabled: true
+
+  ITUFwZq7ixgjTZMJ:
+    name: "[DEV] Supersystem - Slack Notifier (Test)"
+    complexity: minimal
+    node_count: 3
+    eval_status: passed
+    eval_config: "slack-notifier-test-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies:
+      - slack_api_token
+    last_eval: "2026-01-08T17:59:21Z"
+    last_score: 100
+    mcp_enabled: true
+
+  paneUFRzPscNvih2:
+    name: "[DEV] Pipeline Test - Webhook Processor"
+    complexity: minimal
+    node_count: 3
+    eval_status: passed
+    eval_config: "pipeline-test-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies: []
+    last_eval: "2026-01-08T17:59:21Z"
+    last_score: 100
+    mcp_enabled: true
+
+  # === LOW COMPLEXITY (4-6 nodes) ===
+
+  wZryG5tdRBFZUNMF:
+    name: "[DEV] Southeastern Wyoming Garage Doors SMS Tool"
+    complexity: low
+    node_count: 4
+    eval_status: needs_fix
+    eval_config: "sewy-sms-tool-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - twilio_credentials
+    last_eval: "2026-01-08T18:31:35Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+  qQmGqBM1pe4QUI05:
+    name: "[DEV] Pipedrive Lead Auto-Caller"
+    complexity: low
+    node_count: 6
+    eval_status: needs_fix
+    eval_config: "pipedrive-lead-auto-caller-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies:
+      - pipedrive_api_key
+      - elevenlabs_api_key
+    last_eval: "2026-01-08T18:31:35Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+  M7ZmLGCxyVOn5QJ6:
+    name: "[DEV] Supersystem - Parallel Evaluation Runner v6"
+    complexity: low
+    node_count: 6
+    eval_status: passed
+    eval_config: "parallel-eval-runner-v6-eval.yaml"
+    test_cases: 4
+    pass_threshold: 90
+    dependencies:
+      - n8n_api_key
+    last_eval: "2026-01-08T18:32:36Z"
+    last_score: 100
+    mcp_enabled: true
+
+  # === MEDIUM COMPLEXITY (7-10 nodes) ===
+
+  dKJYSCGIORtUsTSM:
+    name: "[DEV] Supersystem - Autorefinement Orchestrator"
+    complexity: medium
+    node_count: 7
+    eval_status: needs_fix
+    eval_config: "autorefinement-orchestrator-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - gemini_api_key
+      - elevenlabs_api_key
+    last_eval: "2026-01-08T18:32:36Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+  mwepwjfX27x4uTMu:
+    name: "[DEV] Supersystem - Native Evaluation Runner"
+    complexity: medium
+    node_count: 8
+    eval_status: needs_fix
+    eval_config: "native-eval-runner-eval.yaml"
+    test_cases: 4
+    pass_threshold: 80
+    dependencies: []
+    last_eval: "2026-01-08T18:32:36Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+  8qlDREZy5qtEGkNK:
+    name: "[DEV] Supersystem - Post-Call Orchestrator (Test)"
+    complexity: medium
+    node_count: 8
+    eval_status: passed
+    eval_config: "post-call-orchestrator-test-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - elevenlabs_api_key
+    last_eval: "2026-01-09T22:42:42Z"
+    last_score: 100
+    mcp_enabled: true
+
+  zeQNX4g5mQlE4EQ0:
+    name: "[DEV] Supersystem - Autorefinement Orchestrator v2"
+    complexity: medium
+    node_count: 8
+    eval_status: needs_fix
+    eval_config: "autorefinement-orchestrator-v2-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - openrouter_api_key
+    last_eval: "2026-01-08T18:32:37Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "OpenRouter API 401 - Invalid API key"
+
+  5eowJIoZFZOSG85m:
+    name: "[DEV] ElevenLabs Twilio Outbound Call with Client Data"
+    complexity: medium
+    node_count: 9
+    eval_status: passed
+    eval_config: "elevenlabs-twilio-outbound-client-data-eval.yaml"
+    test_cases: 5
+    pass_threshold: 80
+    dependencies:
+      - twilio_credentials
+      - elevenlabs_api_key
+    last_eval: "2026-01-09T22:39:38Z"
+    last_score: 100
+    mcp_enabled: true
+
+  Rry9i9JdDulTrCci:
+    name: "[DEV] Sarah Email Tool v1.0"
+    complexity: medium
+    node_count: 10
+    eval_status: configured
+    eval_config: "sarah-email-tool-v1-eval.yaml"
+    test_cases: 1900  # 75 explicit + combinatorial expansion
+    pass_threshold: 95
+    dependencies:
+      - smtp_credentials
+    last_eval: null
+    last_score: null
+    mcp_enabled: true
+    expansion_enabled: true
+    coverage:
+      authentication: 10
+      email_validation: 27
+      templates: 7
+      data_capture: 10
+      performance: 3
+      edge_cases: 8
+      security: 10
+
+  # === HIGH COMPLEXITY (10+ nodes) ===
+
+  5hvmE72qa4VYyPOK:
+    name: "[DEV] Transcript Field Extractor - AI Agent"
+    complexity: high
+    node_count: 10
+    eval_status: partial
+    eval_config: "transcript-field-extractor-ai-agent-eval.yaml"
+    test_cases: 5
+    pass_threshold: 85
+    dependencies:
+      - openai_api_key
+    last_eval: "2026-01-08T18:32:37Z"
+    last_score: 50
+    mcp_enabled: true
+    issue: "Missing expected field in response"
+
+  54sXqqJVSctlSF6V:
+    name: "[DEV] Transcript Field Extractor v2 - 5-Component Architecture"
+    complexity: high
+    node_count: 10
+    eval_status: partial
+    eval_config: "transcript-field-extractor-v2-eval.yaml"
+    test_cases: 4
+    pass_threshold: 90
+    dependencies:
+      - openai_api_key
+    last_eval: "2026-01-08T18:32:38Z"
+    last_score: 50
+    mcp_enabled: true
+    issue: "Missing expected field in response"
+
+  c9dFlI51VhvANoEj:
+    name: "[DEV] Supersystem - Autorefinement Orchestrator v2 (LangChain)"
+    complexity: high
+    node_count: 10
+    eval_status: needs_fix
+    eval_config: "autorefinement-orchestrator-v2-langchain-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - gemini_api_key
+      - elevenlabs_api_key
+    last_eval: "2026-01-08T18:32:38Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+  KoQChBtjUa5F9bZg:
+    name: "[DEV] SRIS - Verification Loop"
+    complexity: high
+    node_count: 10
+    eval_status: needs_fix
+    eval_config: "sris-verification-loop-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - n8n_api_key
+    last_eval: "2026-01-08T18:33:08Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Invalid JSON in response body"
+
+  RjLiUAiuUs5XPvBj:
+    name: "[DEV] SRIS - ElevenLabs Conversation Evaluator"
+    complexity: high
+    node_count: 10
+    eval_status: needs_fix
+    eval_config: "sris-elevenlabs-conversation-evaluator-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - elevenlabs_api_key
+    last_eval: "2026-01-08T18:33:08Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "ExpressionError - $env access blocked, use n8n credentials"
+
+  4TqaQ6kORDzZVwVP:
+    name: "[DEV] SRIS - Master Orchestrator"
+    complexity: high
+    node_count: 11
+    eval_status: needs_fix
+    eval_config: "sris-master-orchestrator-eval.yaml"
+    test_cases: 4
+    pass_threshold: 90
+    dependencies:
+      - n8n_api_key
+    last_eval: "2026-01-08T18:33:16Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Invalid JSON in response body"
+
+  cEORduJCqCVDOKce:
+    name: "[DEV] ElevenLabs Call Completed - Update Pipedrive"
+    complexity: high
+    node_count: 11
+    eval_status: passed
+    eval_config: "elevenlabs-call-completed-update-pipedrive-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - pipedrive_api_key
+      - elevenlabs_api_key
+    last_eval: "2026-01-09T22:42:27Z"
+    last_score: 100
+    mcp_enabled: true
+
+  NcP4oEeS3xolYXzC:
+    name: "[DEV] ElevenLabs Twilio Outbound - Bulletproof Edition"
+    complexity: high
+    node_count: 12
+    eval_status: passed
+    eval_config: "elevenlabs-twilio-outbound-bulletproof-eval.yaml"
+    test_cases: 5
+    pass_threshold: 90
+    dependencies:
+      - twilio_credentials
+      - elevenlabs_api_key
+    last_eval: "2026-01-09T22:41:12Z"
+    last_score: 100
+    mcp_enabled: true
+
+  SjItj6uzYSr9rotM:
+    name: "[DEV] Supersystem - Autonomous Sleep Loop"
+    complexity: high
+    node_count: 12
+    eval_status: needs_fix
+    eval_config: "autonomous-sleep-loop-eval.yaml"
+    test_cases: 4
+    pass_threshold: 85
+    dependencies:
+      - n8n_api_key
+    last_eval: "2026-01-08T18:33:16Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+  KrqpJuyN8pjTouAo:
+    name: "[DEV] Voice Agent Tester v2.0"
+    complexity: high
+    node_count: 18
+    eval_status: needs_fix
+    eval_config: "voice-agent-tester-v2-eval.yaml"
+    test_cases: 5
+    pass_threshold: 85
+    dependencies:
+      - elevenlabs_api_key
+    last_eval: "2026-01-08T18:33:17Z"
+    last_score: 0
+    mcp_enabled: true
+    issue: "Merge node - Fields to Match not configured"
+
+# Evaluation Queue (ordered by complexity)
+evaluation_queue:
+  - D4GGMXFGC1PLOUT0  # minimal - Get ElevenLabs Agent
+  - NBvO92RVDa8pCK0d  # minimal - Client Data Lookup (Test)
+  - oik6SebewNAh1cV5  # minimal - Client Data Lookup (Eval-Ready)
+  - Ar2lX0cprjeWB4Kd  # minimal - Execution Logger
+  - ITUFwZq7ixgjTZMJ  # minimal - Slack Notifier
+  - paneUFRzPscNvih2  # minimal - Pipeline Test
+  # Low complexity...
+  - wZryG5tdRBFZUNMF
+  - qQmGqBM1pe4QUI05
+  - M7ZmLGCxyVOn5QJ6
+  # Medium complexity...
+  - dKJYSCGIORtUsTSM
+  - mwepwjfX27x4uTMu
+  - 8qlDREZy5qtEGkNK
+  - zeQNX4g5mQlE4EQ0
+  - 5eowJIoZFZOSG85m
+  - Rry9i9JdDulTrCci  # Sarah Email Tool v1.0
+  # High complexity...
+  - 5hvmE72qa4VYyPOK
+  - 54sXqqJVSctlSF6V
+  - c9dFlI51VhvANoEj
+  - KoQChBtjUa5F9bZg
+  - RjLiUAiuUs5XPvBj
+  - 4TqaQ6kORDzZVwVP
+  - cEORduJCqCVDOKce
+  - NcP4oEeS3xolYXzC
+  - SjItj6uzYSr9rotM
+  - KrqpJuyN8pjTouAo
+
+# Summary Statistics
+stats:
+  total_workflows: 24
+  by_complexity:
+    minimal: 6
+    low: 3
+    medium: 6
+    high: 9
+  eval_status:
+    passed: 10         # 6 minimal + 1 low + 2 medium + 1 high (Parallel Eval Runner, Post-Call, Client Data, Call Completed, Bulletproof)
+    partial: 2         # 2 high (Transcript extractors)
+    needs_fix: 11      # 2 low + 3 medium + 6 high
+    configured: 1      # Sarah Email Tool v1.0
+  mcp_enabled: 24
+
+# Latest Evaluation Run
+latest_run:
+  timestamp: "2026-01-09T22:42:42Z"
+  scope: "elevenlabs_adjacent"
+  results:
+    passed: 10
+    partial: 2
+    failed: 11
+    average_score: 52
+
+# Issue Summary
+issues:
+  expired_api_key: 3       # ElevenLabs key expired
+  invalid_credential_id: 2 # Twilio credential not found
+  mcp_not_available: 3     # Workflow not activated
+  invalid_json_response: 2
+  node_config_error: 1
+  partial_pass: 6
+
+# Blockers Requiring User Action
+blockers:
+  - type: "expired_api_key"
+    service: "ElevenLabs"
+    affected_workflows: ["RjLiUAiuUs5XPvBj", "dKJYSCGIORtUsTSM"]
+    action: "Provide fresh ElevenLabs API key"
+  - type: "invalid_credential_id"
+    service: "Twilio"
+    affected_workflows: ["wZryG5tdRBFZUNMF"]
+    action: "Create valid Twilio credential in n8n"
+  - type: "missing_credentials"
+    service: "Pipedrive"
+    affected_workflows: ["qQmGqBM1pe4QUI05"]
+    action: "Add Pipedrive credentials to activate workflow"

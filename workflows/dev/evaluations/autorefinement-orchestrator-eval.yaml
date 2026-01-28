@@ -1,0 +1,98 @@
+# Evaluation Configuration: Autorefinement Orchestrator
+# Workflow ID: dKJYSCGIORtUsTSM
+# Complexity: Medium (7 nodes)
+
+workflow_id: "dKJYSCGIORtUsTSM"
+workflow_name: "[DEV] Supersystem - Autorefinement Orchestrator"
+webhook_path: "autorefinement"
+
+# Workflow Structure:
+# Autorefinement Trigger → Parse Failure Data (Code) → Get Agent Prompt (HTTP)
+#   → Analyze & Generate Fix (Gemini HTTP) → Extract Fix (Code) → Patch Agent (HTTP) → Respond
+
+# Purpose: Self-improvement loop that analyzes conversation failures and patches voice agent prompts
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 60000
+  mode: "ai_integration"
+
+test_cases:
+  - id: TC001
+    name: "Valid Failure Analysis Request"
+    description: "Test with a real conversation failure scenario"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      conversation_id: "conv-test-001"
+      failure_type: "missed_intent"
+      failure_details:
+        user_message: "I need to schedule a garage door repair"
+        agent_response: "I'm sorry, I didn't understand. Can you repeat that?"
+        expected_intent: "schedule_service"
+    expected:
+      status: 200
+      response_contains:
+        - "analysis"
+        - "patch"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 45000
+    weight: 35
+
+  - id: TC002
+    name: "Multiple Failure Patterns"
+    description: "Test with batch of failure patterns"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - { type: "intent_confusion", count: 5 }
+        - { type: "fallback_triggered", count: 3 }
+        - { type: "context_lost", count: 2 }
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.recommendations"
+        exists: true
+    weight: 25
+
+  - id: TC003
+    name: "No Failures - Skip Patch"
+    description: "Test behavior when no actionable failures"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      conversation_id: "conv-perfect-001"
+      failure_type: "none"
+      failure_details: {}
+    expected:
+      status: 200
+      response_contains:
+        - "no_action"
+    weight: 20
+
+  - id: TC004
+    name: "Invalid Agent ID"
+    description: "Test error handling for non-existent agent"
+    input:
+      agent_id: "agent_invalid_does_not_exist"
+      conversation_id: "conv-test-004"
+      failure_type: "missed_intent"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.error"
+        exists: true
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - gemini_api_key
+    - elevenlabs_api_key
+  integration_type: "ai_self_improvement"
+  notes: "Core SRIS component - analyzes failures and auto-patches agent prompts"

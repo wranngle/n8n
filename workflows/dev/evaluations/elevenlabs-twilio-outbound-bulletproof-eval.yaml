@@ -1,0 +1,118 @@
+# Evaluation Configuration: ElevenLabs Twilio Outbound - Bulletproof Edition
+# Workflow ID: NcP4oEeS3xolYXzC
+# Complexity: High (12 nodes)
+
+workflow_id: "NcP4oEeS3xolYXzC"
+workflow_name: "[DEV] ElevenLabs Twilio Outbound - Bulletproof Edition"
+webhook_path: "elevenlabs-outbound-bulletproof"
+
+# Workflow Structure:
+# Webhook: Initiate Call → Validate & Sanitize Input (Code) → Validation Passed? (IF)
+#   → [fail] Respond: Validation Error
+#   → [pass] Build ElevenLabs Payload (Code) → ElevenLabs: Initiate Call (HTTP)
+#     → Classify API Response (Code) → Route by Action (Switch)
+#       → [success] Respond: Call Initiated
+#       → [retry] Wait for Retry → Increment Retry Counter → [loop back]
+#       → [failure] Respond: Call Failed
+
+evaluation:
+  pass_threshold: 90
+  max_retries: 2
+  timeout_ms: 60000
+  mode: "bulletproof_outbound"
+
+test_cases:
+  - id: TC001
+    name: "Valid Call - First Attempt Success"
+    description: "Test successful call on first attempt"
+    input:
+      to_phone: "+13075551234"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      client_data:
+        name: "John Smith"
+        appointment: "2026-01-09T14:00:00Z"
+    expected:
+      status: 200
+      response_contains:
+        - "call_initiated"
+        - "call_id"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.retry_count"
+        value: 0
+    weight: 30
+
+  - id: TC002
+    name: "Input Validation Failure"
+    description: "Test validation rejects invalid input"
+    input:
+      to_phone: "not-a-phone"
+      agent_id: ""
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.validation_error"
+        exists: true
+      - type: json_path
+        path: "$.call_attempted"
+        value: false
+    weight: 20
+
+  - id: TC003
+    name: "Retry on Transient Error"
+    description: "Test retry loop on rate limit or transient error"
+    input:
+      to_phone: "+13075559999"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      simulate_rate_limit: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.retry_count"
+        min: 1
+    weight: 25
+
+  - id: TC004
+    name: "Max Retries Exhausted"
+    description: "Test failure response after max retries"
+    input:
+      to_phone: "+13075558888"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      simulate_persistent_failure: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.call_failed"
+        value: true
+      - type: json_path
+        path: "$.retries_exhausted"
+        value: true
+    weight: 15
+
+  - id: TC005
+    name: "E.164 Phone Sanitization"
+    description: "Test phone number sanitization to E.164"
+    input:
+      to_phone: "(307) 555-1234"
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.sanitized_phone"
+        value: "+13075551234"
+    weight: 10
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - twilio_credentials
+    - elevenlabs_api_key
+  integration_type: "bulletproof_outbound"
+  notes: "Production-hardened outbound calling with validation and retry logic"

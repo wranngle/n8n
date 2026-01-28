@@ -1,0 +1,83 @@
+# Evaluation Configuration: Client Data Lookup (Test)
+# Workflow ID: NBvO92RVDa8pCK0d
+# Complexity: Minimal (3 nodes)
+
+workflow_id: "NBvO92RVDa8pCK0d"
+workflow_name: "[DEV] Supersystem - Client Data Lookup (Test)"
+webhook_path: "client-data-lookup-test"
+
+# Workflow Structure:
+# Webhook: Client Lookup → Simulate Client Lookup (Code) → Respond with Client Data
+
+evaluation:
+  pass_threshold: 80
+  max_retries: 2
+  timeout_ms: 30000
+
+test_cases:
+  - id: TC001
+    name: "Valid Client Lookup Request"
+    description: "Test with a valid phone number to retrieve client data"
+    input:
+      phone: "+15551234567"
+      caller_id: "test-session-001"
+    expected:
+      status: 200
+      response_contains:
+        - "client"
+        - "phone"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 5000
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 30
+
+  - id: TC002
+    name: "Missing Phone Parameter"
+    description: "Test error handling when phone is missing"
+    input:
+      caller_id: "test-session-002"
+    expected:
+      status: 200
+      response_contains:
+        - "error"
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: false
+    weight: 25
+
+  - id: TC003
+    name: "Empty Request Body"
+    description: "Test handling of empty request"
+    input: {}
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 5000
+    weight: 20
+
+  - id: TC004
+    name: "Malformed Phone Format"
+    description: "Test with non-E.164 phone format"
+    input:
+      phone: "555-123-4567"
+      caller_id: "test-session-004"
+    expected:
+      status: 200
+    assertions:
+      - type: response_time_ms
+        max: 5000
+    weight: 25
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - pipedrive_api_key
+  notes: "Simulated lookup - doesn't hit real Pipedrive API"

@@ -1,0 +1,472 @@
+{
+  "name": "[PROD] Client Initiation Data - Sarah",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Client Lookup",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "webhookId": "client-initiation-data-sarah",
+      "parameters": {
+        "path": "client-initiation-data",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {
+          "timeout": 500
+        }
+      }
+    },
+    {
+      "id": "extract-metadata",
+      "name": "Extract & Validate Call Metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "caller_id",
+              "name": "caller_id",
+              "type": "string",
+              "value": "={{ $json.body?.caller_id || $json.caller_id || '' }}"
+            },
+            {
+              "id": "agent_id",
+              "name": "agent_id",
+              "type": "string",
+              "value": "={{ $json.body?.agent_id || $json.agent_id || '' }}"
+            },
+            {
+              "id": "called_number",
+              "name": "called_number",
+              "type": "string",
+              "value": "={{ $json.body?.called_number || $json.called_number || '' }}"
+            },
+            {
+              "id": "call_sid",
+              "name": "call_sid",
+              "type": "string",
+              "value": "={{ $json.body?.call_sid || $json.call_sid || '' }}"
+            },
+            {
+              "id": "start_time",
+              "name": "start_time",
+              "type": "number",
+              "value": "={{ Date.now() }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "validate-agent",
+      "name": "Validate Agent ID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [440, 0],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "agent-match",
+              "leftValue": "={{ $json.agent_id }}",
+              "rightValue": "agent_8001kdgp7qbyf4wvhs540be78vew",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-invalid-agent",
+      "name": "Error: Invalid Agent",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 140],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: 'Invalid agent_id', expected: 'agent_8001kdgp7qbyf4wvhs540be78vew', received: $json.agent_id } }}",
+        "options": {
+          "responseCode": 400
+        }
+      }
+    },
+    {
+      "id": "pipedrive-lookup",
+      "name": "Pipedrive: Lookup Person",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, -60],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.pipedrive.com/v1/persons/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pipedriveApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "term",
+              "value": "={{ $json.caller_id }}"
+            },
+            {
+              "name": "fields",
+              "value": "phone"
+            },
+            {
+              "name": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 300,
+          "retry": {
+            "enabled": false
+          }
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "sheets-lookup",
+      "name": "Google Sheets: Lookup Call History",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [660, 60],
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "phone",
+              "lookupValue": "={{ $json.caller_id }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 300
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "merge-transform",
+      "name": "Merge & Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 0],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Merge & Transform Data for Client Initiation\n// This node combines Pipedrive and Google Sheets data into ElevenLabs format\n\nconst startTime = $('Extract & Validate Call Metadata').first().json.start_time || Date.now();\nconst callerId = $('Extract & Validate Call Metadata').first().json.caller_id || '';\n\n// Extract Pipedrive data (if successful)\nlet pipedriveData = null;\ntry {\n  const pipedriveNode = $('Pipedrive: Lookup Person').all();\n  if (pipedriveNode.length > 0 && pipedriveNode[0].json?.data?.items?.length > 0) {\n    const person = pipedriveNode[0].json.data.items[0].item;\n    pipedriveData = {\n      id: person.id,\n      name: person.name,\n      first_name: person.first_name || person.name?.split(' ')[0],\n      org_name: person.organization?.name || '',\n      org_id: person.organization?.id || 0,\n      account_tier: person.custom_fields?.account_tier || null,\n      industry: person.custom_fields?.industry || ''\n    };\n  }\n} catch (e) {\n  console.log('Pipedrive lookup failed or no results:', e.message);\n}\n\n// Extract Sheets data (if successful)\nlet sheetsData = null;\ntry {\n  const sheetsNode = $('Google Sheets: Lookup Call History').all();\n  if (sheetsNode.length > 0 && sheetsNode[0].json) {\n    const row = sheetsNode[0].json;\n    sheetsData = {\n      row_number: row.row || 0,\n      name: row.name || '',\n      call_count: parseInt(row.call_count) || 0,\n      last_interaction: row.last_interaction || '',\n      last_topic: row.last_topic || '',\n      notes: row.notes || ''\n    };\n  }\n} catch (e) {\n  console.log('Sheets lookup failed or no results:', e.message);\n}\n\n// Sanitize function to remove PII patterns\nfunction sanitize(text) {\n  if (!text) return '';\n  // Remove SSN patterns\n  text = text.replace(/\\b\\d{3}-\\d{2}-\\d{4}\\b/g, '[REDACTED]');\n  // Remove credit card patterns\n  text = text.replace(/\\b\\d{16}\\b/g, '[REDACTED]');\n  // Truncate long strings\n  if (text.length > 200) {\n    text = text.substring(0, 197) + '...';\n  }\n  return text;\n}\n\n// Calculate account tier if not in Pipedrive\nfunction calculateTier(callCount) {\n  if (callCount === 0) return 'New';\n  if (callCount <= 5) return 'Bronze';\n  if (callCount <= 15) return 'Silver';\n  return 'Gold';\n}\n\n// Merge data with priority: field-level merge, most recent/Pipedrive > Sheets\nconst customerName = pipedriveData?.name || sheetsData?.name || 'there';\nconst customerFirstName = pipedriveData?.first_name || sheetsData?.name?.split(' ')[0] || 'there';\nconst company = pipedriveData?.org_name || '';\nconst industry = pipedriveData?.industry || '';\nconst interactionCount = sheetsData?.call_count || 0;\nconst accountTier = pipedriveData?.account_tier || calculateTier(interactionCount);\nconst callHistory = sheetsData?.last_interaction || 'First-time caller';\nconst lastTopic = sheetsData?.last_topic || '';\nconst notes = sanitize(sheetsData?.notes || '');\n\nconst lookupSuccess = !!(pipedriveData || sheetsData);\nconst dataSource = pipedriveData ? 'pipedrive' : (sheetsData ? 'sheets' : 'none');\n\n// Build dynamic variables object\nconst dynamicVariables = {\n  customer_name: customerName,\n  customer_first_name: customerFirstName,\n  company: company,\n  industry: industry,\n  account_tier: accountTier,\n  call_history: callHistory,\n  interaction_count: interactionCount,\n  last_topic: lastTopic,\n  notes: notes,\n  lookup_success: lookupSuccess,\n  data_source: dataSource,\n  secret__pipedrive_person_id: pipedriveData?.id || 0,\n  secret__pipedrive_org_id: pipedriveData?.org_id || 0,\n  secret__google_sheet_row: sheetsData?.row_number || 0\n};\n\n// Build conversation config override (for VIP/returning customers)\nlet conversationConfigOverride = null;\n\nif (accountTier === 'Gold') {\n  // VIP greeting\n  conversationConfigOverride = {\n    agent: {\n      first_message: `Hi ${customerFirstName}, this is Sarah from Wranngle. I see you're one of our premium clients - how can I help you today?`\n    }\n  };\n} else if (interactionCount >= 3) {\n  // Returning customer greeting\n  conversationConfigOverride = {\n    agent: {\n      first_message: `Hi ${customerFirstName}, great to hear from you again! This is Sarah from Wranngle.`\n    }\n  };\n}\n\n// Calculate execution time\nconst executionTime = Date.now() - startTime;\n\n// Build final response\nconst response = {\n  type: 'conversation_initiation_client_data',\n  dynamic_variables: dynamicVariables,\n  ...(conversationConfigOverride && { conversation_config_override: conversationConfigOverride })\n};\n\n// Build metadata for logging\nconst metadata = {\n  caller_id: callerId,\n  execution_time_ms: executionTime,\n  pipedrive_success: !!pipedriveData,\n  sheets_success: !!sheetsData,\n  enrichment_success: lookupSuccess,\n  account_tier: accountTier,\n  data_source: dataSource\n};\n\nreturn [\n  {\n    json: {\n      response: response,\n      metadata: metadata\n    }\n  }\n];"
+      }
+    },
+    {
+      "id": "log-execution",
+      "name": "Log Execution Metrics",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1100, 0],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "log_entry",
+              "name": "log_entry",
+              "type": "object",
+              "value": "={{ {\n  timestamp: new Date().toISOString(),\n  caller_id: $json.metadata.caller_id,\n  execution_time_ms: $json.metadata.execution_time_ms,\n  enrichment_success: $json.metadata.enrichment_success,\n  data_source: $json.metadata.data_source,\n  account_tier: $json.metadata.account_tier\n} }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "check-performance",
+      "name": "Check Performance Threshold",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1320, 0],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "leftValue": "",
+            "caseSensitive": false,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "slow-response",
+              "leftValue": "={{ $json.metadata.execution_time_ms }}",
+              "rightValue": 500,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "alert-slow-webhook",
+      "name": "Alert: Slow Webhook Performance",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1540, 80],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "alert",
+              "name": "alert",
+              "type": "string",
+              "value": "=⚠️ PERFORMANCE: Client initiation webhook exceeded 500ms threshold\\n\\nCaller: {{ $json.metadata.caller_id }}\\nExecution Time: {{ $json.metadata.execution_time_ms }}ms\\nData Source: {{ $json.metadata.data_source }}\\n\\nConsider implementing caching."
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "respond-success",
+      "name": "Respond: Client Initiation Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1540, -80],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "X-Execution-Time-Ms",
+                "value": "={{ $json.metadata?.execution_time_ms ?? 0 }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "error-fallback",
+      "name": "Error Fallback: Generic Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 200],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Fallback response when lookups fail or timeout\nconst response = {\n  type: 'conversation_initiation_client_data',\n  dynamic_variables: {\n    customer_name: 'there',\n    customer_first_name: 'there',\n    company: '',\n    industry: '',\n    account_tier: 'New',\n    call_history: 'First-time caller',\n    interaction_count: 0,\n    last_topic: '',\n    notes: '',\n    lookup_success: false,\n    data_source: 'none',\n    secret__pipedrive_person_id: 0,\n    secret__pipedrive_org_id: 0,\n    secret__google_sheet_row: 0\n  }\n};\n\nreturn [{ json: { response: response } }];"
+      }
+    },
+    {
+      "id": "respond-fallback",
+      "name": "Respond: Fallback",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1100, 200],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.response }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Client Lookup": {
+      "main": [
+        [
+          {
+            "node": "Extract & Validate Call Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract & Validate Call Metadata": {
+      "main": [
+        [
+          {
+            "node": "Validate Agent ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Agent ID": {
+      "main": [
+        [
+          {
+            "node": "Pipedrive: Lookup Person",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets: Lookup Call History",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Invalid Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pipedrive: Lookup Person": {
+      "main": [
+        [
+          {
+            "node": "Merge & Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: Lookup Call History": {
+      "main": [
+        [
+          {
+            "node": "Merge & Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge & Transform Data": {
+      "main": [
+        [
+          {
+            "node": "Log Execution Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Execution Metrics": {
+      "main": [
+        [
+          {
+            "node": "Check Performance Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Performance Threshold": {
+      "main": [
+        [
+          {
+            "node": "Alert: Slow Webhook Performance",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Client Initiation Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert: Slow Webhook Performance": {
+      "main": [
+        [
+          {
+            "node": "Respond: Client Initiation Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Fallback: Generic Response": {
+      "main": [
+        [
+          {
+            "node": "Respond: Fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "error-fallback"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "production",
+      "id": "prod"
+    },
+    {
+      "name": "elevenlabs",
+      "id": "elevenlabs"
+    },
+    {
+      "name": "client-enrichment",
+      "id": "enrichment"
+    }
+  ],
+  "meta": {
+    "instanceId": "wranngle-n8n",
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 1,
+  "active": false
+}

@@ -1,0 +1,602 @@
+# Evaluation Configuration: Sarah SMS Tool - BULLETPROOF v3.0
+# Workflow ID: TBD (deploy workflow first)
+# Complexity: High (18+ nodes)
+# Protocol: Hierarchical Development - Spec → Tests → Implementation
+
+workflow_id: "uFFwYcr7XgdRCvdW"
+workflow_name: "[DEV] Sarah SMS Tool - BULLETPROOF v3.0"
+webhook_path: "sarah-send-sms-v3"
+
+# Workflow Architecture:
+# Webhook → Auth Check → Extract Params → Validate Phone → Compose Message
+# → Twilio Send (with retry) → Delivery Verify → Route Response
+
+evaluation:
+  pass_threshold: 95  # Bulletproof means 95%+ pass rate
+  max_retries: 2
+  timeout_ms: 45000   # Longer timeout for retry logic
+
+# ============================================
+# TEST SUITE: Authentication (P0 - Security)
+# ============================================
+test_cases:
+  - id: AUTH001
+    name: "Valid Secret Header"
+    description: "Request with correct X-Webhook-Secret should proceed"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+        Content-Type: "application/json"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Test User"
+    expected:
+      status: [200, 202]
+      response_not_contains:
+        - "UNAUTHORIZED"
+    assertions:
+      - type: status_code_not
+        value: 401
+    weight: 15
+
+  - id: AUTH002
+    name: "Missing Secret Header"
+    description: "Request without auth header should be rejected"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        Content-Type: "application/json"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Test User"
+    expected:
+      status: 401
+      response_contains:
+        - "UNAUTHORIZED"
+    assertions:
+      - type: status_code
+        value: 401
+      - type: json_path
+        path: "$.success"
+        value: false
+    weight: 15
+
+  - id: AUTH003
+    name: "Invalid Secret Header"
+    description: "Request with wrong secret should be rejected"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: "wrong-secret-value"
+        Content-Type: "application/json"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Test User"
+    expected:
+      status: 401
+    assertions:
+      - type: json_path
+        path: "$.error"
+        value: "UNAUTHORIZED"
+    weight: 10
+
+  - id: AUTH004
+    name: "ElevenLabs User-Agent Bypass"
+    description: "ElevenLabs origin should bypass secret check"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        User-Agent: "ElevenLabs/1.0"
+        Content-Type: "application/json"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Test User"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: status_code_not
+        value: 401
+    weight: 10
+
+# ============================================
+# TEST SUITE: Phone Validation (P0 - Core)
+# ============================================
+  - id: PHONE001
+    name: "Valid US Phone - E.164"
+    description: "Standard US number in E.164 format"
+    priority: P0
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "John Smith"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+      - type: json_path_exists
+        path: "$.message_sid"
+    weight: 15
+
+  - id: PHONE002
+    name: "Valid Canadian Phone"
+    description: "Canadian number should be accepted (+1 prefix)"
+    priority: P0
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+14165551234"
+        caller_name: "Canadian User"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 10
+
+  - id: PHONE003
+    name: "Valid UK Phone"
+    description: "International UK number should be accepted"
+    priority: P1
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+447911123456"
+        caller_name: "UK User"
+    expected:
+      status: [200, 202, 400]  # May fail due to intl restrictions
+    assertions:
+      - type: json_path_exists
+        path: "$.recipient"
+    weight: 5
+
+  - id: PHONE004
+    name: "Missing Phone Number"
+    description: "Request with no phone should return 400"
+    priority: P0
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        caller_name: "No Phone User"
+    expected:
+      status: 400
+      response_contains:
+        - "MISSING_PHONE_NUMBER"
+    assertions:
+      - type: json_path
+        path: "$.error"
+        value: "MISSING_PHONE_NUMBER"
+      - type: json_path_exists
+        path: "$.hint"
+    weight: 10
+
+  - id: PHONE005
+    name: "Invalid Phone - Letters"
+    description: "Phone with letters should be rejected"
+    priority: P0
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+1555CALLME"
+        caller_name: "Bad Phone User"
+    expected:
+      status: 400
+      response_contains:
+        - "INVALID_PHONE_FORMAT"
+    assertions:
+      - type: json_path
+        path: "$.error"
+        value: "INVALID_PHONE_FORMAT"
+    weight: 5
+
+  - id: PHONE006
+    name: "Invalid Phone - Too Short"
+    description: "Phone with too few digits should be rejected"
+    priority: P0
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+1555"
+        caller_name: "Short Phone"
+    expected:
+      status: 400
+    assertions:
+      - type: json_path
+        path: "$.error"
+        value: "INVALID_PHONE_FORMAT"
+    weight: 5
+
+  - id: PHONE007
+    name: "Phone Normalization - Parentheses"
+    description: "Phone with (XXX) format should be cleaned"
+    priority: P1
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "(555) 123-4567"
+        caller_name: "Formatted Phone"
+    expected:
+      status: 400  # Missing country code after cleaning
+    assertions:
+      - type: json_path_exists
+        path: "$.cleaned"
+    weight: 5
+
+  - id: PHONE008
+    name: "Phone Normalization - Dashes"
+    description: "Phone with dashes should be cleaned to E.164"
+    priority: P1
+    category: phone_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+1-555-123-4567"
+        caller_name: "Dashed Phone"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 5
+
+# ============================================
+# TEST SUITE: Message Templates (P2 - Feature)
+# ============================================
+  - id: TEMPLATE001
+    name: "Default Demo Template"
+    description: "No template specified should use demo"
+    priority: P2
+    category: message_templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Demo User"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 5
+
+  - id: TEMPLATE002
+    name: "Recap Template"
+    description: "Recap template with company name"
+    priority: P2
+    category: message_templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Recap User"
+        company_name: "Acme HVAC"
+        template: "recap"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path_exists
+        path: "$.company_name"
+    weight: 5
+
+  - id: TEMPLATE003
+    name: "Followup Template"
+    description: "Followup template with industry"
+    priority: P2
+    category: message_templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Followup User"
+        industry: "plumbing"
+        template: "followup"
+    expected:
+      status: [200, 202]
+    weight: 5
+
+# ============================================
+# TEST SUITE: Data Capture (P2 - Feature)
+# ============================================
+  - id: DATA001
+    name: "Full Data Capture"
+    description: "All optional fields should be captured in response"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Full Data User"
+        company_name: "Full Data Corp"
+        industry: "hvac"
+        email: "test@example.com"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.first_name"
+        value: "Full Data User"
+      - type: json_path_exists
+        path: "$.company_name"
+      - type: json_path_exists
+        path: "$.request_id"
+    weight: 5
+
+  - id: DATA002
+    name: "Minimal Data - Name Only"
+    description: "Only required fields should still work"
+    priority: P1
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Minimal User"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 5
+
+  - id: DATA003
+    name: "Missing Name - Default"
+    description: "Missing caller_name should default to 'there'"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.first_name"
+        value: "there"
+    weight: 3
+
+# ============================================
+# TEST SUITE: Error Handling (P1 - Reliability)
+# ============================================
+  - id: ERROR001
+    name: "Twilio Error - Invalid Number"
+    description: "Twilio 21211 error should return troubleshooting"
+    priority: P1
+    category: error_handling
+    mock_twilio_response:
+      error_code: 21211
+      error_message: "Invalid 'To' Phone Number"
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+10000000000"
+        caller_name: "Invalid Number"
+    expected:
+      status: 400
+    assertions:
+      - type: json_path_exists
+        path: "$.troubleshooting"
+    weight: 5
+    skip_live: true  # Uses mock
+
+  - id: ERROR002
+    name: "Twilio Error - Landline"
+    description: "Twilio 21614 error for landline numbers"
+    priority: P1
+    category: error_handling
+    mock_twilio_response:
+      error_code: 21614
+      error_message: "Not a mobile number"
+    expected:
+      status: 400
+      response_contains:
+        - "landline"
+        - "VoIP"
+    weight: 5
+    skip_live: true
+
+  - id: ERROR003
+    name: "Twilio Error - A2P Not Verified"
+    description: "Twilio 30032 error should have clear troubleshooting"
+    priority: P0
+    category: error_handling
+    mock_twilio_response:
+      error_code: 30032
+      error_message: "Toll-free number not verified"
+    expected:
+      status: 500
+      response_contains:
+        - "A2P"
+        - "Twilio console"
+    weight: 10
+    skip_live: true
+
+# ============================================
+# TEST SUITE: Retry Logic (P1 - Reliability)
+# ============================================
+  - id: RETRY001
+    name: "Retry on Temporary Error"
+    description: "Retryable error should trigger retry logic"
+    priority: P1
+    category: retry_logic
+    mock_twilio_sequence:
+      - error_code: 30003
+        error_message: "Destination unreachable"
+      - error_code: 30003
+        error_message: "Destination unreachable"
+      - success: true
+        sid: "SM_RETRY_SUCCESS"
+    expected:
+      status: [200, 202]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: true
+    weight: 10
+    skip_live: true
+
+  - id: RETRY002
+    name: "Max Retries Exceeded"
+    description: "After 3 failures should return MAX_RETRIES error"
+    priority: P1
+    category: retry_logic
+    mock_twilio_sequence:
+      - error_code: 30003
+      - error_code: 30003
+      - error_code: 30003
+    expected:
+      status: 500
+      response_contains:
+        - "MAX_RETRIES_EXCEEDED"
+    weight: 10
+    skip_live: true
+
+  - id: RETRY003
+    name: "Permanent Error No Retry"
+    description: "Permanent errors (21211) should not retry"
+    priority: P1
+    category: retry_logic
+    mock_twilio_response:
+      error_code: 21211
+    expected:
+      status: 400
+      response_contains:
+        - "PERMANENT"
+    assertions:
+      - type: response_time_ms
+        max: 5000  # Should be fast, no retries
+    weight: 5
+    skip_live: true
+
+# ============================================
+# TEST SUITE: Delivery Verification (P1)
+# ============================================
+  - id: DELIVERY001
+    name: "Delivery Confirmed"
+    description: "Successfully delivered SMS returns 200"
+    priority: P1
+    category: delivery_verification
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Delivery Test"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.verification"
+        value: "CONFIRMED"
+      - type: json_path_exists
+        path: "$.delivery_status"
+    weight: 10
+
+  - id: DELIVERY002
+    name: "Delivery Pending"
+    description: "Pending delivery returns 202"
+    priority: P1
+    category: delivery_verification
+    mock_twilio_status: "queued"
+    expected:
+      status: 202
+    assertions:
+      - type: json_path
+        path: "$.status"
+        value: "pending"
+    weight: 5
+    skip_live: true
+
+# ============================================
+# TEST SUITE: Performance (P2)
+# ============================================
+  - id: PERF001
+    name: "Response Time - Happy Path"
+    description: "Successful SMS should complete within 15s"
+    priority: P2
+    category: performance
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "+15551234567"
+        caller_name: "Performance Test"
+    assertions:
+      - type: response_time_ms
+        max: 15000
+    weight: 5
+
+  - id: PERF002
+    name: "Response Time - Validation Error"
+    description: "Validation errors should be fast (<2s)"
+    priority: P2
+    category: performance
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+      body:
+        phone_number: "invalid"
+    assertions:
+      - type: response_time_ms
+        max: 2000
+    weight: 3
+
+# ============================================
+# METADATA
+# ============================================
+metadata:
+  created: "2026-01-15"
+  author: "Claude Code - Hierarchical Dev Protocol"
+  version: "3.0.0"
+  dependencies:
+    - twilio_credentials: "7NL1kUMhDvMY4yUc"
+    - twilio_basic_auth: "twilio-basic-auth"
+  integration_type: "elevenlabs_voice_agent_tool"
+  known_limitations:
+    - "Toll-free number +18882662193 must be A2P verified"
+    - "International numbers may have carrier restrictions"
+    - "Retry tests require mock injection"
+  coverage:
+    authentication: 4
+    phone_validation: 8
+    message_templates: 3
+    data_capture: 3
+    error_handling: 3
+    retry_logic: 3
+    delivery_verification: 2
+    performance: 2
+    total: 28

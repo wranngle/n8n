@@ -1,0 +1,77 @@
+# Evaluation Configuration: Pipeline Test - Webhook Processor
+# ============================================================
+# Target Workflow: paneUFRzPscNvih2
+# Complexity: Minimal (3 nodes)
+# Purpose: Basic webhook processing and response
+
+workflow_id: "paneUFRzPscNvih2"
+workflow_name: "[DEV] Pipeline Test - Webhook Processor"
+evaluation_version: "1.0"
+created: "2026-01-08"
+
+webhook_path: "pipeline-test"
+is_active: true
+
+test_cases:
+  - id: TC001
+    name: "Basic JSON Processing"
+    description: "Send simple JSON and verify processing"
+    input:
+      name: "Test User"
+      email: "test@example.com"
+    expected:
+      status: 200
+      response_contains:
+        - "success"
+        - "processed"
+        - "pipeline"
+      response_type: "object"
+    weight: 40
+
+  - id: TC002
+    name: "Empty Payload Handling"
+    description: "Verify workflow handles empty payload"
+    input: {}
+    expected:
+      status: 200
+      response_contains:
+        - "success"
+        - "processed"
+    weight: 20
+
+  - id: TC003
+    name: "Complex Nested Data"
+    description: "Test with nested object structure"
+    input:
+      user:
+        name: "John Doe"
+        contact:
+          email: "john@test.com"
+          phone: "+15551234567"
+      metadata:
+        source: "api"
+        version: "1.0"
+    expected:
+      status: 200
+      response_contains:
+        - "received"
+        - "user"
+    weight: 30
+
+  - id: TC004
+    name: "Performance Check"
+    description: "Response time under threshold"
+    input:
+      test: "performance"
+    expected:
+      status: 200
+      max_response_time_ms: 2000
+    weight: 10
+
+scoring:
+  pass_threshold: 80
+
+sris_config:
+  evaluator_workflow: "RjLiUAiuUs5XPvBj"
+  orchestrator_workflow: "4TqaQ6kORDzZVwVP"
+  auto_fix_enabled: false

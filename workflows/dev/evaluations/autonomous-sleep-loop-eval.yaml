@@ -1,0 +1,101 @@
+# Evaluation Configuration: Autonomous Sleep Loop
+# Workflow ID: SjItj6uzYSr9rotM
+# Complexity: High (12 nodes)
+
+workflow_id: "SjItj6uzYSr9rotM"
+workflow_name: "[DEV] Supersystem - Autonomous Sleep Loop"
+webhook_path: "autonomous-sleep-loop"
+
+# Workflow Structure:
+# [Nightly @ Midnight OR Manual Trigger] → Initialize Loop (Code)
+#   → Run Evaluations (Code) → Needs Autofix? (Switch)
+#     → [yes] Trigger Autorefinement (Code) → Wait 60s for Agent Sync → Loop Back to Eval
+#     → [max_cycles] Build Summary: Max Cycles → Slack: Final Result → Respond: Final
+#     → [perfect] Build Summary: Perfect → Slack: Final Result → Respond: Final
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 1
+  timeout_ms: 300000
+  mode: "autonomous_loop"
+  trigger_type: "webhook"
+
+test_cases:
+  - id: TC001
+    name: "Single Cycle - All Pass"
+    description: "Test when first evaluation passes perfectly"
+    input:
+      max_cycles: 3
+      simulate_perfect: true
+    expected:
+      status: 200
+      response_contains:
+        - "perfect"
+        - "summary"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.cycles_run"
+        value: 1
+      - type: json_path
+        path: "$.outcome"
+        value: "perfect"
+    weight: 30
+
+  - id: TC002
+    name: "Autofix Loop Execution"
+    description: "Test loop that runs autofix and re-evaluates"
+    input:
+      max_cycles: 3
+      simulate_fail_then_pass: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.autorefinement_triggered"
+        value: true
+      - type: json_path
+        path: "$.cycles_run"
+        min: 2
+    weight: 25
+
+  - id: TC003
+    name: "Max Cycles Reached"
+    description: "Test exit when max cycles exhausted"
+    input:
+      max_cycles: 2
+      simulate_persistent_failure: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.outcome"
+        value: "max_cycles"
+      - type: json_path
+        path: "$.cycles_run"
+        value: 2
+    weight: 25
+
+  - id: TC004
+    name: "Slack Notification Sent"
+    description: "Verify Slack receives final result"
+    input:
+      max_cycles: 1
+      simulate_perfect: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.slack_notified"
+        value: true
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - n8n_api_key
+  integration_type: "autonomous_loop"
+  notes: "Self-healing loop that runs nightly or on-demand"
+  special_handling: "Long timeout due to potential multi-cycle execution"

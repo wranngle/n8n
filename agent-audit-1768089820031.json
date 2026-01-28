@@ -1,0 +1,89 @@
+[
+  {
+    "agent": "SEWY Garage Doors - Sarah",
+    "id": "agent_8801kdhbm6ane7wbxrq0vfenmsj9",
+    "firstMessage": "Hi, thanks for calling Southeastern Wyoming Garage Doors. This is Sarah, how can I help you today?",
+    "promptLength": 32241,
+    "issues": [
+      {
+        "id": "HARDCODED_GREETING",
+        "name": "Hardcoded inbound greeting in first_message",
+        "severity": "HIGH"
+      },
+      {
+        "id": "NO_CALL_DIRECTION",
+        "name": "Missing call_direction handling in prompt",
+        "severity": "HIGH"
+      },
+      {
+        "id": "NO_NONE_GUARD",
+        "name": "Missing tool verbalization guardrail (None/null)",
+        "severity": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "agent": "Wranngle Lead Qualifier",
+    "id": "agent_5701kdgf9s4vfe9rhe68ntjrms9g",
+    "firstMessage": "Hi {{customer_first_name}}, this is Alex from Wranngle. I'm following up on your interest in automation solutions. Do you have a few minutes to chat about what you're looking to accomplish?",
+    "promptLength": 34126,
+    "issues": [
+      {
+        "id": "NO_CALL_DIRECTION",
+        "name": "Missing call_direction handling in prompt",
+        "severity": "HIGH"
+      },
+      {
+        "id": "NO_NONE_GUARD",
+        "name": "Missing tool verbalization guardrail (None/null)",
+        "severity": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "agent": "Client Data Test Agent",
+    "id": "agent_3801kdf7fkhcev8tkhpm92d65jws",
+    "firstMessage": "Hi {{customer_name}}, this is a test call from Wranngle. I see you're a {{account_type}} customer. How can I help you today?",
+    "promptLength": 32162,
+    "issues": [
+      {
+        "id": "HARDCODED_GREETING",
+        "name": "Hardcoded inbound greeting in first_message",
+        "severity": "HIGH"
+      },
+      {
+        "id": "NO_CALL_DIRECTION",
+        "name": "Missing call_direction handling in prompt",
+        "severity": "HIGH"
+      },
+      {
+        "id": "NO_NONE_GUARD",
+        "name": "Missing tool verbalization guardrail (None/null)",
+        "severity": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "agent": "Sarah - Wranngle COPY",
+    "id": "agent_3301kedf4zqket7bd8zngdaen1ww",
+    "firstMessage": "Hi, this is Sarah with Wranngle Systems. How can I help you today?",
+    "promptLength": 14192,
+    "issues": [
+      {
+        "id": "HARDCODED_GREETING",
+        "name": "Hardcoded inbound greeting in first_message",
+        "severity": "HIGH"
+      },
+      {
+        "id": "NO_PRICING_GUARD",
+        "name": "Missing pricing qualification guardrail",
+        "severity": "MEDIUM"
+      },
+      {
+        "id": "NO_NONE_GUARD",
+        "name": "Missing tool verbalization guardrail (None/null)",
+        "severity": "MEDIUM"
+      }
+    ]
+  }
+]

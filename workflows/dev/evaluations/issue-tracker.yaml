@@ -1,0 +1,294 @@
+# Workflow Issue Tracker
+# Generated: 2026-01-08T18:33:17Z
+# Comprehensive evaluation of all 23 DEV workflows
+
+version: "1.0"
+evaluation_run:
+  timestamp: "2026-01-08T18:33:17Z"
+  total_workflows: 23
+  passed: 5  # 4 minimal + 1 low
+  failed: 18
+  pass_rate: "21.7%"
+
+# Issue Categories with Auto-Fix Strategies
+issues:
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CATEGORY 1: Wrong Trigger Type (6 workflows)
+  # Root Cause: Workflow uses Execute Workflow/Manual trigger instead of Webhook
+  # Auto-Fix: Add Webhook Trigger node as primary entry point
+  # ═══════════════════════════════════════════════════════════════════
+  wrong_trigger_type:
+    description: "MCP execution requires Webhook/Schedule/Form/Chat trigger"
+    count: 6
+    auto_fixable: true
+    fix_strategy: "Add Webhook Trigger node, connect to existing flow"
+    workflows:
+      - id: wZryG5tdRBFZUNMF
+        name: "[DEV] SEWY Garage Doors SMS Tool"
+        complexity: low
+        current_trigger: "Unknown"
+
+      - id: qQmGqBM1pe4QUI05
+        name: "[DEV] Pipedrive Lead Auto-Caller"
+        complexity: low
+        current_trigger: "Unknown"
+
+      - id: dKJYSCGIORtUsTSM
+        name: "[DEV] Autorefinement Orchestrator"
+        complexity: medium
+        current_trigger: "Unknown"
+
+      - id: mwepwjfX27x4uTMu
+        name: "[DEV] Native Evaluation Runner"
+        complexity: medium
+        current_trigger: "Unknown"
+
+      - id: c9dFlI51VhvANoEj
+        name: "[DEV] Autorefinement Orchestrator v2 (LangChain)"
+        complexity: high
+        current_trigger: "Unknown"
+
+      - id: SjItj6uzYSr9rotM
+        name: "[DEV] Autonomous Sleep Loop"
+        complexity: high
+        current_trigger: "Unknown"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CATEGORY 2: Authentication Errors (2 workflows)
+  # Root Cause: Invalid/expired API keys or env var access blocked
+  # Auto-Fix: Update API keys from memory store, use n8n credentials
+  # ═══════════════════════════════════════════════════════════════════
+  auth_error:
+    description: "API authentication failed - invalid keys or blocked env access"
+    count: 2
+    auto_fixable: partial
+    fix_strategy: "Replace hardcoded keys with n8n credentials or memory store values"
+    workflows:
+      - id: zeQNX4g5mQlE4EQ0
+        name: "[DEV] Autorefinement Orchestrator v2"
+        complexity: medium
+        error: "OpenRouter 401 - User not found"
+        api_used: "openrouter.ai"
+        issue: "Invalid OpenRouter API key: sk-or-v1-1a0e17a0d0c0b4e4..."
+        fix: "Get valid OpenRouter key from memory or .env"
+
+      - id: RjLiUAiuUs5XPvBj
+        name: "[DEV] SRIS - ElevenLabs Conversation Evaluator"
+        complexity: high
+        error: "ExpressionError - access to env vars denied"
+        api_used: "elevenlabs"
+        issue: "Uses $env.ELEVENLABS_API_KEY which is blocked by N8N_BLOCK_ENV_ACCESS_IN_NODE"
+        fix: "Use n8n credential reference instead of $env expression"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CATEGORY 3: Missing Credentials (1 workflow)
+  # Root Cause: HTTP Request node configured for credentialType but no credential assigned
+  # Auto-Fix: Assign appropriate n8n credential ID
+  # ═══════════════════════════════════════════════════════════════════
+  credentials_not_found:
+    description: "n8n credential reference missing from node"
+    count: 1
+    auto_fixable: true
+    fix_strategy: "Add credential ID to node configuration"
+    workflows:
+      - id: 5eowJIoZFZOSG85m
+        name: "[DEV] ElevenLabs Twilio Outbound with Client Data"
+        complexity: medium
+        node: "ElevenLabs: Initiate Outbound Call"
+        configured_auth: "genericCredentialType: httpHeaderAuth"
+        fix: "Assign ElevenLabs credential ID or use hardcoded xi-api-key header"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CATEGORY 4: Invalid JSON Response (2 workflows)
+  # Root Cause: HTTP Request expects JSON but endpoint returns non-JSON
+  # Auto-Fix: Configure response handling, add error handling
+  # ═══════════════════════════════════════════════════════════════════
+  invalid_json_response:
+    description: "HTTP node failed to parse response as JSON"
+    count: 2
+    auto_fixable: true
+    fix_strategy: "Set responseFormat to 'text' or add neverError + manual JSON parse"
+    workflows:
+      - id: KoQChBtjUa5F9bZg
+        name: "[DEV] SRIS - Verification Loop"
+        complexity: high
+        issue: "HTTP response body is not valid JSON"
+        fix: "Check endpoint, set responseFormat='text', or add error handling"
+
+      - id: 4TqaQ6kORDzZVwVP
+        name: "[DEV] SRIS - Master Orchestrator"
+        complexity: high
+        issue: "HTTP response body is not valid JSON"
+        fix: "Check endpoint, set responseFormat='text', or add error handling"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CATEGORY 5: Node Configuration Error (1 workflow)
+  # Root Cause: Merge node configured for "combine by fields" but no fields defined
+  # Auto-Fix: Define merge field pairs or change merge mode
+  # ═══════════════════════════════════════════════════════════════════
+  node_config_error:
+    description: "Node has invalid configuration"
+    count: 1
+    auto_fixable: true
+    fix_strategy: "Fix node parameters"
+    workflows:
+      - id: KrqpJuyN8pjTouAo
+        name: "[DEV] Voice Agent Tester v2.0"
+        complexity: high
+        node: "Merge"
+        error: "You need to define at least one pair of fields in 'Fields to Match' to match on"
+        fix: "Add fieldsToMatch parameter or change mode to 'append' or 'combine'"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CATEGORY 6: Partial Pass (5 workflows)
+  # Root Cause: Response missing expected fields OR test case wrong
+  # Auto-Fix: Analyze actual response structure, adjust expected_fields
+  # ═══════════════════════════════════════════════════════════════════
+  partial_pass:
+    description: "Workflow executes but response doesn't match all expected fields"
+    count: 5
+    auto_fixable: partial
+    fix_strategy: "Review actual response, adjust eval config expected_fields"
+    workflows:
+      - id: 8qlDREZy5qtEGkNK
+        name: "[DEV] Post-Call Orchestrator (Test)"
+        complexity: medium
+        score: 50
+        expected_fields: ["success", "processed"]
+        issue: "Only 1 of 2 expected fields found"
+
+      - id: 5hvmE72qa4VYyPOK
+        name: "[DEV] Transcript Field Extractor - AI Agent"
+        complexity: high
+        score: 50
+        expected_fields: ["success", "extracted"]
+        issue: "Only 1 of 2 expected fields found"
+
+      - id: 54sXqqJVSctlSF6V
+        name: "[DEV] Transcript Field Extractor v2"
+        complexity: high
+        score: 50
+        expected_fields: ["success", "fields"]
+        issue: "Only 1 of 2 expected fields found"
+
+      - id: cEORduJCqCVDOKce
+        name: "[DEV] ElevenLabs Call Completed - Update Pipedrive"
+        complexity: high
+        score: 50
+        expected_fields: ["success", "updated"]
+        issue: "Only 1 of 2 expected fields found"
+
+      - id: NcP4oEeS3xolYXzC
+        name: "[DEV] ElevenLabs Twilio Outbound - Bulletproof"
+        complexity: high
+        score: 50
+        expected_fields: ["success", "call_id"]
+        issue: "Only 1 of 2 expected fields found"
+
+# ═══════════════════════════════════════════════════════════════════
+# PASSED WORKFLOWS (Combined minimal + low/medium/high)
+# ═══════════════════════════════════════════════════════════════════
+passed_workflows:
+  # From minimal evaluation run
+  - id: D4GGMXFGC1PLOUT0
+    name: "[DEV] Get ElevenLabs Agent"
+    complexity: minimal
+    score: 100
+
+  - id: NBvO92RVDa8pCK0d
+    name: "[DEV] Client Data Lookup (Test)"
+    complexity: minimal
+    score: 100
+
+  - id: ITUFwZq7ixgjTZMJ
+    name: "[DEV] Slack Notifier (Test)"
+    complexity: minimal
+    score: 100
+
+  - id: paneUFRzPscNvih2
+    name: "[DEV] Pipeline Test - Webhook Processor"
+    complexity: minimal
+    score: 100
+
+  # From comprehensive evaluation run
+  - id: M7ZmLGCxyVOn5QJ6
+    name: "[DEV] Parallel Evaluation Runner v6"
+    complexity: low
+    score: 100
+
+# ═══════════════════════════════════════════════════════════════════
+# KNOWN ISSUES (from minimal evaluation)
+# ═══════════════════════════════════════════════════════════════════
+known_issues:
+  - id: Ar2lX0cprjeWB4Kd
+    name: "[DEV] Execution Logger (Test)"
+    complexity: minimal
+    score: 50
+    issue: "Missing 'logged' field in response"
+
+  - id: oik6SebewNAh1cV5
+    name: "[DEV] Client Data Lookup (Eval-Ready)"
+    complexity: minimal
+    score: 0
+    issue: "Wrong trigger type - needs Webhook trigger"
+
+# ═══════════════════════════════════════════════════════════════════
+# FIX PRIORITY QUEUE
+# Order: Most impact first, easiest fixes first within category
+# ═══════════════════════════════════════════════════════════════════
+fix_priority_queue:
+  # Priority 1: Easy wins - just need trigger node added
+  - category: wrong_trigger_type
+    priority: 1
+    effort: low
+    impact: high
+    workflow_count: 6
+
+  # Priority 2: Credential fixes
+  - category: credentials_not_found
+    priority: 2
+    effort: low
+    impact: medium
+    workflow_count: 1
+
+  # Priority 3: Node config errors
+  - category: node_config_error
+    priority: 3
+    effort: low
+    impact: medium
+    workflow_count: 1
+
+  # Priority 4: JSON response handling
+  - category: invalid_json_response
+    priority: 4
+    effort: medium
+    impact: medium
+    workflow_count: 2
+
+  # Priority 5: Auth errors (may need external API key updates)
+  - category: auth_error
+    priority: 5
+    effort: medium
+    impact: medium
+    workflow_count: 2
+
+  # Priority 6: Partial passes (may need eval config adjustment)
+  - category: partial_pass
+    priority: 6
+    effort: low
+    impact: low
+    workflow_count: 5
+
+# Summary Statistics
+stats:
+  total_issues: 17
+  by_category:
+    wrong_trigger_type: 6
+    auth_error: 2
+    credentials_not_found: 1
+    invalid_json_response: 2
+    node_config_error: 1
+    partial_pass: 5
+  auto_fixable: 12
+  requires_manual: 5

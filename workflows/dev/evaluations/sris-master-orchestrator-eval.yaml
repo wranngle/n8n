@@ -1,0 +1,107 @@
+# Evaluation Configuration: SRIS - Master Orchestrator
+# Workflow ID: 4TqaQ6kORDzZVwVP
+# Complexity: High (11 nodes)
+
+workflow_id: "4TqaQ6kORDzZVwVP"
+workflow_name: "[DEV] SRIS - Master Orchestrator"
+webhook_path: "sris-master"
+
+# Workflow Structure:
+# SRIS Trigger → Parse Config (Code)
+#   → [parallel] Run n8n Evaluation + Run ElevenLabs Evaluation
+#   → Merge Results → Aggregate Unified Metrics (Code) → Check Status (Switch)
+#     → [critical] Process Actions → Execute Autocorrection → Respond: Critical
+#     → [ok/warning] Respond: OK/Warning
+
+evaluation:
+  pass_threshold: 90
+  max_retries: 1
+  timeout_ms: 300000
+  mode: "master_orchestrator"
+
+test_cases:
+  - id: TC001
+    name: "Full System Evaluation"
+    description: "Run complete SRIS evaluation cycle"
+    input:
+      config:
+        evaluate_n8n: true
+        evaluate_elevenlabs: true
+        agent_ids:
+          - "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+    expected:
+      status: 200
+      response_contains:
+        - "unified_score"
+        - "n8n_results"
+        - "elevenlabs_results"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 240000
+    weight: 30
+
+  - id: TC002
+    name: "Critical Status Handling"
+    description: "Test autocorrection trigger on critical status"
+    input:
+      config:
+        evaluate_n8n: true
+        evaluate_elevenlabs: true
+        force_critical: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.status"
+        value: "critical"
+      - type: json_path
+        path: "$.autocorrection_executed"
+        value: true
+    weight: 25
+
+  - id: TC003
+    name: "Parallel Evaluation Merge"
+    description: "Verify both evaluation branches complete and merge"
+    input:
+      config:
+        evaluate_n8n: true
+        evaluate_elevenlabs: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.n8n_completed"
+        value: true
+      - type: json_path
+        path: "$.elevenlabs_completed"
+        value: true
+    weight: 25
+
+  - id: TC004
+    name: "Warning Status - No Action"
+    description: "Test that warning status doesn't trigger autocorrection"
+    input:
+      config:
+        evaluate_n8n: true
+        force_warning: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.status"
+        value: "warning"
+      - type: json_path
+        path: "$.autocorrection_executed"
+        value: false
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - n8n_api_key
+  integration_type: "sris_core"
+  notes: "Top-level SRIS orchestrator - coordinates all evaluations"
+  special_handling: "Long timeout due to parallel evaluations"

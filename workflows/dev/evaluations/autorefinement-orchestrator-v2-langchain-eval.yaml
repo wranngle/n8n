@@ -1,0 +1,101 @@
+# Evaluation Configuration: Autorefinement Orchestrator v2 (LangChain)
+# Workflow ID: c9dFlI51VhvANoEj
+# Complexity: High (10 nodes)
+
+workflow_id: "c9dFlI51VhvANoEj"
+workflow_name: "[DEV] Supersystem - Autorefinement Orchestrator v2"
+webhook_path: "autorefinement-v2-langchain"
+
+# Workflow Structure:
+# Autorefinement Trigger → Parse Failure Data (Code) → Get Agent Prompt (HTTP)
+#   → AI Agent: Analyze Failures (LangChain) ← Gemini Chat Model
+#   → Extract Fix from Response (Code) → Should Apply Fix? (Switch)
+#     → [apply] Patch Agent Prompt (HTTP) → Respond: Success
+#     → [skip] Respond: Skipped
+
+# Note: Uses LangChain AI Agent node instead of direct HTTP to Gemini
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 90000
+  mode: "langchain_agent"
+
+test_cases:
+  - id: TC001
+    name: "AI Agent Analysis"
+    description: "Test LangChain AI agent analyzing failures"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - conversation_id: "conv-lc-001"
+          failure_type: "intent_misclassification"
+          severity: "high"
+          transcript_snippet: "User asked about pricing but agent talked about hours"
+    expected:
+      status: 200
+      response_contains:
+        - "analysis"
+        - "recommendation"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: response_time_ms
+        max: 60000
+    weight: 35
+
+  - id: TC002
+    name: "Conditional Patching Logic"
+    description: "Verify Switch node correctly routes based on analysis"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - failure_type: "critical_bug"
+          severity: "critical"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.action_taken"
+        value: "patched"
+    weight: 25
+
+  - id: TC003
+    name: "Skip Patch Scenario"
+    description: "Test that minor issues don't trigger patches"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - failure_type: "minor_delay"
+          severity: "low"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.action_taken"
+        value: "skipped"
+    weight: 20
+
+  - id: TC004
+    name: "LangChain Model Integration"
+    description: "Verify Gemini Chat Model connects to AI Agent"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      failures:
+        - failure_type: "test_integration"
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.model_used"
+        value: "gemini"
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - gemini_api_key
+    - elevenlabs_api_key
+  integration_type: "langchain_agent"
+  notes: "LangChain variant using AI Agent node with Gemini"

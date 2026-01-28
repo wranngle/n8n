@@ -1,0 +1,87 @@
+{
+  "scan_metadata": {
+    "generated": "2026-01-07T00:00:00Z",
+    "workflow": "document-project",
+    "mode": "initial_scan",
+    "scan_level": "Quick",
+    "project_root": "C:\\Users\\root\\Documents\\dev\\n8n"
+  },
+  "project_classification": {
+    "type": "methodology-repository",
+    "closest_csv_match": "infra",
+    "architecture_pattern": "Hook-Driven Deterministic",
+    "field_type": "brownfield"
+  },
+  "technology_stack": {
+    "primary": ["n8n", "Claude Code CLI", "JavaScript", "PowerShell"],
+    "integrations": ["ElevenLabs", "Twilio", "Exa", "Context7"],
+    "mcp_servers": ["n8n-mcp", "elevenlabs-mcp", "exa", "context7", "scrapling"]
+  },
+  "file_statistics": {
+    "javascript_files": 52,
+    "python_files": 19,
+    "powershell_scripts": 60,
+    "shell_scripts": 13,
+    "markdown_files": 49,
+    "yaml_files": 12,
+    "json_files": 25
+  },
+  "knowledge_bases": {
+    "youtube_tutorials": 10279,
+    "discord_qa": 2930,
+    "community_workflows": 4343,
+    "official_templates": 2709
+  },
+  "governance_status": {
+    "workflow_phases": ["DEV", "ARCHIVED"],
+    "tracked_workflows": 20,
+    "active_workflows": 8,
+    "archived_workflows": 5
+  },
+  "skills_inventory": {
+    "total_skills": 11,
+    "skills": [
+      "n8n-workflow-dev",
+      "n8n-workflow-patterns",
+      "n8n-code-node-strategy",
+      "n8n-validation-expert",
+      "n8n-mcp-tools-expert",
+      "n8n-expression-syntax",
+      "n8n-node-configuration",
+      "n8n-code-javascript",
+      "n8n-code-python",
+      "twilio-integration",
+      "voice-agent-factory"
+    ]
+  },
+  "hooks_inventory": {
+    "total_hooks": 15,
+    "categories": {
+      "SessionStart": 1,
+      "UserPromptSubmit": 4,
+      "PreToolUse": 10,
+      "PostToolUse": 6
+    }
+  },
+  "documentation_generated": {
+    "files": [
+      "docs/index.md",
+      "docs/project-overview.md",
+      "docs/architecture.md",
+      "docs/source-tree-analysis.md",
+      "docs/development-guide.md"
+    ],
+    "total_lines": 772
+  },
+  "existing_documentation": {
+    "primary": "CLAUDE.md",
+    "inventory": "INVENTORY.md",
+    "directives": 5,
+    "integration_docs": 3
+  },
+  "next_actions": [
+    "Review generated documentation for accuracy",
+    "Update bmm-workflow-status.yaml",
+    "Proceed to Phase 2: Planning (create-prd) when ready"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "[DEV] Pipeline Test - Webhook Processor",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pipeline-test",
+        "responseMode": "responseNode"
+      },
+      "webhookId": "pipeline-test"
+    },
+    {
+      "id": "process-data",
+      "name": "Process Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [470, 300],
+      "parameters": {
+        "jsCode": "// Get input data from webhook\nconst items = $input.all();\nconst inputData = items[0].json.body || items[0].json;\n\n// Process the data\nconst result = {\n  received: inputData,\n  processed: true,\n  timestamp: new Date().toISOString(),\n  message: `Processed request with ${Object.keys(inputData).length} fields`\n};\n\nreturn [{ json: result }];"
+      }
+    },
+    {
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [690, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, data: $json, pipeline: 'test-complete' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{"node": "Process Data", "type": "main", "index": 0}]]
+    },
+    "Process Data": {
+      "main": [[{"node": "Respond to Webhook", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "createdBy": "pipeline-test",
+    "createdAt": "2026-01-07T18:40:00Z",
+    "purpose": "End-to-end pipeline validation workflow"
+  }
+}

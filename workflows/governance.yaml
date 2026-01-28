@@ -19,8 +19,8 @@
 #   DEV:      Nbnc0KJVYlJeasQJ
 #   ARCHIVED: 4k9QbQQTpxNkOoJQ
 
-version: "2.0"
-last_updated: "2025-12-31"
+version: "2.5"
+last_updated: "2026-01-08T14:10:00Z"
 
 settings:
   deletion_allowed: false
@@ -129,9 +129,9 @@ workflows:
 
   # === DEVELOPMENT (continued) ===
   "wZryG5tdRBFZUNMF":
-    name: "Southeastern Wyoming Garage Doors SMS Tool"
+    name: "[DEV] Southeastern Wyoming Garage Doors SMS Tool"
     phase: DEV
-    active: false
+    active: true
     description: "SMS booking tool for SEWY voice agent"
     agent_id: "agent_8801kdhbm6ane7wbxrq0vfenmsj9"
     factory_generated: true
@@ -147,16 +147,14 @@ workflows:
         timestamp: "2025-12-28T05:36:00Z"
         note: "Applied n8n native DEV tag"
 
-  "tfie4q0zRL80PpQC":
-    name: "[DEV] Sarah SMS Tool - Demo Mode"
+  "IZIj5oh3VwCVJb34":
+    name: "[ARCHIVED] Voice Agent Tester - Automated Simulation"
     phase: ARCHIVED
     active: false
-    description: "DELETED - Sarah agent now uses httpbin.org directly"
-    agent_id: "agent_8001kdgp7qbyf4wvhs540be78vew"
-    demo_mode: true
+    description: "Automated testing workflow for voice agents - superseded by v2.0"
     created: "2025-12-28T00:00:00Z"
-    modified: "2025-12-28T06:12:00Z"
-    archived_reason: "n8n webhook registration requires GUI; using httpbin.org mock instead"
+    modified: "2026-01-08T00:00:00Z"
+    archived_reason: "Superseded by Voice Agent Tester v2.0"
     history:
       - action: created
         phase: DEV
@@ -165,26 +163,10 @@ workflows:
         phase: DEV
         timestamp: "2025-12-28T05:36:00Z"
         note: "Applied n8n native DEV tag"
-      - action: deleted
+      - action: archived
         phase: ARCHIVED
-        timestamp: "2025-12-28T06:12:00Z"
-        note: "Workflow deleted - Sarah agent uses httpbin.org mock endpoint directly"
-
-  "IZIj5oh3VwCVJb34":
-    name: "Voice Agent Tester - Automated Simulation"
-    phase: DEV
-    active: false
-    description: "Automated testing workflow for voice agents"
-    created: "2025-12-28T00:00:00Z"
-    modified: "2025-12-28T05:36:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-28T05:36:00Z"
-        note: "Applied n8n native DEV tag"
+        timestamp: "2026-01-08T00:00:00Z"
+        note: "Tag fixed from DEV to ARCHIVED per governance audit"
 
   "D4GGMXFGC1PLOUT0":
     name: "[DEV] Get ElevenLabs Agent"
@@ -242,21 +224,6 @@ workflows:
         timestamp: "2025-12-28T05:36:00Z"
         note: "Duplicate workflow - archived per governance hygiene"
 
-# Archive summary
-archive:
-  - id: "1PEcVXAmWa4hMbHG"
-    reason: "Duplicate workflow"
-    archived_at: "2025-12-28T05:36:00Z"
-  - id: "99IwjxkWI0EOMDF1"
-    reason: "Duplicate workflow"
-    archived_at: "2025-12-28T05:36:00Z"
-  - id: "spdpuSuiFyjBtrgR"
-    reason: "Duplicate workflow"
-    archived_at: "2025-12-28T05:36:00Z"
-  - id: "8CLfPvHIK10jcyPb"
-    reason: "Superseded - SMS added to dual-webhook workflow"
-    archived_at: "2025-12-28T18:40:00Z"
-
 # === SUPERSYSTEM (Autonomous Self-Improvement) ===
   "M7ZmLGCxyVOn5QJ6":
     name: "[DEV] Supersystem - Parallel Evaluation Runner v6"
@@ -273,10 +240,11 @@ archive:
         timestamp: "2026-01-01T05:22:17Z"
 
   "c9dFlI51VhvANoEj":
-    name: "[DEV] Supersystem - Autorefinement Orchestrator"
-    phase: DEV
+    name: "[ARCHIVED] Supersystem - Autorefinement Orchestrator v2 (Duplicate)"
+    phase: ARCHIVED
     active: false
-    description: "Analyzes failures and patches agent prompts via gemini-3-pro"
+    description: "Duplicate - archived per governance audit 2026-01-09"
+    archived_reason: "Duplicate of zeQNX4g5mQlE4EQ0"
     created: "2026-01-01T19:04:06Z"
     webhooks:
       - path: "/webhook/autorefinement-trigger"
@@ -285,6 +253,10 @@ archive:
       - action: created
         phase: DEV
         timestamp: "2026-01-01T19:04:06Z"
+      - action: archived
+        phase: ARCHIVED
+        timestamp: "2026-01-09T00:00:00Z"
+        note: "Duplicate archived per governance audit"
 
   "SjItj6uzYSr9rotM":
     name: "[DEV] Supersystem - Autonomous Sleep Loop"
@@ -304,12 +276,208 @@ archive:
         phase: DEV
         timestamp: "2026-01-01T18:58:31Z"
 
+# === SRIS (Self-Referential Improvement System) - Added 2026-01-07 ===
+  "4TqaQ6kORDzZVwVP":
+    name: "[DEV] SRIS - Master Orchestrator"
+    phase: DEV
+    active: true
+    description: "Central orchestrator for SRIS - coordinates evaluation, decision, and action phases"
+    created: "2026-01-07T22:21:22Z"
+    modified: "2026-01-08T01:52:06Z"
+    webhooks:
+      - path: "/webhook/sris-orchestrator"
+        purpose: "SRIS trigger endpoint"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2026-01-07T22:21:22Z"
+        note: "SRIS Epic 1 foundation"
+      - action: activated
+        phase: DEV
+        timestamp: "2026-01-08T01:52:06Z"
+        note: "Activated for production use"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+  "RjLiUAiuUs5XPvBj":
+    name: "[DEV] SRIS - ElevenLabs Conversation Evaluator"
+    phase: DEV
+    active: true
+    description: "Evaluates ElevenLabs voice agent conversations for quality metrics"
+    created: "2026-01-07T22:20:22Z"
+    modified: "2026-01-08T01:52:06Z"
+    webhooks:
+      - path: "/webhook/elevenlabs-conversation-eval"
+        purpose: "Conversation evaluation endpoint"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2026-01-07T22:20:22Z"
+        note: "SRIS Epic 3 - ElevenLabs evaluation"
+      - action: activated
+        phase: DEV
+        timestamp: "2026-01-08T01:52:06Z"
+        note: "Activated for production use"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+  "KoQChBtjUa5F9bZg":
+    name: "[DEV] SRIS - Verification Loop"
+    phase: DEV
+    active: true
+    description: "Verification and rollback loop for SRIS auto-fixes"
+    created: "2026-01-07T22:21:55Z"
+    modified: "2026-01-08T01:52:07Z"
+    webhooks:
+      - path: "/webhook/verification-loop"
+        purpose: "Verification trigger endpoint"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2026-01-07T22:21:55Z"
+        note: "SRIS Epic 6 - Verification system"
+      - action: activated
+        phase: DEV
+        timestamp: "2026-01-08T01:52:07Z"
+        note: "Activated for production use"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+# === TRANSCRIPT EXTRACTORS ===
+  "54sXqqJVSctlSF6V":
+    name: "[DEV] Transcript Field Extractor v2 - 5-Component Architecture"
+    phase: DEV
+    active: true
+    description: "Advanced transcript extraction with 5-component modular architecture"
+    created: "2025-12-29T06:00:49Z"
+    modified: "2025-12-29T21:39:50Z"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2025-12-29T06:00:49Z"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+  "5hvmE72qa4VYyPOK":
+    name: "[DEV] Transcript Field Extractor - AI Agent"
+    phase: DEV
+    active: true
+    description: "AI-powered transcript field extraction using LangChain agent"
+    created: "2025-12-29T02:43:08Z"
+    modified: "2025-12-29T05:49:33Z"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2025-12-29T02:43:08Z"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+# === VOICE AGENT TESTING ===
+  "KrqpJuyN8pjTouAo":
+    name: "[DEV] Voice Agent Tester v2.0"
+    phase: DEV
+    active: true
+    description: "Voice agent testing with ElevenLabs simulate-conversation API"
+    created: "2025-12-28T23:38:42Z"
+    modified: "2025-12-28T23:38:42Z"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2025-12-28T23:38:42Z"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+  "NBvO92RVDa8pCK0d":
+    name: "[ARCHIVED] Supersystem - Client Data Lookup (Test - Merged)"
+    phase: ARCHIVED
+    active: false
+    description: "Merged into oik6SebewNAh1cV5 - lacked eval input support"
+    archived_reason: "Merged - oik6SebewNAh1cV5 is canonical (eval-ready with input_phone/input_email support)"
+    created: "2026-01-01T04:50:53Z"
+    modified: "2026-01-09T00:00:00Z"
+    superseded_by: "oik6SebewNAh1cV5"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2026-01-01T04:50:53Z"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+  "zeQNX4g5mQlE4EQ0":
+    name: "[ARCHIVED] Supersystem - Autorefinement Orchestrator v2 (Merged)"
+    phase: ARCHIVED
+    active: false
+    description: "Merged into dKJYSCGIORtUsTSM - had hardcoded API keys, lacked pattern analysis"
+    archived_reason: "Merged - dKJYSCGIORtUsTSM is canonical (better credentials, pattern analysis)"
+    created: "2026-01-01T05:10:55Z"
+    modified: "2026-01-09T00:00:00Z"
+    superseded_by: "dKJYSCGIORtUsTSM"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2026-01-01T05:10:55Z"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-08T01:55:00Z"
+        note: "Applied DEV tag per governance audit"
+
+# === ARCHIVED (Additional) ===
+  "8zxKBJH4QiwzhNtf":
+    name: "[ARCHIVED] Single Simulation Test"
+    phase: ARCHIVED
+    active: false
+    description: "Single simulation test workflow - archived"
+    created: "2025-12-28T21:29:18Z"
+    modified: "2026-01-08T00:00:00Z"
+    archived_reason: "Test workflow no longer needed"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2025-12-28T21:29:18Z"
+      - action: archived
+        phase: ARCHIVED
+        timestamp: "2026-01-08T00:00:00Z"
+        note: "Archived per governance audit"
+
+# Archive summary
+archive:
+  - id: "1PEcVXAmWa4hMbHG"
+    reason: "Duplicate workflow"
+    archived_at: "2025-12-28T05:36:00Z"
+  - id: "99IwjxkWI0EOMDF1"
+    reason: "Duplicate workflow"
+    archived_at: "2025-12-28T05:36:00Z"
+  - id: "spdpuSuiFyjBtrgR"
+    reason: "Duplicate workflow"
+    archived_at: "2025-12-28T05:36:00Z"
+  - id: "8CLfPvHIK10jcyPb"
+    reason: "Superseded - SMS added to dual-webhook workflow"
+    archived_at: "2025-12-28T18:40:00Z"
+  - id: "Xlr1brwbzNPMyTbW"
+    reason: "Superseded by Voice Agent Tester v2.0 (KrqpJuyN8pjTouAo)"
+    archived_at: "2026-01-08T02:15:00Z"
+
 # Additional tracked workflows (overflow from main workflows section)
+# TODO: Consolidate into main workflows section in next governance refactor
 overflow_workflows:
   "8CLfPvHIK10jcyPb":
-    name: "[DEV] Sarah SMS Tool - ElevenLabs Webhook"
+    name: "[ARCHIVED] Sarah SMS Tool - ElevenLabs Webhook"
     phase: ARCHIVED
-    active: true
+    active: false
     description: "Standalone SMS webhook - superseded by 5eowJIoZFZOSG85m dual-webhook"
     archived_reason: "SMS functionality merged into existing PROD workflow"
     created: "2025-12-28T18:17:07Z"
@@ -325,12 +493,13 @@ overflow_workflows:
         note: "Superseded - SMS added to 5eowJIoZFZOSG85m instead"
 
   "Xlr1brwbzNPMyTbW":
-    name: "Voice Agent Tester v2.0 - Automated Simulation"
-    phase: DEV
+    name: "[ARCHIVED] Voice Agent Tester v2.0 - Automated Simulation"
+    phase: ARCHIVED
     active: false
-    description: "ElevenLabs Conversation Simulation API testing with CI/CD support"
+    description: "ElevenLabs Conversation Simulation API testing with CI/CD support - superseded by KrqpJuyN8pjTouAo"
+    archived_reason: "Superseded by Voice Agent Tester v2.0 (KrqpJuyN8pjTouAo)"
     created: "2025-12-28T19:42:31Z"
-    modified: "2025-12-28T19:42:31Z"
+    modified: "2026-01-08T02:15:00Z"
     webhooks:
       - path: "/webhook/voice-agent-test"
         purpose: "Manual/CI/CD test trigger"
@@ -339,6 +508,10 @@ overflow_workflows:
         phase: DEV
         timestamp: "2025-12-28T19:42:31Z"
         note: "Voice Agent Tester v2.0 with scenario filtering, metrics, and CI/CD integration"
+      - action: archived
+        phase: ARCHIVED
+        timestamp: "2026-01-08T02:15:00Z"
+        note: "Archived per governance audit - superseded by KrqpJuyN8pjTouAo"
 
   # === SUPERSYSTEM WORKFLOWS (Added 2025-12-31) ===
   "mwepwjfX27x4uTMu":
@@ -393,23 +566,21 @@ overflow_workflows:
         timestamp: "2025-12-31T00:00:00Z"
         note: "Applied n8n native DEV tag"
 
-  "saxtfujFimKnciaA":
-    name: "[ARCHIVED] Supersystem Evaluation Runner"
-    phase: ARCHIVED
+  "p60GgdEwiDcIrxgp":
+    name: "[DEV] Universal Evaluation Runner v2"
+    phase: DEV
     active: false
-    description: "Legacy evaluation runner - superseded by Native version"
-    created: "2025-12-29T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    superseded_by: "mwepwjfX27x4uTMu"
-    archived_reason: "Superseded by Native Evaluation Runner (mwepwjfX27x4uTMu)"
+    description: "Universal evaluation runner for all workflow types"
+    created: "2026-01-08T22:31:14Z"
+    modified: "2026-01-09T00:00:00Z"
     history:
       - action: created
         phase: DEV
-        timestamp: "2025-12-29T00:00:00Z"
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Superseded by Native Evaluation Runner - archiving per governance policy"
+        timestamp: "2026-01-08T22:31:14Z"
+      - action: tagged
+        phase: DEV
+        timestamp: "2026-01-09T00:00:00Z"
+        note: "Added DEV tag per governance audit"
 
   "8qlDREZy5qtEGkNK":
     name: "[DEV] Supersystem - Post-Call Orchestrator (Test)"
@@ -459,5 +630,71 @@ overflow_workflows:
         timestamp: "2025-12-31T00:00:00Z"
         note: "Applied n8n native DEV tag"
 
+# Pipeline Test Workflow (added 2026-01-07)
+  "paneUFRzPscNvih2":
+    name: "[DEV] Pipeline Test - Webhook Processor"
+    phase: DEV
+    active: true
+    description: "End-to-end pipeline validation workflow - receives POST, processes data, returns JSON"
+    created: "2026-01-07T18:34:28Z"
+    modified: "2026-01-07T19:28:00Z"
+    webhooks:
+      - path: "/webhook/pipeline-test"
+        purpose: "Pipeline validation endpoint"
+    evaluation:
+      test_count: 5
+      pass_rate: 100
+      last_run: "2026-01-07T19:28:39Z"
+    history:
+      - action: created
+        phase: DEV
+        timestamp: "2026-01-07T18:34:28Z"
+        note: "Created for end-to-end pipeline validation"
+      - action: evaluated
+        phase: DEV
+        timestamp: "2026-01-07T19:28:39Z"
+        note: "5/5 test cases passed (100%)"
+
 # No untracked workflows remaining
 untracked: []
+
+# ============================================================================
+# KNOWN BUG: n8n-mcp addTag Operation (2026-01-08) [RESOLVED]
+# ============================================================================
+#
+# BUG SUMMARY:
+#   The n8n-mcp server's `addTag` operation in `n8n_update_partial_workflow`
+#   returns success responses but does NOT persist tags to the n8n instance.
+#
+# SYMPTOMS:
+#   - Tool returns: { success: true, operationsApplied: 1 }
+#   - Subsequent n8n_get_workflow shows tags: []
+#   - Tested with both tagId and tagName parameters - same result
+#
+# ROOT CAUSE:
+#   n8n-mcp `addTag` operation does not make the correct API call.
+#   Tags require the dedicated endpoint: PUT /api/v1/workflows/{id}/tags
+#
+# WORKAROUND (SUCCESSFUL):
+#   Direct n8n REST API call via PowerShell:
+#   ```powershell
+#   $body = '[{"id":"tagId"}]'
+#   Invoke-RestMethod -Uri "$baseUrl/workflows/$workflowId/tags" `
+#     -Headers @{"X-N8N-API-KEY"=$apiKey; "Content-Type"="application/json"} `
+#     -Method PUT -Body $body
+#   ```
+#
+# RESOLUTION DATE: 2026-01-08T14:05:00Z
+# RESOLUTION METHOD: Direct API via PowerShell scripts
+# SCRIPTS LOCATION: scripts/add-tags.ps1, scripts/tag-last-workflow.ps1
+#
+# ============================================================================
+# TAG APPLICATION STATUS: COMPLETE (2026-01-08)
+# ============================================================================
+#
+# All 31 workflows now have n8n native tags applied:
+#   - 23 workflows with DEV tag (Nbnc0KJVYlJeasQJ)
+#   - 8 workflows with ARCHIVED tag (4k9QbQQTpxNkOoJQ)
+#
+# Verified via n8n_list_workflows - all tags persisting correctly.
+# ============================================================================

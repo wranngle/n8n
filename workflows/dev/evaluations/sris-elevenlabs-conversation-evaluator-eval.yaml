@@ -1,0 +1,99 @@
+# Evaluation Configuration: SRIS - ElevenLabs Conversation Evaluator
+# Workflow ID: RjLiUAiuUs5XPvBj
+# Complexity: High (10 nodes)
+
+workflow_id: "RjLiUAiuUs5XPvBj"
+workflow_name: "[DEV] SRIS - ElevenLabs Conversation Evaluator"
+webhook_path: "sris-evaluate-agent"
+
+# Workflow Structure:
+# Evaluate Agent → Load Test Scenarios (Code) → Split Scenarios
+#   → Simulate Conversation (HTTP) → Evaluate Result (Code)
+#   → Aggregate Results (Code) → Needs Autocorrection? (Switch)
+#     → [yes] Trigger Autorefinement (HTTP) → Respond: With Refinement
+#     → [no] Respond: OK
+
+evaluation:
+  pass_threshold: 85
+  max_retries: 2
+  timeout_ms: 180000
+  mode: "agent_evaluation"
+
+test_cases:
+  - id: TC001
+    name: "Standard Agent Evaluation"
+    description: "Run full evaluation on a voice agent"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      scenario_count: 3
+      evaluation_type: "standard"
+    expected:
+      status: 200
+      response_contains:
+        - "score"
+        - "passed"
+        - "failed"
+    assertions:
+      - type: status_code
+        value: 200
+      - type: json_path
+        path: "$.evaluation_complete"
+        value: true
+    weight: 30
+
+  - id: TC002
+    name: "All Scenarios Pass"
+    description: "Test when all scenarios pass"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      force_all_pass: true
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.needs_autocorrection"
+        value: false
+      - type: json_path
+        path: "$.final_score"
+        min: 0.9
+    weight: 25
+
+  - id: TC003
+    name: "Autocorrection Triggered"
+    description: "Test when failures trigger autorefinement"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      force_failures: true
+      failure_threshold: 0.3
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.needs_autocorrection"
+        value: true
+      - type: json_path
+        path: "$.autorefinement_triggered"
+        value: true
+    weight: 25
+
+  - id: TC004
+    name: "Scenario Split Verification"
+    description: "Verify scenarios are processed individually"
+    input:
+      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
+      scenario_count: 5
+    expected:
+      status: 200
+    assertions:
+      - type: json_path
+        path: "$.scenarios_processed"
+        value: 5
+    weight: 20
+
+metadata:
+  created: "2026-01-08"
+  author: "SRIS Auto-Eval"
+  dependencies:
+    - elevenlabs_api_key
+  integration_type: "sris_core"
+  notes: "Core SRIS component - evaluates ElevenLabs agents"

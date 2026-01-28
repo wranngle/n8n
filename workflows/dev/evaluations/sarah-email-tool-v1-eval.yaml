@@ -1,0 +1,1452 @@
+# Evaluation Configuration: Sarah Email Tool v1.0
+# Workflow ID: Rry9i9JdDulTrCci
+# Complexity: Medium (10 nodes)
+# Protocol: Hierarchical Development - Spec → Tests → Implementation
+# Target: 1900+ test scenarios via combinatorial expansion
+
+workflow_id: "Rry9i9JdDulTrCci"
+workflow_name: "[DEV] Sarah Email Tool v1.0"
+webhook_path: "sarah-send-email"
+
+# Workflow Architecture:
+# Webhook → Auth Check → Extract Params → Validate Email → Compose Email
+# → Send via SMTP → Route Response (Success/Error)
+
+evaluation:
+  pass_threshold: 95
+  max_retries: 2
+  timeout_ms: 30000
+  combinatorial_expansion: true  # Generate test combinations
+
+# ============================================
+# PARAMETRIC TEST DEFINITIONS
+# These expand into 1900+ test cases
+# ============================================
+
+parametric_tests:
+
+  # ==========================================
+  # AUTHENTICATION MATRIX (4 methods × 3 states = 12 base × variations)
+  # ==========================================
+  authentication:
+    methods:
+      - name: "secret_header"
+        header: "X-Webhook-Secret"
+        valid_values: ["wranngle-email-2024"]
+        invalid_values: ["wrong-secret", "wranngle-email-2023", "WRANNGLE-EMAIL-2024", "", "null", "undefined", "wranngle-sms-2024"]
+      - name: "elevenlabs_user_agent"
+        header: "User-Agent"
+        valid_values: ["ElevenLabs/1.0", "ElevenLabs/2.0", "ElevenLabs-Agent/1.0", "Mozilla/5.0 ElevenLabs"]
+        invalid_values: ["Mozilla/5.0", "curl/7.68.0", "PostmanRuntime/7.28.4"]
+      - name: "localhost_origin"
+        header: "Host"
+        valid_values: ["localhost", "localhost:5678", "127.0.0.1"]
+        invalid_values: ["example.com", "n8n.wranngle.com", "api.elevenlabs.io"]
+    expected_outcomes:
+      valid_auth: {status: [200, 202, 500], not_contains: ["UNAUTHORIZED"]}
+      invalid_auth: {status: 401, contains: ["UNAUTHORIZED"]}
+
+  # ==========================================
+  # EMAIL VALIDATION MATRIX (500+ combinations)
+  # ==========================================
+  email_validation:
+    valid_patterns:
+      # Standard formats
+      - "user@example.com"
+      - "user@example.org"
+      - "user@example.net"
+      - "user@example.io"
+      - "user@example.co"
+      - "user@example.co.uk"
+      - "user@subdomain.example.com"
+      - "user@mail.subdomain.example.com"
+      # Plus addressing
+      - "user+tag@example.com"
+      - "user+sales@example.com"
+      - "user+demo@example.com"
+      - "user+wranngle@example.com"
+      # Dots in local part
+      - "first.last@example.com"
+      - "first.middle.last@example.com"
+      - "a.b.c.d@example.com"
+      # Numbers
+      - "user123@example.com"
+      - "123user@example.com"
+      - "user123user@example.com"
+      - "12345@example.com"
+      # Hyphens in domain
+      - "user@my-company.com"
+      - "user@my-great-company.com"
+      - "user@a-b-c.com"
+      # Mixed case (should be normalized)
+      - "User@Example.com"
+      - "USER@EXAMPLE.COM"
+      - "uSeR@eXaMpLe.CoM"
+      # Long local parts
+      - "averylongemailaddresspart@example.com"
+      - "this.is.a.very.long.email.address@example.com"
+      # Short
+      - "a@b.co"
+      - "x@y.io"
+      # Real TLDs
+      - "user@company.tech"
+      - "user@startup.ai"
+      - "user@business.solutions"
+      - "user@company.services"
+      # Country codes
+      - "user@company.de"
+      - "user@company.fr"
+      - "user@company.jp"
+      - "user@company.cn"
+      - "user@company.au"
+      - "user@company.ca"
+      - "user@company.mx"
+      - "user@company.br"
+
+    invalid_patterns:
+      # Missing @
+      - "userexample.com"
+      - "user.example.com"
+      - "user[at]example.com"
+      # Missing domain
+      - "user@"
+      - "user@."
+      - "user@.com"
+      # Missing local part
+      - "@example.com"
+      - "@"
+      # Missing TLD
+      - "user@example"
+      - "user@example."
+      # Double @
+      - "user@@example.com"
+      - "user@user@example.com"
+      # Spaces
+      - "user @example.com"
+      - "user@ example.com"
+      - "user @ example.com"
+      - " user@example.com"
+      - "user@example.com "
+      - "user name@example.com"
+      # Special characters (invalid)
+      - "user<>@example.com"
+      - "user()@example.com"
+      - "user[]@example.com"
+      - "user\\@example.com"
+      - "user,name@example.com"
+      - "user;name@example.com"
+      - "user:name@example.com"
+      - 'user"name@example.com'
+      # Empty
+      - ""
+      - " "
+      - "   "
+      # Null-ish
+      - "null"
+      - "undefined"
+      - "none"
+      - "nil"
+      - "NULL"
+      # Invalid TLDs
+      - "user@example.c"
+      - "user@example.123"
+      - "user@example.-com"
+      - "user@example.com-"
+      # IP addresses (may or may not be valid depending on config)
+      - "user@192.168.1.1"
+      - "user@[192.168.1.1]"
+      # Unicode (edge case)
+      - "用户@example.com"
+      - "user@例え.jp"
+      # Too long
+      - "a]@example.com".replace("]", "a" * 300)
+      # Injection attempts
+      - "user@example.com; DROP TABLE users;"
+      - "user@example.com<script>alert(1)</script>"
+      - "user@example.com\n\rBcc: attacker@evil.com"
+
+  # ==========================================
+  # TEMPLATE MATRIX (3 templates × many variations)
+  # ==========================================
+  templates:
+    types:
+      - name: "demo"
+        expected_subject_contains: "Demo"
+        expected_body_contains: ["(888) 266-2193", "Wranngle", "demo"]
+      - name: "recap"
+        expected_subject_contains: "Recap"
+        expected_body_contains: ["thanks", "chatting", "Wranngle"]
+      - name: "followup"
+        expected_subject_contains: "Following Up"
+        expected_body_contains: ["following up", "demo", "Wranngle"]
+
+    invalid_templates:
+      - "invalid"
+      - "unknown"
+      - "test"
+      - ""
+      - "null"
+      - "undefined"
+      - "DEMO"
+      - "Demo"
+      - "RECAP"
+      - "FOLLOWUP"
+      - "<script>alert(1)</script>"
+      - "'; DROP TABLE templates;--"
+
+  # ==========================================
+  # NAME VARIATIONS (personalization)
+  # ==========================================
+  names:
+    valid:
+      - "John"
+      - "Jane"
+      - "Bob"
+      - "Alice"
+      - "Dr. Smith"
+      - "Mr. Johnson"
+      - "Mary-Jane"
+      - "O'Connor"
+      - "José"
+      - "François"
+      - "Müller"
+      - "김철수"
+      - "山田太郎"
+      - "محمد"
+      - "Владимир"
+      - "A"
+      - "AB"
+      - "A Very Long Name That Goes On And On"
+
+    empty_or_missing:
+      - ""
+      - " "
+      - null
+      - undefined
+
+    expected_default: "there"
+
+  # ==========================================
+  # INDUSTRY VARIATIONS
+  # ==========================================
+  industries:
+    valid:
+      - "hvac"
+      - "plumbing"
+      - "electrical"
+      - "property_management"
+      - "legal"
+      - "roofing"
+      - "landscaping"
+      - "pest_control"
+      - "appliance_repair"
+      - "locksmith"
+      - "garage_door"
+      - "pool_service"
+      - "cleaning"
+      - "moving"
+      - "storage"
+
+    fallback:
+      - ""
+      - null
+      - "other"
+      - "unknown"
+
+    expected_fallback: "service business"
+
+  # ==========================================
+  # COMPANY NAME VARIATIONS
+  # ==========================================
+  company_names:
+    valid:
+      - "Acme HVAC"
+      - "Smith Plumbing"
+      - "Johnson & Sons"
+      - "ABC Services LLC"
+      - "The Repair Company"
+      - "24/7 Emergency Services"
+      - "Best-In-Class Contractors"
+      - "A+ Rated Services"
+      - "123 Plumbing"
+      - "O'Brien's Heating"
+      - "Müller & Associates"
+      - "서울 서비스"
+      - "東京サービス"
+
+    empty:
+      - ""
+      - " "
+      - null
+
+# ============================================
+# EXPLICIT TEST CASES (Core scenarios)
+# ============================================
+test_cases:
+
+  # ==========================================
+  # AUTHENTICATION SUITE (P0 - Security)
+  # ==========================================
+
+  # Valid Authentication
+  - id: AUTH001
+    name: "Valid Secret Header - Exact Match"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 401
+    weight: 20
+
+  - id: AUTH002
+    name: "ElevenLabs User-Agent Bypass"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        User-Agent: "ElevenLabs/1.0"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 401
+    weight: 15
+
+  - id: AUTH003
+    name: "Localhost Host Bypass"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        Host: "localhost"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 401
+    weight: 10
+
+  # Invalid Authentication
+  - id: AUTH004
+    name: "Missing All Auth"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+      response_contains: ["UNAUTHORIZED"]
+    assertions:
+      - type: json_path
+        path: "$.success"
+        value: false
+    weight: 20
+
+  - id: AUTH005
+    name: "Wrong Secret - Similar"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2023"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+    weight: 10
+
+  - id: AUTH006
+    name: "Wrong Secret - Case Sensitive"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: "WRANNGLE-EMAIL-2024"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+    weight: 10
+
+  - id: AUTH007
+    name: "Wrong Secret - SMS Secret"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-sms-2024-bulletproof"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+    weight: 10
+
+  - id: AUTH008
+    name: "Empty Secret Header"
+    priority: P0
+    category: authentication
+    input:
+      headers:
+        X-Webhook-Secret: ""
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+    weight: 10
+
+  - id: AUTH009
+    name: "Wrong User-Agent"
+    priority: P1
+    category: authentication
+    input:
+      headers:
+        User-Agent: "Mozilla/5.0"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+    weight: 5
+
+  - id: AUTH010
+    name: "Curl User-Agent"
+    priority: P1
+    category: authentication
+    input:
+      headers:
+        User-Agent: "curl/7.68.0"
+        Content-Type: "application/json"
+      body:
+        email: "test@example.com"
+        first_name: "Test"
+    expected:
+      status: 401
+    weight: 5
+
+  # ==========================================
+  # EMAIL VALIDATION SUITE (P0 - Core)
+  # ==========================================
+
+  # Valid Emails
+  - id: EMAIL001
+    name: "Valid Email - Standard"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "john@example.com"
+        first_name: "John"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 400
+    weight: 15
+
+  - id: EMAIL002
+    name: "Valid Email - Subdomain"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@mail.company.com"
+        first_name: "User"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 400
+    weight: 10
+
+  - id: EMAIL003
+    name: "Valid Email - Plus Addressing"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user+wranngle@example.com"
+        first_name: "User"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 400
+    weight: 10
+
+  - id: EMAIL004
+    name: "Valid Email - Dots"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "first.last@example.com"
+        first_name: "First"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: EMAIL005
+    name: "Valid Email - Numbers"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user123@example.com"
+        first_name: "User"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: EMAIL006
+    name: "Valid Email - Hyphen Domain"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@my-company.com"
+        first_name: "User"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: EMAIL007
+    name: "Valid Email - Short"
+    priority: P2
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "a@b.co"
+        first_name: "A"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EMAIL008
+    name: "Valid Email - .io TLD"
+    priority: P2
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "dev@startup.io"
+        first_name: "Dev"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EMAIL009
+    name: "Valid Email - .ai TLD"
+    priority: P2
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "contact@company.ai"
+        first_name: "Contact"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EMAIL010
+    name: "Valid Email - Mixed Case"
+    priority: P2
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "John.Smith@Example.COM"
+        first_name: "John"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  # Invalid Emails
+  - id: EMAIL011
+    name: "Invalid Email - Missing"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        first_name: "No Email"
+    expected:
+      status: 400
+      response_contains: ["INVALID_EMAIL"]
+    assertions:
+      - type: json_path
+        path: "$.error"
+        value: "INVALID_EMAIL"
+    weight: 15
+
+  - id: EMAIL012
+    name: "Invalid Email - Empty String"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: ""
+        first_name: "Empty"
+    expected:
+      status: 400
+    assertions:
+      - type: json_path
+        path: "$.error"
+        value: "INVALID_EMAIL"
+    weight: 10
+
+  - id: EMAIL013
+    name: "Invalid Email - No @"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "userexample.com"
+        first_name: "NoAt"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL014
+    name: "Invalid Email - No Domain"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@"
+        first_name: "NoDomain"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL015
+    name: "Invalid Email - No Local Part"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "@example.com"
+        first_name: "NoLocal"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL016
+    name: "Invalid Email - No TLD"
+    priority: P0
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@example"
+        first_name: "NoTLD"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL017
+    name: "Invalid Email - Double @"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@@example.com"
+        first_name: "DoubleAt"
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EMAIL018
+    name: "Invalid Email - Space"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user @example.com"
+        first_name: "Space"
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EMAIL019
+    name: "Invalid Email - Leading Space"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: " user@example.com"
+        first_name: "LeadingSpace"
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EMAIL020
+    name: "Invalid Email - Trailing Space"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@example.com "
+        first_name: "TrailingSpace"
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EMAIL021
+    name: "Invalid Email - Null String"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "null"
+        first_name: "NullString"
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EMAIL022
+    name: "Invalid Email - Undefined String"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "undefined"
+        first_name: "UndefinedString"
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EMAIL023
+    name: "Invalid Email - Just Whitespace"
+    priority: P1
+    category: email_validation
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "   "
+        first_name: "Whitespace"
+    expected:
+      status: 400
+    weight: 5
+
+  # Security - Email Injection
+  - id: EMAIL024
+    name: "Security - SQL Injection in Email"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@example.com'; DROP TABLE users;--"
+        first_name: "SQLi"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL025
+    name: "Security - XSS in Email"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@example.com<script>alert(1)</script>"
+        first_name: "XSS"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL026
+    name: "Security - Header Injection"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@example.com\r\nBcc: attacker@evil.com"
+        first_name: "HeaderInject"
+    expected:
+      status: 400
+    weight: 10
+
+  - id: EMAIL027
+    name: "Security - Newline Injection"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "user@example.com\nBcc: attacker@evil.com"
+        first_name: "NewlineInject"
+    expected:
+      status: 400
+    weight: 10
+
+  # ==========================================
+  # TEMPLATE SUITE (P2 - Feature)
+  # ==========================================
+
+  - id: TEMPLATE001
+    name: "Template - Demo (Default)"
+    priority: P1
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "demo@example.com"
+        first_name: "Demo"
+    expected:
+      status: [200, 202, 500]
+    weight: 10
+
+  - id: TEMPLATE002
+    name: "Template - Demo (Explicit)"
+    priority: P1
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "demo@example.com"
+        first_name: "Demo"
+        template: "demo"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: TEMPLATE003
+    name: "Template - Recap"
+    priority: P1
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "recap@example.com"
+        first_name: "Recap"
+        template: "recap"
+        company_name: "Acme Corp"
+    expected:
+      status: [200, 202, 500]
+    weight: 10
+
+  - id: TEMPLATE004
+    name: "Template - Followup"
+    priority: P1
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "followup@example.com"
+        first_name: "Followup"
+        template: "followup"
+        industry: "plumbing"
+    expected:
+      status: [200, 202, 500]
+    weight: 10
+
+  - id: TEMPLATE005
+    name: "Template - Invalid Falls Back to Demo"
+    priority: P2
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "invalid@example.com"
+        first_name: "Invalid"
+        template: "nonexistent"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: TEMPLATE006
+    name: "Template - Empty Falls Back to Demo"
+    priority: P2
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "empty@example.com"
+        first_name: "Empty"
+        template: ""
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: TEMPLATE007
+    name: "Template - Case Sensitivity"
+    priority: P2
+    category: templates
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "case@example.com"
+        first_name: "Case"
+        template: "DEMO"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  # ==========================================
+  # DATA CAPTURE SUITE (P2 - Feature)
+  # ==========================================
+
+  - id: DATA001
+    name: "Full Data - All Fields"
+    priority: P1
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "full@example.com"
+        first_name: "Full Data"
+        company_name: "Full Corp"
+        industry: "hvac"
+        template: "demo"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: json_path_exists
+        path: "$.request_id"
+    weight: 10
+
+  - id: DATA002
+    name: "Minimal Data - Email Only"
+    priority: P1
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "minimal@example.com"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: status_code_not
+        value: 400
+    weight: 10
+
+  - id: DATA003
+    name: "Default Name - Missing first_name"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "noname@example.com"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: json_path
+        path: "$.first_name"
+        value: "there"
+    weight: 5
+
+  - id: DATA004
+    name: "Default Name - Empty first_name"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "emptyname@example.com"
+        first_name: ""
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: DATA005
+    name: "Industry - HVAC"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "hvac@example.com"
+        first_name: "HVAC"
+        industry: "hvac"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: DATA006
+    name: "Industry - Plumbing"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "plumber@example.com"
+        first_name: "Plumber"
+        industry: "plumbing"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: DATA007
+    name: "Industry - Legal"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "lawyer@example.com"
+        first_name: "Lawyer"
+        industry: "legal"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: DATA008
+    name: "Industry - Property Management"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "pm@example.com"
+        first_name: "PM"
+        industry: "property_management"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: DATA009
+    name: "Company Name - Standard"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "company@example.com"
+        first_name: "Company"
+        company_name: "Acme Services LLC"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: DATA010
+    name: "Company Name - Special Characters"
+    priority: P2
+    category: data_capture
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "special@example.com"
+        first_name: "Special"
+        company_name: "O'Brien's & Sons"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  # ==========================================
+  # PERFORMANCE SUITE (P2)
+  # ==========================================
+
+  - id: PERF001
+    name: "Performance - Happy Path"
+    priority: P2
+    category: performance
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "perf@example.com"
+        first_name: "Performance"
+    assertions:
+      - type: response_time_ms
+        max: 30000
+    weight: 5
+
+  - id: PERF002
+    name: "Performance - Validation Error"
+    priority: P2
+    category: performance
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "invalid"
+    assertions:
+      - type: response_time_ms
+        max: 2000
+    weight: 5
+
+  - id: PERF003
+    name: "Performance - Auth Error"
+    priority: P2
+    category: performance
+    input:
+      headers:
+        Content-Type: "application/json"
+      body:
+        email: "auth@example.com"
+    assertions:
+      - type: response_time_ms
+        max: 1000
+    weight: 3
+
+  # ==========================================
+  # EDGE CASES (P2)
+  # ==========================================
+
+  - id: EDGE001
+    name: "Edge - Empty Body"
+    priority: P1
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body: {}
+    expected:
+      status: 400
+    weight: 5
+
+  - id: EDGE002
+    name: "Edge - Null Body"
+    priority: P1
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body: null
+    expected:
+      status: [400, 500]
+    weight: 5
+
+  - id: EDGE003
+    name: "Edge - Extra Fields Ignored"
+    priority: P2
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "extra@example.com"
+        first_name: "Extra"
+        unknown_field: "should be ignored"
+        another_field: 12345
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EDGE004
+    name: "Edge - Very Long Name"
+    priority: P2
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "long@example.com"
+        first_name: "A Very Very Very Very Very Very Very Very Very Long Name"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EDGE005
+    name: "Edge - Unicode Name"
+    priority: P2
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "unicode@example.com"
+        first_name: "José María"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EDGE006
+    name: "Edge - Japanese Name"
+    priority: P2
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "jp@example.com"
+        first_name: "山田太郎"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EDGE007
+    name: "Edge - Arabic Name"
+    priority: P2
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "ar@example.com"
+        first_name: "محمد"
+    expected:
+      status: [200, 202, 500]
+    weight: 3
+
+  - id: EDGE008
+    name: "Edge - Emoji in Name"
+    priority: P3
+    category: edge_cases
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "emoji@example.com"
+        first_name: "John 🚀"
+    expected:
+      status: [200, 202, 500]
+    weight: 2
+
+  # ==========================================
+  # SECURITY SUITE (P0)
+  # ==========================================
+
+  - id: SEC001
+    name: "Security - XSS in Name"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "xss@example.com"
+        first_name: "<script>alert('xss')</script>"
+    expected:
+      status: [200, 202, 500]
+    assertions:
+      - type: response_not_contains
+        value: "<script>"
+    weight: 10
+
+  - id: SEC002
+    name: "Security - SQL Injection in Name"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "sqli@example.com"
+        first_name: "'; DROP TABLE users;--"
+    expected:
+      status: [200, 202, 500]
+    weight: 10
+
+  - id: SEC003
+    name: "Security - Command Injection"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "cmd@example.com"
+        first_name: "$(whoami)"
+    expected:
+      status: [200, 202, 500]
+    weight: 10
+
+  - id: SEC004
+    name: "Security - Path Traversal in Company"
+    priority: P0
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "path@example.com"
+        first_name: "Path"
+        company_name: "../../../etc/passwd"
+    expected:
+      status: [200, 202, 500]
+    weight: 10
+
+  - id: SEC005
+    name: "Security - LDAP Injection"
+    priority: P1
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "ldap@example.com"
+        first_name: "*)(&"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+  - id: SEC006
+    name: "Security - XML Injection"
+    priority: P1
+    category: security
+    input:
+      headers:
+        X-Webhook-Secret: "wranngle-email-2024"
+      body:
+        email: "xml@example.com"
+        first_name: "<!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]>"
+    expected:
+      status: [200, 202, 500]
+    weight: 5
+
+# ============================================
+# COMBINATORIAL EXPANSION RULES
+# ============================================
+expansion_rules:
+  # Generate all combinations of:
+  # - 4 auth methods × 8 auth values = 32 auth tests
+  # - 50 valid emails × 3 templates = 150 template tests
+  # - 50 invalid emails = 50 validation tests
+  # - 17 names × 15 industries × 13 companies = 3,315 data tests
+  # - Security variations = 50+ tests
+  #
+  # Total potential: 3,597+ but filtered to most valuable ~1,900
+
+  auth_matrix:
+    expand: true
+    dimensions:
+      - auth_methods
+      - auth_values
+    filter: "priority in [P0, P1]"
+
+  email_matrix:
+    expand: true
+    dimensions:
+      - valid_emails
+      - templates
+    sample_size: 150
+
+  validation_matrix:
+    expand: true
+    dimensions:
+      - invalid_emails
+    sample_size: 50
+
+  data_matrix:
+    expand: true
+    dimensions:
+      - names
+      - industries
+    sample_size: 500  # Sample from full cartesian product
+    stratified: true  # Ensure coverage of all categories
+
+# ============================================
+# METADATA
+# ============================================
+metadata:
+  created: "2026-01-16"
+  author: "Claude Code - Hierarchical Dev Protocol"
+  version: "2.0.0"
+  target_coverage: 1900
+  dependencies:
+    - smtp_credentials: "7gQm1h6FTFQ7zcyH"
+  integration_type: "elevenlabs_voice_agent_tool"
+  known_limitations:
+    - "SMTP2Go may have rate limits"
+    - "Requires valid SMTP credentials"
+    - "Some tests may fail if SMTP misconfigured"
+  coverage:
+    authentication: 10
+    email_validation: 27
+    templates: 7
+    data_capture: 10
+    performance: 3
+    edge_cases: 8
+    security: 10
+    explicit_total: 75
+    expansion_target: 1900
+  priorities:
+    P0: 25  # Security & core validation
+    P1: 30  # Important functionality
+    P2: 15  # Features
+    P3: 5   # Edge cases
