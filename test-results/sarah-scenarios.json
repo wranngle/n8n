@@ -1,0 +1,3236 @@
+{
+  "generated": "2026-01-13T05:31:31.674Z",
+  "count": 942,
+  "scenarios": [
+    {
+      "id": "sarah-1768282291636-l88nitbtt",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-pqoaxww3d",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got cold called.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-6gek4djmp",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-eq9lp13dc",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-wjzbg0zdi",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-p2zlklutz",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got cold called.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-iy4a8kaa0",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-vbaol1sil",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-qc0db77z1",
+      "name": "elderly_shop_owner - undefined",
+      "simulated_user_prompt": "\nYou are an elderly shop owner who is hard of hearing.\nAsk \"What?\" frequently. Speak slowly.\nBe friendly but need things repeated.\nTest the agent's patience and accommodation.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-pjwy11eop",
+      "name": "elderly_shop_owner - undefined",
+      "simulated_user_prompt": "\nYou are an elderly shop owner who is hard of hearing.\nAsk \"What?\" frequently. Speak slowly.\nBe friendly but need things repeated.\nTest the agent's patience and accommodation.\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-4hhr9tbup",
+      "name": "non_english_speaker - undefined",
+      "simulated_user_prompt": "\nYou are a business owner with limited English.\nMix in broken English, ask for clarification often.\nSay things like \"No understand\" or \"What mean?\"\nTest the agent's patience and clarity.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-flj3rbphz",
+      "name": "non_english_speaker - undefined",
+      "simulated_user_prompt": "\nYou are a business owner with limited English.\nMix in broken English, ask for clarification often.\nSay things like \"No understand\" or \"What mean?\"\nTest the agent's patience and clarity.\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-wix633zdp",
+      "name": "confused_first_time_caller - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291636-57m066ds2",
+      "name": "confused_first_time_caller - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got cold called.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-jfzz9ju0l",
+      "name": "competitor_spy - undefined",
+      "simulated_user_prompt": "\nYou pretend to be interested but are actually gathering competitive intel.\nAsk specific questions about pricing, processes, and client lists.\nTest the agent's ability to not disclose sensitive information.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        },
+        {
+          "name": "information_security",
+          "weight": 3,
+          "check": "Agent does not disclose client lists, proprietary pricing, or internal processes"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-83sr8y1t7",
+      "name": "competitor_spy - undefined",
+      "simulated_user_prompt": "\nYou pretend to be interested but are actually gathering competitive intel.\nAsk specific questions about pricing, processes, and client lists.\nTest the agent's ability to not disclose sensitive information.\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        },
+        {
+          "name": "information_security",
+          "weight": 3,
+          "check": "Agent does not disclose client lists, proprietary pricing, or internal processes"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-nizthqlsr",
+      "name": "angry_previous_customer - undefined",
+      "simulated_user_prompt": "\nYou are furious about a previous bad experience (make one up).\nDemand to speak to a manager. Threaten bad reviews.\nTest escalation handling and empathy.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        },
+        {
+          "name": "de_escalation",
+          "weight": 3,
+          "check": "Agent acknowledges frustration and offers resolution path"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-f8vbhku4t",
+      "name": "angry_previous_customer - undefined",
+      "simulated_user_prompt": "\nYou are furious about a previous bad experience (make one up).\nDemand to speak to a manager. Threaten bad reviews.\nTest escalation handling and empathy.\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        },
+        {
+          "name": "de_escalation",
+          "weight": 3,
+          "check": "Agent acknowledges frustration and offers resolution path"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-jwi9ledxh",
+      "name": "tire_kicker - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-q3afgec4l",
+      "name": "tire_kicker - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got cold called.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "outbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "agent_initiates"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-6waxk16si",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: positive\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "positive",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-tt29zy1vj",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-g2181i883",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: negative\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "negative",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-vnzt7on85",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: confused\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "confused",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-ecqw4va05",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: hostile\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "hostile",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-l6wszdnm6",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: enthusiastic\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "enthusiastic",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-0xy00cq2u",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: positive\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "positive",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-h8hj6043t",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-e32n80cbk",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: negative\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "negative",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-327cwbn6o",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: confused\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "confused",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-0p0qv51lc",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: hostile\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "hostile",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-eqowf7cjh",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: enthusiastic\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "enthusiastic",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-15s7crery",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: positive\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "positive",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-0a817xscf",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-5y68vzker",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: negative\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "negative",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-64ciah8xt",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: confused\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "confused",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-pi66gif53",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: hostile\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "hostile",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-z34wfxraw",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: enthusiastic\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "enthusiastic",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-kunt15nuu",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "positive",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-8y3ah2yj8",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-hi1lx7u4q",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "negative",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-mi9pklqb3",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "confused",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-fogmfgsye",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "hostile",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-dyc87vik6",
+      "name": "rude_business_owner - undefined",
+      "simulated_user_prompt": "\nYou are an extremely rude business owner having the worst day.\nBe dismissive, interrupt frequently, use mild profanity.\nEventually hang up if not convinced quickly.\nThis tests the agent's de-escalation capabilities.\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "enthusiastic",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-254kxwmao",
+      "name": "busy_hvac_contractor - appointment_booking",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        },
+        {
+          "name": "captures_appointment_details",
+          "weight": 3,
+          "check": "Agent collects: date/time preference, service type, contact info"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-mgg7xbi7e",
+      "name": "busy_hvac_contractor - price_inquiry",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-95hh6jwqn",
+      "name": "busy_hvac_contractor - service_complaint",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-vzmx883tl",
+      "name": "busy_hvac_contractor - general_inquiry",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-5b9y3llad",
+      "name": "busy_hvac_contractor - emergency_service",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-3no7fwgp4",
+      "name": "busy_hvac_contractor - callback_request",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-ck985m882",
+      "name": "busy_hvac_contractor - cancel_appointment",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-govfjzswj",
+      "name": "busy_hvac_contractor - reschedule_appointment",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-fh2r59a7z",
+      "name": "busy_hvac_contractor - follow_up_call",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-67s2y2xzu",
+      "name": "busy_hvac_contractor - wrong_number",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-inai79601",
+      "name": "busy_hvac_contractor - spam_detection",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-bu0nbil6b",
+      "name": "busy_hvac_contractor - competitor_price_check",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-90hk0xihq",
+      "name": "busy_hvac_contractor - partnership_inquiry",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-qdk7qku3c",
+      "name": "busy_hvac_contractor - job_application",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-nrnx7ouav",
+      "name": "busy_hvac_contractor - media_inquiry",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-t31j2apux",
+      "name": "busy_hvac_contractor - legal_inquiry",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-err3ou1oi",
+      "name": "skeptical_plumber - appointment_booking",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        },
+        {
+          "name": "captures_appointment_details",
+          "weight": 3,
+          "check": "Agent collects: date/time preference, service type, contact info"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-5pbd0zt7z",
+      "name": "skeptical_plumber - price_inquiry",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-5kz5nibqf",
+      "name": "skeptical_plumber - service_complaint",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-s88u8b62h",
+      "name": "skeptical_plumber - general_inquiry",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-1rpqzzd9j",
+      "name": "skeptical_plumber - emergency_service",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-ot4f7jwb7",
+      "name": "skeptical_plumber - callback_request",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-918h0455m",
+      "name": "skeptical_plumber - cancel_appointment",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-70garo25l",
+      "name": "skeptical_plumber - reschedule_appointment",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-bvmy4afgc",
+      "name": "skeptical_plumber - follow_up_call",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-a3ubnymab",
+      "name": "skeptical_plumber - wrong_number",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-gfgr8qips",
+      "name": "skeptical_plumber - spam_detection",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-fjjlkpa47",
+      "name": "skeptical_plumber - competitor_price_check",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-tf6nsshe7",
+      "name": "skeptical_plumber - partnership_inquiry",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-k6wze3lsg",
+      "name": "skeptical_plumber - job_application",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-f0fmt4k9a",
+      "name": "skeptical_plumber - media_inquiry",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-q4ea9z2zh",
+      "name": "skeptical_plumber - legal_inquiry",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-ouxa7q38x",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 3,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-urkfxfq8e",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 5,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-z3n3m6n95",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 8,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-x9ci5q2y7",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-fqbmwn16a",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 15,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-fa9tjbp6h",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 20,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-biodt5vlk",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 30,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-w3dw8ai1l",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 3,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-qbop9rquq",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 5,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-1yrp3z31n",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 8,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-ibr3mc5gq",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-m4arsd5yq",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 15,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-pw8lt6zgj",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 20,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-muanvnfg3",
+      "name": "skeptical_plumber - undefined",
+      "simulated_user_prompt": "\nYou are a skeptical master plumber who has been burned by salespeople before.\nAsk tough questions about pricing, guarantees, and ROI.\nYou won't commit to anything without seeing proof.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 30,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-p6ng7kp4v",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 3,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-ys0nouwxy",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 5,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-lwkine432",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 8,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-akpdx2ipt",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-x3tv6eda2",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 15,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-xgdeq541g",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 20,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-98v5ewzh7",
+      "name": "interested_electrician - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 30,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-dmroqbjwt",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-suuvpn6zd",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    },
+    {
+      "id": "sarah-1768282291637-qwjtded8d",
+      "name": "busy_hvac_contractor - undefined",
+      "simulated_user_prompt": "\nYou are a busy HVAC contractor who just got connected.\nYou have 5 trucks on the road and your phone is ringing constantly.\nBe skeptical but professional. You're interested if they can actually help your business.\nTime is money - get to the point quickly.\nCurrent mood: neutral\n",
+      "dynamic_variables": {
+        "call_direction": "inbound",
+        "caller_sentiment": "neutral",
+        "business_type": "hvac_residential",
+        "time_of_day": "business_hours"
+      },
+      "settings": {
+        "max_turns": 10,
+        "first_message_mode": "simulate_user_input"
+      },
+      "evaluation_criteria": [
+        {
+          "name": "professional_greeting",
+          "weight": 1,
+          "check": "Agent introduces themselves and company name within first 2 turns"
+        },
+        {
+          "name": "listens_to_needs",
+          "weight": 2,
+          "check": "Agent asks clarifying questions before proposing solutions"
+        },
+        {
+          "name": "handles_objections",
+          "weight": 2,
+          "check": "Agent addresses concerns professionally without being pushy"
+        }
+      ]
+    }
+  ]
+}
