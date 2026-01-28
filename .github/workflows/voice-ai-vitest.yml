@@ -42,8 +42,9 @@ jobs:
 
       - name: Run Vitest (unit + governance, no live endpoints)
         run: |
-          bunx vitest run --reporter=json --outputFile=test-results.json --exclude 'tests/webhook/**' --exclude 'tests/post-call-webhook.test.ts' --exclude 'tests/client-initiation-webhook.test.ts' 2>&1 | tee test-output.txt
-          bunx vitest run --exclude 'tests/webhook/**' --exclude 'tests/post-call-webhook.test.ts' --exclude 'tests/client-initiation-webhook.test.ts'
+          EXCLUDE="--exclude 'tests/webhook/**' --exclude 'tests/post-call-webhook.test.ts' --exclude 'tests/client-initiation-webhook.test.ts' --exclude 'tests/el/**' --exclude 'tests/eval/**' --exclude 'tests/mcp/**' --exclude 'tests/integration/infrastructure.test.ts'"
+          eval "bunx vitest run --reporter=json --outputFile=test-results.json $EXCLUDE" 2>&1 | tee test-output.txt
+          eval "bunx vitest run $EXCLUDE"
 
       - name: Publish test summary
         if: always()
