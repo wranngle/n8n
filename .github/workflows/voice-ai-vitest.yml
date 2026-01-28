@@ -40,8 +40,10 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Run Vitest
-        run: bunx vitest run --reporter=json --outputFile=test-results.json 2>&1 | tee test-output.txt; bunx vitest run
+      - name: Run Vitest (unit + governance, no live endpoints)
+        run: |
+          bunx vitest run --reporter=json --outputFile=test-results.json --exclude 'tests/webhook/**' --exclude 'tests/post-call-webhook.test.ts' --exclude 'tests/client-initiation-webhook.test.ts' 2>&1 | tee test-output.txt
+          bunx vitest run --exclude 'tests/webhook/**' --exclude 'tests/post-call-webhook.test.ts' --exclude 'tests/client-initiation-webhook.test.ts'
 
       - name: Publish test summary
         if: always()
