@@ -5,7 +5,7 @@
  * Run: bun test tests/post-call-webhook.test.ts
  */
 
-import { describe, it, expect, beforeAll } from "bun:test";
+import { describe, it, expect, beforeAll } from "vitest";
 
 const WEBHOOK_URL = "https://n8n.wranngle.com/webhook/post-call";
 const VALID_AGENT_ID = "agent_8001kdgp7qbyf4wvhs540be78vew";

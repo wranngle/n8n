@@ -5,6 +5,8 @@
  * Run with: bun test tests/client-initiation-webhook.test.ts
  */
 
+import { describe, test, expect } from 'vitest';
+
 const WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || 'https://n8n.wranngle.com/webhook/client-initiation-data';
 const VALID_AGENT_ID = 'agent_8001kdgp7qbyf4wvhs540be78vew';
 
