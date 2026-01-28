@@ -78,10 +78,13 @@ jobs:
             }
             md += '\n## Suites\n\n';
             for (const suite of (r.testResults||[])) {
-              const si = suite.numFailingTests > 0 ? 'FAIL' : 'PASS';
+              const ar = suite.assertionResults||[];
+              const sp = ar.filter(t=>t.status==='passed').length;
+              const sf = ar.filter(t=>t.status==='failed').length;
+              const si = sf > 0 ? 'FAIL' : 'PASS';
               const name = suite.name.split('/').pop();
-              md += si + ' **' + name + '** — ' + suite.numPassingTests + ' passed';
-              if (suite.numFailingTests > 0) md += ', ' + suite.numFailingTests + ' failed';
+              md += si + ' **' + name + '** — ' + sp + ' passed';
+              if (sf > 0) md += ', ' + sf + ' failed';
               md += '\n';
             }
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
