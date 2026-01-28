@@ -189,6 +189,48 @@ Specialized AI personalities for delegated tasks, running in isolated context wi
 
 ---
 
+### Testing Strategy
+
+### Shell Script Tests
+
+Located in `workflows/*/tests/`:
+
+```bash
+# ElevenLabs auth test
+workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/tests/elevenlabs/01-auth-test.sh
+
+# Twilio SMS test
+workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/tests/twilio/02-send-sms.sh
+
+# Run all tests
+workflows/voice_ai_agents/elevenlabs-twilio-voiceagent/tests/run-all-tests.sh
+```
+
+### Governance Test Suite (Vitest)
+
+Located in `workflows/voice_ai_agents/tests/governance/`:
+
+```bash
+# Run strict governance checks on all workflows
+npx vitest run --project governance
+```
+
+### n8n Evaluations (Supersystem)
+
+
+**Script:** `scripts/governance-engine.js`
+**Wrapper:** `scripts/enforce-governance.ps1`
+
+### Blocking Rules (Strictly Enforced)
+1.  **Literal Tagging:** Workflows must have `tags` array with `Nbnc0KJVYlJeasQJ` (DEV) or `4k9QbQQTpxNkOoJQ` (ARCHIVED). Name prefix is insufficient.
+2.  **Naming:** No version numbers (`v1`), no buzzwords (`orchestrator`, `agent`, `super`).
+3.  **Nodes:** All nodes must be `snake_case` (exception: `webhook_trigger`). All nodes must have `notes`.
+4.  **Webhooks:** Path must be `kebab-case` and unnested.
+5.  **Pre-action Research:** `meta.research_proof` is required for all changes to ensure best practices.
+6.  **Duplication:** New workflows rejected if >95% similar to existing content.
+
+---
+
 ## Key Documentation
 
 ### CLAUDE.md (Master Playbook)

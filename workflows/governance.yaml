@@ -14,6 +14,9 @@
 #   - ARCHIVED for deprecated/superseded workflows
 #   - New workflows auto-tagged as DEV
 #   - Superseded workflows must be archived immediately
+#   - LITERAL TAGGING REQUIRED: Workflows must have actual tag objects in JSON, not just name prefixes.
+#   - LITERAL ARCHIVING REQUIRED: Archived workflows must have active: false.
+#   - ENFORCEMENT: scripts/governance-engine.js blocks non-compliant changes.
 #
 # TAG IDs (n8n native tags):
 #   DEV:      Nbnc0KJVYlJeasQJ
