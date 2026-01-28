@@ -96,6 +96,8 @@ All workflows must use the simplified two-phase model:
 | `scripts/deploy-workflow.ps1` | Deploy workflow to n8n |
 | `scripts/activate-workflow.ps1` | Activate deployed workflow |
 | `scripts/activate-workflows.ps1` | Batch activate workflows |
+| `scripts/governance-engine.js` | **Strict Governance Enforcement** |
+| `scripts/enforce-governance.ps1` | Wrapper for governance engine |
 
 ### Testing Scripts
 
