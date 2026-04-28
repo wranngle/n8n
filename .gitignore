@@ -154,6 +154,20 @@ mcp-server-config.json
 !.env.example
 
 # ===================
+# CLAUDE CODE SESSION ARTIFACTS
+# ===================
+tmpclaude-*
+.claude-controlled
+
+# ===================
+# TEST / AUDIT RESULT ARTIFACTS (root)
+# ===================
+/agent-audit-*.json
+/baseline-results-*.json
+/nightmare-results-*.json
+/regression-results-*.json
+
+# ===================
 # BMAD OUTPUT
 # ===================
 # BMM methodology artifacts (track selectively)

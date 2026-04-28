@@ -7,7 +7,7 @@
 ## Directory Structure
 
 ```
-D:\Things\Work\Wranngle\n8n\
+n8n/
 │
 ├── .claude/
 │   ├── commands/                    # 10 Slash Commands
