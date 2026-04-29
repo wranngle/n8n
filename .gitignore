@@ -73,7 +73,7 @@ venv/
 # LOGS
 # ===================
 logs/
-.claude/logs/
+# .claude/logs/  # Preserving AI agent local state
 *.log
 npm-debug.log*
 
