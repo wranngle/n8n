@@ -1,0 +1,138 @@
+{
+  "name": "Lead Enrichment Microservice",
+  "nodes": [
+    {
+      "id": "webhook-1",
+      "name": "Lead Enrichment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "lead-enrichment",
+      "parameters": {
+        "path": "lead-enrichment",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "extract-domain",
+      "name": "Extract Domain",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "parameters": {
+        "jsCode": "const lead = $input.item.json;\nconst email = lead.email || lead.company_url || '';\nlet domain = '';\n\nif (email.includes('@')) {\n  domain = email.split('@')[1];\n} else if (email.startsWith('http')) {\n  try {\n    domain = new URL(email).hostname.replace('www.', '');\n  } catch (e) {\n    domain = email;\n  }\n} else {\n  domain = email;\n}\n\nconst freeProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'];\nconst isBusinessEmail = domain && !freeProviders.includes(domain.toLowerCase());\n\nreturn { \n  ...lead, \n  extracted_domain: domain,\n  is_business: isBusinessEmail\n};"
+      }
+    },
+    {
+      "id": "clearbit-enrich",
+      "name": "Clearbit Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300],
+      "parameters": {
+        "url": "=https://autocomplete.clearbit.com/v1/companies/suggest?query={{ $json.extracted_domain }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "merge-enrichment",
+      "name": "Merge Enrichment",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300],
+      "parameters": {
+        "jsCode": "const originalLead = $(\"Extract Domain\").item.json;\nconst clearbitData = $input.item.json;\n\nlet enriched = { ...originalLead };\n\nif (Array.isArray(clearbitData) && clearbitData.length > 0) {\n  const topMatch = clearbitData[0];\n  enriched.company_name = enriched.company_name || topMatch.name;\n  enriched.company_logo = topMatch.logo;\n  enriched.company_domain = topMatch.domain;\n  enriched.enrichment_source = 'clay_n8n';\n  enriched.enriched_at = new Date().toISOString();\n}\n\nreturn enriched;"
+      }
+    },
+    {
+      "id": "ai-research",
+      "name": "Groq AI Research",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.GROQ_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "llama3-8b-8192"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\": \"system\", \"content\": \"You are an expert sales researcher.\"}, {\"role\": \"user\", \"content\": \"Summarize likely pain points for: {{ $json.company_name || $json.extracted_domain }}\"}]"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "parameters": {
+        "jsCode": "const lead = $(\"Merge Enrichment\").item.json;\nconst aiData = $input.item.json;\n\nreturn {\n  ...lead,\n  ai_research: aiData?.choices?.[0]?.message?.content || 'Research failed',\n  status: 'enriched'\n};"
+      }
+    },
+    {
+      "id": "respond-node",
+      "name": "Return Enriched Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1450, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Lead Enrichment Webhook": {
+      "main": [[{"node": "Extract Domain", "type": "main", "index": 0}]]
+    },
+    "Extract Domain": {
+      "main": [[{"node": "Clearbit Enrichment", "type": "main", "index": 0}]]
+    },
+    "Clearbit Enrichment": {
+      "main": [[{"node": "Merge Enrichment", "type": "main", "index": 0}]]
+    },
+    "Merge Enrichment": {
+      "main": [[{"node": "Groq AI Research", "type": "main", "index": 0}]]
+    },
+    "Groq AI Research": {
+      "main": [[{"node": "Format Response", "type": "main", "index": 0}]]
+    },
+    "Format Response": {
+      "main": [[{"node": "Return Enriched Data", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

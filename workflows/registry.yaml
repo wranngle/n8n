@@ -76,6 +76,15 @@ business_processes:
       - "Nightly scheduled runs at midnight"
       - "Slack notifications on completion"
 
+  # Lead Enrichment - Centralized data enrichment microservice
+  lead_enrichment:
+    description: "Centralized Clearbit and Groq enrichment for all inbound leads"
+    status: production
+    workflows:
+      - lead-enrichment-microservice
+      - lead-intake-main
+    integrations: [webhook, clearbit, groq_api, postgres, email, http_request]
+
   # Knowledge Management - RAG Ingestion and Vector Databases
   knowledge_management:
     description: "Systems for ingesting and vectorizing content for AI knowledge bases"
@@ -301,6 +310,38 @@ workflows:
         type: ai_llm
         model: "gemini-3-pro-preview"
         docs_cached: true
+
+  lead-enrichment-microservice:
+    path: "lead-enrichment-microservice.json"
+    type: webhook_processor
+    status: active
+    description: "Centralized data enrichment using Clearbit and Groq"
+    serves_processes: [lead_enrichment]
+    depends_on: []
+    enables: []
+    webhook_path: "/lead-enrichment"
+    integrations:
+      - name: clearbit
+        type: data_enrichment
+      - name: groq_api
+        type: ai_llm
+
+  lead-intake-main:
+    path: "lead-intake-main.json"
+    type: webhook_processor
+    status: active
+    description: "Main lead intake orchestrator calling the enrichment service"
+    serves_processes: [lead_enrichment]
+    depends_on: [lead-enrichment-microservice]
+    enables: []
+    webhook_path: "/wranngle-intake-form"
+    integrations:
+      - name: postgres
+        type: storage
+      - name: email
+        type: output
+      - name: http_request
+        type: output
 
   youtube-rag-pipeline:
     path: "knowledge_management/youtube-rag-pipeline/workflow.json"
