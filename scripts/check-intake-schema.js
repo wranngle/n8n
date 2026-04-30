@@ -3,20 +3,9 @@
  * Verify intake schema integration in Sarah agent
  */
 
-const fs = require('fs');
-const path = require('path');
+require('./lib/env');
 
-function loadApiKey() {
-  const envPath = path.join(process.env.USERPROFILE || process.env.HOME, '.claude', '.env');
-  if (fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf8');
-    const match = content.match(/ELEVENLABS_API_KEY=([^\r\n]+)/);
-    if (match) return match[1].trim();
-  }
-  return process.env.ELEVENLABS_API_KEY;
-}
-
-const API_KEY = loadApiKey();
+const API_KEY = process.env.ELEVENLABS_API_KEY;
 const AGENT_ID = 'agent_xxxx_demo';
 
 async function main() {

@@ -1,7 +1,13 @@
 const fs = require('fs');
 const https = require('https');
+const env = require('./lib/env');
 
-const workflowData = JSON.parse(fs.readFileSync('C:/Users/root/Documents/dev/n8n/temp-update-eval-workflow.json', 'utf8'));
+const inputFile = process.argv[2];
+if (!inputFile) {
+  console.error('Usage: node update-eval-workflow.js <path-to-workflow.json>');
+  process.exit(1);
+}
+const workflowData = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
 
 const options = {
   hostname: 'n8n.wranngle.com',
@@ -10,7 +16,7 @@ const options = {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
-    'X-N8N-API-KEY': '***SCRUBBED_N8N_API_KEY***'
+    'X-N8N-API-KEY': env.require('N8N_API_KEY')
   }
 };
 

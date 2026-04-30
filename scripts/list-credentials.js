@@ -1,7 +1,8 @@
 // List n8n credentials
 const https = require('https');
+const env = require('./lib/env');
 
-const apiKey = '***SCRUBBED_N8N_API_KEY***';
+const apiKey = env.require('N8N_API_KEY');
 
 const options = {
   hostname: 'n8n.wranngle.com',

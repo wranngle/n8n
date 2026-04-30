@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
-"""Update n8n workflow via API"""
+"""Update n8n workflow via API.
+
+Usage: python update_workflow.py <workflow_id> <path-to-workflow.json>
+"""
 import json
-import urllib.request
-import urllib.error
+import os
 import sys
+import urllib.error
+import urllib.request
 
-WORKFLOW_ID = "54sXqqJVSctlSF6V"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib import env  # noqa: E402
+
+if len(sys.argv) < 3:
+    print("Usage: python update_workflow.py <workflow_id> <path-to-workflow.json>")
+    sys.exit(1)
+
+WORKFLOW_ID = sys.argv[1]
+WORKFLOW_FILE = sys.argv[2]
 API_URL = f"https://n8n.wranngle.com/api/v1/workflows/{WORKFLOW_ID}"
-API_KEY = "***SCRUBBED_N8N_API_KEY***"
+API_KEY = env.require("N8N_API_KEY")
 
-# Read workflow file
-with open(r"D:\Things\Work\Wranngle\n8n_workflow_development\workflows\voice_ai_agents\transcript-extraction\transcript-field-extractor-v2.json") as f:
+with open(WORKFLOW_FILE) as f:
     workflow = json.load(f)
 
 # Make PUT request

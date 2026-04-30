@@ -3,24 +3,9 @@
  * Test ElevenLabs Simulation API with minimal payload
  */
 
-const fs = require('fs');
-const path = require('path');
+require('./lib/env');
 
-// Load API key
-const CLAUDE_JSON_PATH = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude.json');
-let API_KEY = null;
-try {
-  const claudeJson = JSON.parse(fs.readFileSync(CLAUDE_JSON_PATH, 'utf-8'));
-  if (claudeJson.projects) {
-    for (const [key, value] of Object.entries(claudeJson.projects)) {
-      if (value?.mcpServers?.elevenlabs?.env?.ELEVENLABS_API_KEY) {
-        API_KEY = value.mcpServers.elevenlabs.env.ELEVENLABS_API_KEY;
-        break;
-      }
-    }
-  }
-} catch {}
-
+const API_KEY = process.env.ELEVENLABS_API_KEY;
 const AGENT_ID = 'agent_xxxx_demo';
 const API_BASE = 'https://api.elevenlabs.io/v1';
 

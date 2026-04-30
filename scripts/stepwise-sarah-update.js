@@ -4,31 +4,9 @@
  * Tests incremental updates to identify which field causes validation failure
  */
 
-const fs = require('fs');
-const path = require('path');
+const env = require('./lib/env');
 
-// Load API key from .claude.json
-const CLAUDE_JSON_PATH = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude.json');
-let API_KEY = null;
-try {
-  const claudeJson = JSON.parse(fs.readFileSync(CLAUDE_JSON_PATH, 'utf-8'));
-  if (claudeJson.projects) {
-    for (const [key, value] of Object.entries(claudeJson.projects)) {
-      if (value?.mcpServers?.elevenlabs?.env?.ELEVENLABS_API_KEY) {
-        API_KEY = value.mcpServers.elevenlabs.env.ELEVENLABS_API_KEY;
-        break;
-      }
-    }
-  }
-} catch (e) {
-  console.error('Failed to load .claude.json:', e.message);
-}
-
-if (!API_KEY) {
-  console.error('No API key found');
-  process.exit(1);
-}
-
+const API_KEY = env.require('ELEVENLABS_API_KEY');
 const AGENT_ID = 'agent_xxxx_demo';
 const API_BASE = 'https://api.elevenlabs.io/v1';
 

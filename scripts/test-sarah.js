@@ -8,7 +8,7 @@
  *
  * Credentials are auto-loaded from:
  *   1. Environment variable ELEVENLABS_API_KEY (if set)
- *   2. ~/.claude/.env file (automatic fallback)
+ *   2. ~/.agents/.env (via scripts/lib/env.js)
  *
  * Usage:
  *   node test-sarah.js [scenario] [--json]
@@ -22,39 +22,9 @@
  *   --json      - Output results as JSON for CI/CD integration
  */
 
-const fs = require('fs');
-const path = require('path');
+require('./lib/env');
 
-/**
- * Load credentials from .env file
- * @param {string} envPath - Path to .env file
- * @returns {Record<string, string>} Key-value pairs from .env
- */
-function loadEnvFile(envPath) {
-  try {
-    const content = fs.readFileSync(envPath, 'utf-8');
-    const env = {};
-    for (const line of content.split('\n')) {
-      const trimmed = line.trim();
-      if (trimmed && !trimmed.startsWith('#')) {
-        const [key, ...valueParts] = trimmed.split('=');
-        if (key && valueParts.length > 0) {
-          env[key.trim()] = valueParts.join('=').trim();
-        }
-      }
-    }
-    return env;
-  } catch {
-    return {};
-  }
-}
-
-// Auto-load from ~/.claude/.env if env vars not set
-const CLAUDE_ENV_PATH = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude', '.env');
-const envFile = loadEnvFile(CLAUDE_ENV_PATH);
-
-// Configuration with automatic fallback to .env file
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || envFile.ELEVENLABS_API_KEY;
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const AGENT_ID = process.env.ELEVENLABS_AGENT_ID || 'agent_xxxx_demo';
 
 // Named constants for turn limits (based on conversation complexity)

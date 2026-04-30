@@ -5,26 +5,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const env = require('./lib/env');
 
-// Load API key from centralized credential store
-function loadApiKey() {
-  const envPath = path.join(process.env.USERPROFILE || process.env.HOME, '.claude', '.env');
-  if (fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf8');
-    const match = content.match(/ELEVENLABS_API_KEY=([^\r\n]+)/);
-    if (match) return match[1].trim();
-  }
-  return process.env.ELEVENLABS_API_KEY;
-}
-
-const API_KEY = loadApiKey();
+const API_KEY = env.require('ELEVENLABS_API_KEY');
 const AGENT_ID = 'agent_xxxx_demo';
 const API_BASE = 'https://api.elevenlabs.io/v1';
-
-if (!API_KEY) {
-  console.error('ERROR: No API key found');
-  process.exit(1);
-}
 
 console.log('=== ELEVENLABS NATIVE TEST UPLOADER ===\n');
 console.log('API Key:', API_KEY.substring(0, 10) + '...');

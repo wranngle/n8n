@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Rename n8n workflow via API - preserves all other data"""
 import json
-import urllib.request
-import urllib.error
+import os
 import sys
+import urllib.error
+import urllib.request
 
-API_KEY = "***SCRUBBED_N8N_API_KEY***"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lib import env  # noqa: E402
+
+API_KEY = env.require("N8N_API_KEY")
 BASE_URL = "https://n8n.wranngle.com/api/v1/workflows"
 
 def rename_workflow(workflow_id, new_name):

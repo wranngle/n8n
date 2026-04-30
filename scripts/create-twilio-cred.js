@@ -1,15 +1,15 @@
 const https = require('https');
+const env = require('./lib/env');
 
-const apiKey = "***SCRUBBED_N8N_API_KEY***";
+const apiKey = env.require('N8N_API_KEY');
 
-// Provide ALL fields to satisfy the broken schema validation
 const twilioCredential = {
     name: "Twilio API Credentials",
     type: "twilioApi",
     data: {
         authType: "authToken",
-        accountSid: "***SCRUBBED_TWILIO_SID***",
-        authToken: "***SCRUBBED_TWILIO_AUTH_TOKEN***",
+        accountSid: env.require('TWILIO_ACCOUNT_SID'),
+        authToken: env.require('TWILIO_AUTH_TOKEN'),
         apiKeySid: "",
         apiKeySecret: ""
     }

@@ -14,47 +14,9 @@
 
 const fs = require('fs');
 const path = require('path');
+require('./lib/env');
 
-// Load credentials from ~/.claude/.env
-function loadEnvFile(envPath) {
-  try {
-    const content = fs.readFileSync(envPath, 'utf-8');
-    const env = {};
-    for (const line of content.split('\n')) {
-      const trimmed = line.trim();
-      if (trimmed && !trimmed.startsWith('#')) {
-        const [key, ...valueParts] = trimmed.split('=');
-        if (key && valueParts.length > 0) {
-          env[key.trim()] = valueParts.join('=').trim();
-        }
-      }
-    }
-    return env;
-  } catch {
-    return {};
-  }
-}
-
-const CLAUDE_ENV_PATH = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude', '.env');
-const envFile = loadEnvFile(CLAUDE_ENV_PATH);
-// Also check .claude.json for MCP-configured API key (may be nested under projects)
-const CLAUDE_JSON_PATH = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude.json');
-let mcpApiKey = null;
-try {
-  const claudeJson = JSON.parse(fs.readFileSync(CLAUDE_JSON_PATH, 'utf-8'));
-  // Check root mcpServers
-  mcpApiKey = claudeJson?.mcpServers?.elevenlabs?.env?.ELEVENLABS_API_KEY;
-  // Check projects (Claude Code stores project-specific MCP configs here)
-  if (!mcpApiKey && claudeJson.projects) {
-    for (const [key, value] of Object.entries(claudeJson.projects)) {
-      if (value?.mcpServers?.elevenlabs?.env?.ELEVENLABS_API_KEY) {
-        mcpApiKey = value.mcpServers.elevenlabs.env.ELEVENLABS_API_KEY;
-        break;
-      }
-    }
-  }
-} catch {}
-const API_KEY = process.env.ELEVENLABS_API_KEY || mcpApiKey || envFile.ELEVENLABS_API_KEY;
+const API_KEY = process.env.ELEVENLABS_API_KEY;
 const API_BASE = 'https://api.elevenlabs.io/v1';
 
 // Sarah Agent ID
@@ -98,7 +60,7 @@ async function main() {
   console.log('╚═══════════════════════════════════════════════════════════════╝\n');
 
   if (!API_KEY) {
-    console.error('ERROR: ELEVENLABS_API_KEY not found in environment or ~/.claude/.env');
+    console.error('ERROR: ELEVENLABS_API_KEY not found in environment or ~/.agents/.env');
     process.exit(1);
   }
 

@@ -1,11 +1,12 @@
 const https = require('https');
+const env = require('./lib/env');
 
 const options = {
   hostname: 'n8n.wranngle.com',
   path: '/api/v1/workflows',
   method: 'GET',
   headers: {
-    'X-N8N-API-KEY': process.env.N8N_API_KEY || '***SCRUBBED_N8N_API_KEY***',
+    'X-N8N-API-KEY': env.require('N8N_API_KEY'),
     'Content-Type': 'application/json'
   }
 };

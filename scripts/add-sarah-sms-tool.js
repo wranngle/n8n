@@ -4,21 +4,10 @@
  * Single source of truth: n8n webhook at https://n8n.wranngle.com/webhook/send-sms
  */
 
-const fs = require('fs');
-const path = require('path');
+require('./lib/env');
 
-// Load from centralized credential store
-function loadApiKey() {
-  const envPath = path.join(process.env.USERPROFILE || process.env.HOME, '.claude', '.env');
-  if (fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf8');
-    const match = content.match(/ELEVENLABS_API_KEY=([^\r\n]+)/);
-    if (match) return match[1].trim();
-  }
-  return process.env.ELEVENLABS_API_KEY;
-}
-
-const API_KEY = loadApiKey();
+const API_KEY = process.env.ELEVENLABS_API_KEY;
+const N8N_WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET;
 const AGENT_ID = 'agent_xxxx_demo';
 
 // Tool configuration pointing to n8n webhook (source of truth)
@@ -31,6 +20,9 @@ const SEND_SMS_TOOL = {
     url: "https://n8n.wranngle.com/webhook/send-sms",
     method: "POST",
     content_type: "application/json",
+    request_headers: {
+      "X-Webhook-Secret": N8N_WEBHOOK_SECRET,
+    },
     request_body_schema: {
       type: "object",
       required: ["phone_number", "caller_name"],
@@ -59,7 +51,11 @@ const SEND_SMS_TOOL = {
 
 async function main() {
   if (!API_KEY) {
-    console.error('ERROR: No API key found');
+    console.error('ERROR: No ELEVENLABS_API_KEY found');
+    process.exit(1);
+  }
+  if (!N8N_WEBHOOK_SECRET) {
+    console.error('ERROR: N8N_WEBHOOK_SECRET not set — required to register the SMS tool with auth.');
     process.exit(1);
   }
 

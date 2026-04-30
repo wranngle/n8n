@@ -9,44 +9,12 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('yaml');
+require('./lib/env');
 
 const AGENT_ID = 'agent_xxxx_demo';
 const API_BASE = 'https://api.elevenlabs.io/v1';
 
-// Load API key from multiple sources
-function loadApiKey() {
-  // Check environment first
-  if (process.env.ELEVENLABS_API_KEY) return process.env.ELEVENLABS_API_KEY;
-
-  // Check .claude.json (Claude Code MCP config)
-  const claudeJsonPath = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude.json');
-  try {
-    const claudeJson = JSON.parse(fs.readFileSync(claudeJsonPath, 'utf-8'));
-    if (claudeJson.projects) {
-      for (const [key, value] of Object.entries(claudeJson.projects)) {
-        if (value?.mcpServers?.elevenlabs?.env?.ELEVENLABS_API_KEY) {
-          return value.mcpServers.elevenlabs.env.ELEVENLABS_API_KEY;
-        }
-      }
-    }
-  } catch {}
-
-  // Check ~/.claude/.env
-  const claudeEnvPath = path.join(process.env.USERPROFILE || process.env.HOME || '', '.claude', '.env');
-  try {
-    const content = fs.readFileSync(claudeEnvPath, 'utf-8');
-    for (const line of content.split('\n')) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('ELEVENLABS_API_KEY=')) {
-        return trimmed.split('=').slice(1).join('=').trim();
-      }
-    }
-  } catch {}
-
-  return null;
-}
-
-const API_KEY = loadApiKey();
+const API_KEY = process.env.ELEVENLABS_API_KEY;
 
 // Parse command line args
 const args = process.argv.slice(2);

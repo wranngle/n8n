@@ -1,20 +1,7 @@
 const https = require('https');
-const fs = require('fs');
-const path = require('path');
+require('./lib/env');
 
-// Load API key from ~/.claude/.env
-function loadCredentials() {
-  const envPath = path.join(process.env.USERPROFILE || process.env.HOME, '.claude', '.env');
-  if (fs.existsSync(envPath)) {
-    const content = fs.readFileSync(envPath, 'utf8');
-    const match = content.match(/ELEVENLABS_API_KEY=([^\r\n]+)/);
-    if (match) return match[1].trim();
-  }
-  // Fallback to process.env
-  return process.env.ELEVENLABS_API_KEY;
-}
-
-const API_KEY = loadCredentials();
+const API_KEY = process.env.ELEVENLABS_API_KEY;
 const AGENT_ID = 'agent_xxxx_demo';
 
 if (!API_KEY) {

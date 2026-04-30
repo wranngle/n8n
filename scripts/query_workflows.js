@@ -1,6 +1,7 @@
 const https = require('https');
+const env = require('./lib/env');
 
-const API_KEY = process.env.N8N_API_KEY || '***SCRUBBED_N8N_API_KEY***';
+const API_KEY = env.require('N8N_API_KEY');
 
 const options = {
   hostname: 'n8n.wranngle.com',
