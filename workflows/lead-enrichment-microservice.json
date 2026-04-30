@@ -1,5 +1,5 @@
 {
-  "name": "Lead Enrichment Microservice",
+  "name": "Lead Enrichment Microservice (Clay)",
   "nodes": [
     {
       "id": "webhook-1",
@@ -26,50 +26,24 @@
       }
     },
     {
-      "id": "clearbit-enrich",
-      "name": "Clearbit Enrichment",
+      "id": "clay-enrich",
+      "name": "Clay AI Enrichment",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [650, 300],
       "parameters": {
-        "url": "=https://autocomplete.clearbit.com/v1/companies/suggest?query={{ $json.extracted_domain }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Accept",
-              "value": "application/json"
-            }
-          ]
-        },
-        "options": {}
-      }
-    },
-    {
-      "id": "merge-enrichment",
-      "name": "Merge Enrichment",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [850, 300],
-      "parameters": {
-        "jsCode": "const originalLead = $(\"Extract Domain\").item.json;\nconst clearbitData = $input.item.json;\n\nlet enriched = { ...originalLead };\n\nif (Array.isArray(clearbitData) && clearbitData.length > 0) {\n  const topMatch = clearbitData[0];\n  enriched.company_name = enriched.company_name || topMatch.name;\n  enriched.company_logo = topMatch.logo;\n  enriched.company_domain = topMatch.domain;\n  enriched.enrichment_source = 'clay_n8n';\n  enriched.enriched_at = new Date().toISOString();\n}\n\nreturn enriched;"
-      }
-    },
-    {
-      "id": "ai-research",
-      "name": "Groq AI Research",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [1050, 300],
-      "parameters": {
         "method": "POST",
-        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "url": "https://api.clay.com/v3/search",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $env.GROQ_API_KEY }}"
+              "value": "Bearer {{ $env.CLAY_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
@@ -77,12 +51,8 @@
         "bodyParameters": {
           "parameters": [
             {
-              "name": "model",
-              "value": "llama3-8b-8192"
-            },
-            {
-              "name": "messages",
-              "value": "=[{\"role\": \"system\", \"content\": \"You are an expert sales researcher.\"}, {\"role\": \"user\", \"content\": \"Summarize likely pain points for: {{ $json.company_name || $json.extracted_domain }}\"}]"
+              "name": "domain",
+              "value": "={{ $json.extracted_domain }}"
             }
           ]
         },
@@ -94,9 +64,9 @@
       "name": "Format Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1250, 300],
+      "position": [850, 300],
       "parameters": {
-        "jsCode": "const lead = $(\"Merge Enrichment\").item.json;\nconst aiData = $input.item.json;\n\nreturn {\n  ...lead,\n  ai_research: aiData?.choices?.[0]?.message?.content || 'Research failed',\n  status: 'enriched'\n};"
+        "jsCode": "const lead = $(\"Extract Domain\").item.json;\nconst clayData = $input.item.json;\n\n// Clay usually returns deep enriched data including company info, description, and AI insights if configured\nreturn {\n  ...lead,\n  company_name: clayData.company?.name || lead.company_name || lead.businessName,\n  company_domain: clayData.company?.domain || lead.extracted_domain,\n  company_logo: clayData.company?.logoUrl || null,\n  ai_research: clayData.ai_summary || clayData.company?.description || 'Enriched via Clay AI',\n  enrichment_source: 'clay_official',\n  enriched_at: new Date().toISOString(),\n  status: 'enriched'\n};"
       }
     },
     {
@@ -104,7 +74,7 @@
       "name": "Return Enriched Data",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1450, 300],
+      "position": [1050, 300],
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ $json }}",
@@ -119,15 +89,9 @@
       "main": [[{"node": "Extract Domain", "type": "main", "index": 0}]]
     },
     "Extract Domain": {
-      "main": [[{"node": "Clearbit Enrichment", "type": "main", "index": 0}]]
+      "main": [[{"node": "Clay AI Enrichment", "type": "main", "index": 0}]]
     },
-    "Clearbit Enrichment": {
-      "main": [[{"node": "Merge Enrichment", "type": "main", "index": 0}]]
-    },
-    "Merge Enrichment": {
-      "main": [[{"node": "Groq AI Research", "type": "main", "index": 0}]]
-    },
-    "Groq AI Research": {
+    "Clay AI Enrichment": {
       "main": [[{"node": "Format Response", "type": "main", "index": 0}]]
     },
     "Format Response": {
