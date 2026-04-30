@@ -60,6 +60,11 @@ async function callWebhook(payload, correlationId = null) {
     const data = JSON.stringify(payload);
     const corrId = correlationId || `ultra-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+    const webhookSecret = process.env.N8N_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      throw new Error('N8N_WEBHOOK_SECRET env var is required to call the n8n webhook.');
+    }
+
     const startTime = Date.now();
 
     const req = https.request({
@@ -71,6 +76,7 @@ async function callWebhook(payload, correlationId = null) {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(data),
         'X-Correlation-ID': corrId,
+        'X-Webhook-Secret': webhookSecret,
         'User-Agent': 'ULTRATHINK-Test-Runner/1.0'
       },
       timeout: CONFIG.requestTimeout

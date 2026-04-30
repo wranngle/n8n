@@ -10,9 +10,16 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "pipeline-test",
-        "responseMode": "responseNode"
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
       },
       "webhookId": "pipeline-test",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REDACTED_N8N_CRED_ID",
+          "name": "X-Webhook-Secret"
+        }
+      },
       "notes": "Receives the pipeline test payload."
     },
     {

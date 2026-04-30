@@ -13,7 +13,14 @@
         "httpMethod": "POST",
         "responseMode": "onReceived",
         "responseData": "{ \"success\": true, \"message\": \"Lead received for processing\" }",
+        "authentication": "headerAuth",
         "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REDACTED_N8N_CRED_ID",
+          "name": "X-Webhook-Secret"
+        }
       }
     },
     {
