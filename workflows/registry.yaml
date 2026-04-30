@@ -343,6 +343,21 @@ workflows:
       - name: http_request
         type: output
 
+  elevenlabs-call-completed-presales:
+    path: "voice_ai_agents/templates/elevenlabs-call-completed-presales.json"
+    type: webhook_processor
+    status: active
+    description: "Processes ElevenLabs post-call transcripts and automatically triggers unified-presales-report"
+    serves_processes: []
+    depends_on: []
+    enables: []
+    webhook_path: "/call-completed"
+    integrations:
+      - name: pipedrive
+        type: storage
+      - name: http_request
+        type: output
+
   youtube-rag-pipeline:
     path: "knowledge_management/youtube-rag-pipeline/workflow.json"
     type: scheduled
