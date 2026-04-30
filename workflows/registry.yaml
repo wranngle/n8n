@@ -78,12 +78,12 @@ business_processes:
 
   # Lead Enrichment - Centralized data enrichment microservice
   lead_enrichment:
-    description: "Centralized Clearbit and Groq enrichment for all inbound leads"
+    description: "Centralized Clay AI enrichment for all inbound leads"
     status: production
     workflows:
       - lead-enrichment-microservice
       - lead-intake-main
-    integrations: [webhook, clearbit, groq_api, postgres, email, http_request]
+    integrations: [webhook, clay_api, postgres, email, http_request]
 
   # Knowledge Management - RAG Ingestion and Vector Databases
   knowledge_management:
