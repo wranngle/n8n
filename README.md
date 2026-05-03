@@ -10,6 +10,12 @@ Sanitized n8n workflow library: lead intake, enrichment, post-call processing, a
 - **`tests/`** — workflow integration smoke tests
 - **`context/`** — local knowledge bases (YouTube + Discord research) feeding the workflow generator
 
+## Demo
+
+🎬 _Loom walkthrough coming soon — workflow library tour: lead intake, enrichment, post-call processing, webhook security._
+
+<!-- Replace with: <a href="https://www.loom.com/share/<id>"><img src="https://cdn.loom.com/sessions/thumbnails/<id>-with-play.gif" alt="Workflow library demo"></a> -->
+
 ## Architecture
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the lead intake → CRM → call → post-call flow and how this repo connects to its satellites:
