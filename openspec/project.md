@@ -100,7 +100,7 @@ workflows/
 ├── dev/         # Development/testing (modifiable)
 ├── staging/     # Pre-production
 ├── production/  # Production-ready (read-only promotion)
-└── voice_ai_agents/  # ElevenLabs agent workflows
+└── voice_ai_agent_evals/  # ElevenLabs agent workflows
 ```
 
 **n8n Workflow JSON Structure:**

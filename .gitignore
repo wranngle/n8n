@@ -168,11 +168,23 @@ tmpclaude-*
 /regression-results-*.json
 
 # ===================
-# BMAD OUTPUT
+# BMAD / planning artifacts (never commit — reviewer noise)
 # ===================
-# BMM methodology artifacts (track selectively)
-# Uncomment to ignore all BMAD output
-# _bmad-output/
+_bmad-output/
 
-# Always ignore implementation artifacts (may contain generated code)
-# _bmad-output/implementation-artifacts/
+# ===================
+# Test results / eval state (synthesize fixtures instead)
+# ===================
+test-results/
+old/
+
+# ===================
+# OpenSpec working state (proposals churn — keep specs/ only)
+# ===================
+openspec/changes/
+
+# ===================
+# n8n cloud instance dumps (had verified live keys; never re-add)
+# ===================
+workflows_list.json
+sewy-current-prompt.txt

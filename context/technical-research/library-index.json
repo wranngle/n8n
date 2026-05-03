@@ -32,29 +32,6 @@
       "business_process": "Patient Pre-Registration, Insurance Verification, Smart Scheduling",
       "base_hours": 120
     },
-    "voice-ai-agency-data-storage-infrastructure": {
-      "file": "voice-ai-agency-data-storage-infrastructure.md",
-      "integrations": [
-        "redis",
-        "postgres",
-        "supabase",
-        "airtable",
-        "google-sheets",
-        "elevenlabs",
-        "vapi",
-        "retell",
-        "gohighlevel",
-        "n8n",
-        "firebase",
-        "qdrant"
-      ],
-      "created_at": "2025-12-29",
-      "complexity_score": 5,
-      "effort_tier": "research",
-      "confidence": 0.87,
-      "business_process": "Voice AI agency data storage and infrastructure patterns",
-      "research_type": "infrastructure_analysis"
-    },
     "proactive-inbound-receptionist-automation-2025-12-30": {
       "file": "proactive-inbound-receptionist-automation-2025-12-30.md",
       "integrations": [
@@ -1096,48 +1073,6 @@
     ],
     "hipaa": [
       "orthopedic-patient-intake"
-    ],
-    "redis": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "postgres": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "supabase": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "airtable": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "google-sheets": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "elevenlabs": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "vapi": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "retell": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "gohighlevel": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "ghl": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "firebase": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "qdrant": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "voice-ai": [
-      "voice-ai-agency-data-storage-infrastructure"
-    ],
-    "latency": [
-      "voice-ai-agency-data-storage-infrastructure"
     ],
     "phone-system": [
       "proactive-inbound-receptionist-automation-2025-12-30"

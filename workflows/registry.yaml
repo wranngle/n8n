@@ -33,7 +33,7 @@ business_processes:
     integrations: [ringcentral, pipedrive]
 
   # Voice AI Agents - ElevenLabs + Twilio + Pipedrive integrations
-  voice_ai_agents:
+  voice_ai_agent_evals:
     description: "Commercial lead qualification pipeline with AI voice agents"
     status: production
     workflows:
@@ -175,12 +175,12 @@ workflows:
         credential_env: ".env.pipedrive"
 
   elevenlabs-twilio-client-data:
-    path: "voice_ai_agents/elevenlabs-twilio-client-data.json"
+    path: "voice_ai_agent_evals/elevenlabs-twilio-client-data.json"
     type: ai_agent
     status: deployed
     n8n_id: "5eowJIoZFZOSG85m"
     description: "ElevenLabs outbound calling with client initiation data (MVP)"
-    serves_processes: [voice_ai_agents]
+    serves_processes: [voice_ai_agent_evals]
     depends_on: []
     enables: [elevenlabs-twilio-bulletproof]
     webhook_path: "/initiate-call"
@@ -195,12 +195,12 @@ workflows:
         credential_env: ".env.twilio"
 
   elevenlabs-twilio-bulletproof:
-    path: "voice_ai_agents/elevenlabs-twilio-bulletproof.json"
+    path: "voice_ai_agent_evals/elevenlabs-twilio-bulletproof.json"
     type: ai_agent
     status: active
     n8n_id: "NcP4oEeS3xolYXzC"
     description: "Production-ready outbound calling with retry logic and comprehensive error handling"
-    serves_processes: [voice_ai_agents]
+    serves_processes: [voice_ai_agent_evals]
     depends_on: []
     enables: [elevenlabs-call-completed]
     webhook_path: "/initiate-call-v2"
@@ -223,12 +223,12 @@ workflows:
         credential_env: ".env.twilio"
 
   pipedrive-lead-caller:
-    path: "voice_ai_agents/pipedrive-lead-caller.json"
+    path: "voice_ai_agent_evals/pipedrive-lead-caller.json"
     type: crm_trigger
     status: inactive  # Needs Pipedrive credentials
     n8n_id: "qQmGqBM1pe4QUI05"
     description: "Auto-call new Pipedrive leads via bulletproof workflow"
-    serves_processes: [voice_ai_agents]
+    serves_processes: [voice_ai_agent_evals]
     depends_on: [elevenlabs-twilio-bulletproof]
     enables: []
     integrations:
@@ -238,12 +238,12 @@ workflows:
         credential_env: ".env.pipedrive"
 
   elevenlabs-call-completed:
-    path: "voice_ai_agents/elevenlabs-call-completed.json"
+    path: "voice_ai_agent_evals/elevenlabs-call-completed.json"
     type: webhook_processor
     status: active
     n8n_id: "cEORduJCqCVDOKce"
     description: "Process ElevenLabs post-call webhooks and update Pipedrive with qualification results"
-    serves_processes: [voice_ai_agents]
+    serves_processes: [voice_ai_agent_evals]
     depends_on: [elevenlabs-twilio-bulletproof]
     enables: []
     webhook_path: "/call-completed"
@@ -262,13 +262,13 @@ workflows:
         credential_env: ".env.pipedrive"
 
   transcript-field-extractor:
-    path: "voice_ai_agents/transcript-extraction/transcript-field-extractor.json"
+    path: "voice_ai_agent_evals/transcript-extraction/transcript-field-extractor.json"
     type: ai_agent
     status: archived
     n8n_id: "5hvmE72qa4VYyPOK"
     version: 30
     description: "[ARCHIVED] Original 7-field extractor - replaced by v2"
-    serves_processes: [voice_ai_agents]
+    serves_processes: [voice_ai_agent_evals]
     depends_on: []
     enables: []
     webhook_path: "/extract-transcript"
@@ -283,13 +283,13 @@ workflows:
         docs_cached: true
 
   transcript-field-extractor-v2:
-    path: "voice_ai_agents/transcript-extraction/transcript-field-extractor-v2.json"
+    path: "voice_ai_agent_evals/transcript-extraction/transcript-field-extractor-v2.json"
     type: ai_agent
     status: active
     n8n_id: "54sXqqJVSctlSF6V"
     version: 1
     description: "5-Component Architecture: Extract 22 structured fields from ElevenLabs transcripts using Gemini 2.0 Flash"
-    serves_processes: [voice_ai_agents]
+    serves_processes: [voice_ai_agent_evals]
     depends_on: []
     enables: []
     webhook_path: "/extract-transcript-v2"
@@ -344,7 +344,7 @@ workflows:
         type: output
 
   elevenlabs-call-completed-presales:
-    path: "voice_ai_agents/templates/elevenlabs-call-completed-presales.json"
+    path: "voice_ai_agent_evals/templates/elevenlabs-call-completed-presales.json"
     type: webhook_processor
     status: active
     description: "Processes ElevenLabs post-call transcripts and automatically triggers unified-presales-report"
