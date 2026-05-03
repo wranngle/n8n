@@ -7,7 +7,10 @@
       "name": "Manual Trigger",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [0, 300]
+      "position": [
+        0,
+        300
+      ]
     },
     {
       "parameters": {
@@ -17,13 +20,10 @@
       "name": "Get Metadata",
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
-      "position": [220, 300],
-      "credentials": {
-        "youTubeOAuth2Api": {
-          "id": "youtube_oauth",
-          "name": "YouTube OAuth2 Account"
-        }
-      }
+      "position": [
+        220,
+        300
+      ]
     },
     {
       "parameters": {
@@ -35,23 +35,23 @@
       "name": "Get Comments",
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
-      "position": [440, 300],
-      "credentials": {
-        "youTubeOAuth2Api": {
-          "id": "youtube_oauth",
-          "name": "YouTube OAuth2 Account"
-        }
-      }
+      "position": [
+        440,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const inputItem = $input.first().json;\nlet videoId = inputItem.id;\n\nif (!videoId) {\n  return [{ json: { error: \"No video ID found\" } }];\n}\n\nconst youtubePageUrl = `https://www.youtube.com/watch?v=${videoId}`;\n\ntry {\n  const response = await fetch(youtubePageUrl);\n  if (!response.ok) throw new Error(\"Failed to fetch page\");\n  const body = await response.text();\n\n  const playerResponseMatch = body.match(/ytInitialPlayerResponse = ({.*?});/);\n  if (!playerResponseMatch) throw new Error(\"No player response found\");\n\n  const ytInitialPlayerResponse = JSON.parse(playerResponseMatch[1]);\n  const captionTracks = ytInitialPlayerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;\n\n  if (!captionTracks || captionTracks.length === 0) {\n    return [{ json: { ...inputItem, transcript: \"[No Captions Available]\" } }];\n  }\n\n  const preferredTrack = captionTracks.find(track => track.languageCode === 'en') || captionTracks[0];\n  const transcriptResponse = await fetch(preferredTrack.baseUrl + '&fmt=json3');\n  const transcriptData = await transcriptResponse.json();\n\n  const transcript = transcriptData.events\n    .filter(event => event.segs)\n    .map(event => event.segs.map(seg => seg.utf8).join(' ')\n    .join(' ')\n    .replace(/[\\u200B-\\u200D\\uFEFF]/g, '')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  return [{ json: { ...inputItem, transcript } }];\n\n} catch (error) {\n  return [{ json: { ...inputItem, transcript: \"[Error Fetching Transcript: \" + error.message + \"]\" } }];\n}" 
+        "jsCode": "const inputItem = $input.first().json;\nlet videoId = inputItem.id;\n\nif (!videoId) {\n  return [{ json: { error: \"No video ID found\" } }];\n}\n\nconst youtubePageUrl = `https://www.youtube.com/watch?v=${videoId}`;\n\ntry {\n  const response = await fetch(youtubePageUrl);\n  if (!response.ok) throw new Error(\"Failed to fetch page\");\n  const body = await response.text();\n\n  const playerResponseMatch = body.match(/ytInitialPlayerResponse = ({.*?});/);\n  if (!playerResponseMatch) throw new Error(\"No player response found\");\n\n  const ytInitialPlayerResponse = JSON.parse(playerResponseMatch[1]);\n  const captionTracks = ytInitialPlayerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;\n\n  if (!captionTracks || captionTracks.length === 0) {\n    return [{ json: { ...inputItem, transcript: \"[No Captions Available]\" } }];\n  }\n\n  const preferredTrack = captionTracks.find(track => track.languageCode === 'en') || captionTracks[0];\n  const transcriptResponse = await fetch(preferredTrack.baseUrl + '&fmt=json3');\n  const transcriptData = await transcriptResponse.json();\n\n  const transcript = transcriptData.events\n    .filter(event => event.segs)\n    .map(event => event.segs.map(seg => seg.utf8).join(' ')\n    .join(' ')\n    .replace(/[\\u200B-\\u200D\\uFEFF]/g, '')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  return [{ json: { ...inputItem, transcript } }];\n\n} catch (error) {\n  return [{ json: { ...inputItem, transcript: \"[Error Fetching Transcript: \" + error.message + \"]\" } }];\n}"
       },
       "id": "fetch-transcript",
       "name": "Fetch Transcript (Code)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 300]
+      "position": [
+        660,
+        300
+      ]
     },
     {
       "parameters": {
@@ -71,7 +71,10 @@
       "name": "Format Document",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [880, 300]
+      "position": [
+        880,
+        300
+      ]
     },
     {
       "parameters": {
@@ -82,7 +85,10 @@
       "name": "Text Splitter",
       "type": "n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
-      "position": [1100, 200]
+      "position": [
+        1100,
+        200
+      ]
     },
     {
       "parameters": {
@@ -92,13 +98,10 @@
       "name": "OpenAI Embeddings",
       "type": "n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1,
-      "position": [1100, 400],
-      "credentials": {
-        "openAiApi": {
-          "id": "openai_api",
-          "name": "OpenAI Account"
-        }
-      }
+      "position": [
+        1100,
+        400
+      ]
     },
     {
       "parameters": {
@@ -110,36 +113,89 @@
       "name": "Qdrant Vector Store",
       "type": "n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1,
-      "position": [1100, 0],
-      "credentials": {
-        "qdrantApi": {
-          "id": "qdrant_api",
-          "name": "Qdrant Account"
-        }
-      }
+      "position": [
+        1100,
+        0
+      ]
     }
   ],
   "connections": {
     "Manual Trigger": {
-      "main": [[{"node": "Get Metadata", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Get Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get Metadata": {
-      "main": [[{"node": "Get Comments", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Get Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get Comments": {
-      "main": [[{"node": "Fetch Transcript (Code)", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Fetch Transcript (Code)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Transcript (Code)": {
-      "main": [[{"node": "Format Document", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Format Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Format Document": {
-      "main": [[{"node": "Qdrant Vector Store", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Text Splitter": {
-      "ai_textSplitter": [[{"node": "Qdrant Vector Store", "type": "ai_textSplitter", "index": 0}]]
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
     },
     "OpenAI Embeddings": {
-      "ai_embedding": [[{"node": "Qdrant Vector Store", "type": "ai_embedding", "index": 0}]]
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
