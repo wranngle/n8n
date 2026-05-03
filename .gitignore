@@ -188,3 +188,27 @@ openspec/changes/
 # ===================
 workflows_list.json
 sewy-current-prompt.txt
+
+# ===================
+# Claude Code / Gemini operator-local (keep commands/ committed; ignore everything else)
+# ===================
+.claude/local/
+.claude/worktrees/
+.claude/mcp.json
+.claude/.env
+.claude/settings.json
+.claude/scheduled_tasks*
+.claude/logs/
+.gemini/local/
+.gemini/settings.json
+
+# ===================
+# Playwright MCP runtime + BMAD output (reviewer noise)
+# ===================
+.playwright-mcp/
+.bmad-output/
+
+# ===================
+# Husky auto-managed (we use lefthook now — lefthook.yml is committed)
+# ===================
+.husky/_/
