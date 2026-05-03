@@ -6,20 +6,16 @@
       "name": "Lead Enrichment Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [250, 300],
-      "webhookId": "lead-enrichment",
+      "position": [
+        250,
+        300
+      ],
       "parameters": {
         "path": "lead-enrichment",
         "httpMethod": "POST",
         "responseMode": "responseNode",
         "authentication": "headerAuth",
         "options": {}
-      },
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "REDACTED_N8N_CRED_ID",
-          "name": "X-Webhook-Secret"
-        }
       }
     },
     {
@@ -27,7 +23,10 @@
       "name": "Extract Domain",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [450, 300],
+      "position": [
+        450,
+        300
+      ],
       "parameters": {
         "jsCode": "const lead = $input.item.json;\nconst email = lead.email || lead.company_url || '';\nlet domain = '';\n\nif (email.includes('@')) {\n  domain = email.split('@')[1];\n} else if (email.startsWith('http')) {\n  try {\n    domain = new URL(email).hostname.replace('www.', '');\n  } catch (e) {\n    domain = email;\n  }\n} else {\n  domain = email;\n}\n\nconst freeProviders = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'];\nconst isBusinessEmail = domain && !freeProviders.includes(domain.toLowerCase());\n\nreturn { \n  ...lead, \n  extracted_domain: domain,\n  is_business: isBusinessEmail\n};"
       }
@@ -37,7 +36,10 @@
       "name": "Clay AI Enrichment",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [650, 300],
+      "position": [
+        650,
+        300
+      ],
       "parameters": {
         "method": "POST",
         "url": "https://api.clay.com/v3/search",
@@ -71,7 +73,10 @@
       "name": "Format Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [850, 300],
+      "position": [
+        850,
+        300
+      ],
       "parameters": {
         "jsCode": "const lead = $(\"Extract Domain\").item.json;\nconst clayData = $input.item.json;\n\n// Clay usually returns deep enriched data including company info, description, and AI insights if configured\nreturn {\n  ...lead,\n  company_name: clayData.company?.name || lead.company_name || lead.businessName,\n  company_domain: clayData.company?.domain || lead.extracted_domain,\n  company_logo: clayData.company?.logoUrl || null,\n  ai_research: clayData.ai_summary || clayData.company?.description || 'Enriched via Clay AI',\n  enrichment_source: 'clay_official',\n  enriched_at: new Date().toISOString(),\n  status: 'enriched'\n};"
       }
@@ -81,7 +86,10 @@
       "name": "Return Enriched Data",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1050, 300],
+      "position": [
+        1050,
+        300
+      ],
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ $json }}",
@@ -93,17 +101,51 @@
   ],
   "connections": {
     "Lead Enrichment Webhook": {
-      "main": [[{"node": "Extract Domain", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Extract Domain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Extract Domain": {
-      "main": [[{"node": "Clay AI Enrichment", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Clay AI Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Clay AI Enrichment": {
-      "main": [[{"node": "Format Response", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Format Response": {
-      "main": [[{"node": "Return Enriched Data", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Return Enriched Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "settings": { "executionOrder": "v1" }
+  "settings": {
+    "executionOrder": "v1"
+  }
 }

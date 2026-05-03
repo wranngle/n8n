@@ -6,19 +6,15 @@
       "name": "webhook_trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [250, 300],
+      "position": [
+        250,
+        300
+      ],
       "parameters": {
         "httpMethod": "POST",
         "path": "pipeline-test",
         "responseMode": "responseNode",
         "authentication": "headerAuth"
-      },
-      "webhookId": "pipeline-test",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "REDACTED_N8N_CRED_ID",
-          "name": "X-Webhook-Secret"
-        }
       },
       "notes": "Receives the pipeline test payload."
     },
@@ -27,7 +23,10 @@
       "name": "process_data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [470, 300],
+      "position": [
+        470,
+        300
+      ],
       "parameters": {
         "jsCode": "// Get input data from webhook\nconst items = $input.all();\nconst inputData = items[0].json.body || items[0].json;\n\n// Process the data\nconst result = {\n  received: inputData,\n  processed: true,\n  timestamp: new Date().toISOString(),\n  message: `Processed request with ${Object.keys(inputData).length} fields`\n};\n\nreturn [{ json: result }];"
       },
@@ -38,7 +37,10 @@
       "name": "respond_to_webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [690, 300],
+      "position": [
+        690,
+        300
+      ],
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ { success: true, data: $json, pipeline: 'test-complete' } }}",
@@ -51,10 +53,26 @@
   ],
   "connections": {
     "webhook_trigger": {
-      "main": [[{"node": "process_data", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "process_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "process_data": {
-      "main": [[{"node": "respond_to_webhook", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "respond_to_webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

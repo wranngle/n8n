@@ -5,8 +5,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "test:hooks": "node .claude/hooks/session-init.js",
-    "verify": "node -e \"require('./.claude/hooks/hook-utils.js')\""
+    "verify": "node scripts/verify-workflows.js"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
