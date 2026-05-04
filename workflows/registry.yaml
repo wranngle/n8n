@@ -347,7 +347,7 @@ workflows:
     path: "voice_ai_agent_evals/templates/elevenlabs-call-completed-presales.json"
     type: webhook_processor
     status: active
-    description: "Processes ElevenLabs post-call transcripts and automatically triggers unified-presales-report"
+    description: "Processes ElevenLabs post-call transcripts and automatically triggers gtm_ops"
     serves_processes: []
     depends_on: []
     enables: []
