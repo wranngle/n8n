@@ -64,8 +64,7 @@ For test/verification planning, n8n nodes map to three levels:
 - **Level 5 — Subworkflow execution**: `executeWorkflow`, `executeWorkflowTrigger`, `errorTrigger`, `start`. Test as integration contracts between caller and callee.
 - **Level 6 — Orchestration / triggers**: `webhook`, `manualTrigger`, `scheduleTrigger`, `emailTrigger`, `formTrigger`, `chatTrigger`, `sseWrite`, `workflowTrigger`. Test end-to-end with simulated trigger events.
 
-Verification states ladder: `UNTESTED → RUNTIME → MOCKED → INTEGRATED → VERIFIED`. A workflow's governance phase implies a minimum verification state (DEV→UNTESTED, ALPHA→RUNTIME, BETA→MOCKED, PROD→INTEGRATED, GA/ARCHIVED→VERIFIED) — promotions advance the verification state but never regress it. Full mapping: `.archive/old-claude-hooks/config/n8n_node_hierarchy.json`.
-
+Verification states ladder: `UNTESTED → RUNTIME → MOCKED → INTEGRATED → VERIFIED`. A workflow's governance phase implies a minimum verification state (DEV→UNTESTED, ALPHA→RUNTIME, BETA→MOCKED, PROD→INTEGRATED, GA/ARCHIVED→VERIFIED) — promotions advance the verification state but never regress it.
 ## Naming standards (n8n)
 
 Zero-tolerance naming, enforced at create/update time:
@@ -78,7 +77,7 @@ Exceptions: `old/`, `archive/`, `test-data/`, `fixtures/` paths and `backup_*` /
 
 ## Test discipline for hooks/configs
 
-This repo ships its own hooks and config JSON. When you modify any `hooks/*.ts`, `config/*.json`, `tests/integration/*.ts`, or `utils/*.ts` file, the corresponding integration test suite should be run before declaring done. The mapping (modified file → tests to run) is documented in `.archive/old-claude-hooks/hooks/on-tool-result/auto_test_runner.ts` (the FILE_TO_TEST_MAP); the upshot is "if you can't find a specific mapping, run all `*.integration.test.ts`".
+This repo ships its own hooks and config JSON. When you modify any `hooks/*.ts`, `config/*.json`, `tests/integration/*.ts`, or `utils/*.ts` file, run the corresponding `*.integration.test.ts` suite before declaring done. If you can't find a specific mapping, run all `*.integration.test.ts`.
 
 ### Test completion summary
 Whenever you run a test suite end-to-end, finish with a structured summary so the next agent can pick up cold:
