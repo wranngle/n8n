@@ -1,4 +1,4 @@
-# n8n Workflow Development - Git Ignore
+# n8n Workflow Library - Git Ignore
 
 # ===================
 # CREDENTIALS & SECRETS
@@ -187,7 +187,18 @@ openspec/changes/
 # n8n cloud instance dumps (had verified live keys; never re-add)
 # ===================
 workflows_list.json
-sewy-current-prompt.txt
+*-current-prompt.txt
+
+# Private deployment logs and agent patch scratch
+workflows/deployment-log.jsonl
+patches/
+context/technical-research/*.db
+context/technical-research/*.sqlite
+context/technical-research/*.sqlite3
+context/technical-research/proactive-*
+
+# Local automation policies are operator-specific.
+.automation/
 
 # ===================
 # Claude Code / Gemini operator-local (keep commands/ committed; ignore everything else)

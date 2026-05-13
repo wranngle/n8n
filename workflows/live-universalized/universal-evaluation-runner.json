@@ -1,0 +1,125 @@
+{
+  "name": "Universal Evaluation Runner",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "manual-trigger",
+      "name": "Trigger: Manual Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "set-config",
+      "name": "Transform: Set Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "target",
+              "name": "target_workflow_id",
+              "value": "D4GGMXFGC1PLOUT0",
+              "type": "string"
+            },
+            {
+              "id": "target_name",
+              "name": "target_name",
+              "value": "Get ElevenLabs Agent",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "exec-workflow",
+      "name": "Workflow: Execute Subworkflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "workflowId": "={{ $json.target_workflow_id }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "score-result",
+      "name": "Transform: Score Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Score the workflow execution\nconst config = $('Set Target Workflow').first().json;\nconst result = $input.first().json;\n\nlet score = 0;\nlet details = [];\n\n// Check if execution succeeded\nif (result) {\n  score += 50;\n  details.push('✓ Workflow executed successfully');\n  \n  // Check for expected response fields\n  const resultStr = JSON.stringify(result);\n  if (resultStr.includes('agent_id')) {\n    score += 25;\n    details.push('✓ Contains agent_id');\n  }\n  if (resultStr.includes('name')) {\n    score += 25;\n    details.push('✓ Contains name field');\n  }\n} else {\n  details.push('✗ Workflow execution failed or returned empty');\n}\n\nreturn {\n  workflow_id: config.target_workflow_id,\n  workflow_name: config.target_name,\n  evaluation_id: `eval_${Date.now()}`,\n  completed_at: new Date().toISOString(),\n  score: score,\n  passed: score >= 70,\n  status: score >= 70 ? 'PASS' : 'NEEDS_IMPROVEMENT',\n  details: details,\n  raw_result: result\n};"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger: Manual Start": {
+      "main": [
+        [
+          {
+            "node": "Transform: Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Set Fields": {
+      "main": [
+        [
+          {
+            "node": "Workflow: Execute Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow: Execute Subworkflow": {
+      "main": [
+        [
+          {
+            "node": "Transform: Score Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Manual evaluation runner that dispatches test payloads into target workflows."
+  },
+  "versionCounter": 11
+}

@@ -1,0 +1,322 @@
+{
+  "name": "Conversation Evaluation Endpoint",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "path": "elevenlabs-conversation-eval",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "load-scenarios",
+      "name": "Transform: Load Test Scenarios",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const input = $input.first().json.body || $input.first().json || {};\nconst agentId = input.agent_id || 'agent_8001kdgp7qbyf4wvhs540be78vew';\nconst customScenarios = input.scenarios || null;\n\nconst defaultScenarios = [\n  {\n    id: 'happy_path_booking',\n    name: 'Happy Path - Book Demo',\n    category: 'happy_path',\n    priority: 'critical',\n    simulated_user_prompt: 'You are Mike, a pizza shop owner interested in AI voice agents for taking orders. You are friendly and willing to book a demo. When asked, confirm your name is Mike and agree to receive an SMS.',\n    expected_tool_calls: ['send_sms'],\n    evaluation_criteria: [\n      { id: 'sms_sent', name: 'SMS Tool Called', type: 'prompt', conversation_goal_prompt: 'The agent successfully called the send_sms tool to send a text message', use_knowledge_base: false },\n      { id: 'name_collected', name: 'Name Collected', type: 'prompt', conversation_goal_prompt: 'The agent collected the user first name before sending SMS', use_knowledge_base: false },\n      { id: 'permission_asked', name: 'Permission Asked', type: 'prompt', conversation_goal_prompt: 'The agent asked permission before texting', use_knowledge_base: false }\n    ]\n  },\n  {\n    id: 'decline_sms',\n    name: 'User Declines SMS',\n    category: 'edge_case',\n    priority: 'high',\n    simulated_user_prompt: 'You are interested in AI voice agents but you do NOT want to receive any text messages. Politely decline when offered SMS. End the call without receiving a text.',\n    expected_tool_calls: [],\n    evaluation_criteria: [\n      { id: 'no_sms_sent', name: 'No SMS Sent', type: 'prompt', conversation_goal_prompt: 'The agent did NOT call send_sms after user declined', use_knowledge_base: false },\n      { id: 'graceful_exit', name: 'Graceful Exit', type: 'prompt', conversation_goal_prompt: 'The agent ended the conversation politely', use_knowledge_base: false }\n    ]\n  },\n  {\n    id: 'difficult_user',\n    name: 'Difficult/Hostile User',\n    category: 'stress_test',\n    priority: 'medium',\n    simulated_user_prompt: 'You are impatient and skeptical. Interrupt frequently. Ask aggressive questions about pricing. Test if the agent remains professional.',\n    expected_tool_calls: [],\n    evaluation_criteria: [\n      { id: 'stays_professional', name: 'Stays Professional', type: 'prompt', conversation_goal_prompt: 'The agent remained calm and professional despite hostility', use_knowledge_base: false },\n      { id: 'no_hallucination', name: 'No Hallucination', type: 'prompt', conversation_goal_prompt: 'The agent did not make up information', use_knowledge_base: false }\n    ]\n  }\n];\n\nconst scenarios = customScenarios || defaultScenarios;\nreturn [{ json: { agent_id: agentId, scenarios: scenarios, total_scenarios: scenarios.length, started_at: new Date().toISOString() } }];"
+      }
+    },
+    {
+      "id": "split-scenarios",
+      "name": "Transform: Split Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "fieldToSplitOut": "scenarios",
+        "options": {}
+      }
+    },
+    {
+      "id": "simulate-conversation",
+      "name": "HTTP: Simulate Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/convai/agents/{{ $('Load Test Scenarios').item.json.agent_id }}/simulate-conversation",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ simulation_specification: { simulated_user_config: { first_message: $json.simulated_user_prompt, language: 'en' } }, extra_evaluation_criteria: $json.evaluation_criteria || [], new_turns_limit: 15 }) }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "evaluate-result",
+      "name": "Transform: Evaluate Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const allResults = [];\nconst items = $input.all();\n\nfor (let i = 0; i < items.length; i++) {\n  const response = items[i].json;\n  const scenario = $('Split Scenarios').all()[i]?.json || {};\n  const conversation = response.body?.simulated_conversation || response.simulated_conversation || [];\n  const analysis = response.body?.analysis || response.analysis || {};\n  const evaluation = analysis.evaluation_criteria_results || {};\n  \n  const actualToolCalls = [];\n  for (const turn of conversation) {\n    if (turn.tool_calls && turn.tool_calls.length > 0) {\n      for (const tc of turn.tool_calls) {\n        actualToolCalls.push(tc.tool_name || tc.name);\n      }\n    }\n  }\n  \n  const expectedTools = scenario.expected_tool_calls || [];\n  const actualSet = new Set(actualToolCalls);\n  \n  let toolAccuracy = 100;\n  if (expectedTools.length > 0) {\n    const matched = expectedTools.filter(t => actualSet.has(t)).length;\n    toolAccuracy = (matched / expectedTools.length) * 100;\n  } else if (actualToolCalls.length > 0) {\n    toolAccuracy = 0;\n  }\n  \n  const criteriaResults = [];\n  let criteriaPassed = 0;\n  let criteriaTotal = 0;\n  \n  for (const [criteriaId, result] of Object.entries(evaluation)) {\n    criteriaTotal++;\n    const passed = result.result === 'success' || result.result === true || (result.score && result.score >= 0.7);\n    if (passed) criteriaPassed++;\n    criteriaResults.push({ id: criteriaId, passed: passed, score: result.score || (passed ? 1 : 0), rationale: result.rationale || '' });\n  }\n  \n  const criteriaScore = criteriaTotal > 0 ? (criteriaPassed / criteriaTotal) * 100 : 100;\n  const callSuccessful = analysis.call_successful === 'success';\n  const overallPassed = callSuccessful && toolAccuracy >= 80 && criteriaScore >= 70;\n  \n  let failurePattern = null;\n  if (!overallPassed) {\n    if (!callSuccessful) {\n      failurePattern = 'CALL_FAILED';\n    } else if (toolAccuracy < 80 && expectedTools.includes('send_sms') && !actualSet.has('send_sms')) {\n      failurePattern = 'TOOL_NOT_CALLED';\n    } else if (toolAccuracy < 80 && !expectedTools.includes('send_sms') && actualSet.has('send_sms')) {\n      failurePattern = 'SMS_AFTER_DECLINE';\n    } else if (criteriaScore < 70) {\n      failurePattern = 'CRITERIA_FAILED';\n    } else {\n      failurePattern = 'UNKNOWN';\n    }\n  }\n  \n  const transcript = conversation.map(t => `${t.role}: ${t.message || '[tool call]'}`).join('\\n');\n  \n  allResults.push({ json: { scenario_id: scenario.id, scenario_name: scenario.name, category: scenario.category, priority: scenario.priority, passed: overallPassed, call_successful: callSuccessful, tool_accuracy: toolAccuracy, criteria_score: criteriaScore, expected_tools: expectedTools, actual_tools: actualToolCalls, criteria_results: criteriaResults, failure_pattern: failurePattern, transcript: transcript, turn_count: conversation.length, summary: analysis.transcript_summary || '' } });\n}\n\nreturn allResults;"
+      }
+    },
+    {
+      "id": "aggregate-results",
+      "name": "Transform: Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const results = $input.all().map(i => i.json);\n\nconst passed = results.filter(r => r.passed).length;\nconst failed = results.filter(r => !r.passed).length;\nconst total = results.length;\nconst passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : '0.0';\n\nconst failuresByPattern = {};\nconst failures = results.filter(r => !r.passed);\nfor (const f of failures) {\n  const pattern = f.failure_pattern || 'UNKNOWN';\n  if (!failuresByPattern[pattern]) failuresByPattern[pattern] = [];\n  failuresByPattern[pattern].push({ scenario_id: f.scenario_id, scenario_name: f.scenario_name, category: f.category, transcript: f.transcript, tool_calls: f.actual_tools });\n}\n\nconst patternCounts = Object.entries(failuresByPattern).map(([name, items]) => ({ name, count: items.length })).sort((a, b) => b.count - a.count);\nconst dominantPattern = patternCounts[0]?.name || null;\n\nconst avgToolAccuracy = results.length > 0 ? results.reduce((sum, r) => sum + r.tool_accuracy, 0) / results.length : 100;\nconst avgCriteriaScore = results.length > 0 ? results.reduce((sum, r) => sum + r.criteria_score, 0) / results.length : 100;\n\nconst needsAutocorrection = failed > 0 && (parseFloat(passRate) < 80 || avgToolAccuracy < 85);\n\nreturn [{ json: { summary: { total_scenarios: total, passed: passed, failed: failed, pass_rate: passRate + '%', avg_tool_accuracy: avgToolAccuracy.toFixed(1) + '%', avg_criteria_score: avgCriteriaScore.toFixed(1) + '%' }, failures_by_pattern: failuresByPattern, pattern_counts: patternCounts, dominant_pattern: dominantPattern, needs_autocorrection: needsAutocorrection, agent_id: $('Load Test Scenarios').item.json.agent_id, detailed_results: results, completed_at: new Date().toISOString() } }];"
+      }
+    },
+    {
+      "id": "check-autocorrection",
+      "name": "Route: Needs Autocorrection",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1320,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "yes",
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.needs_autocorrection }}"
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "trigger-autorefinement",
+      "name": "HTTP: Trigger Autorefinement",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1540,
+        200
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.WEBHOOK_BASE_URL }}/webhook/autorefinement-trigger",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ agent_id: $json.agent_id, failures: $json.detailed_results.filter(r => !r.passed), total_tests: $json.summary.total_scenarios, passed_tests: $json.summary.passed, dominant_pattern: $json.dominant_pattern, source: 'elevenlabs-conversation-eval' }) }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          }
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      }
+    },
+    {
+      "id": "respond-with-refinement",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        200
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { status: 'completed_with_autocorrection', evaluation: $('Aggregate Results').item.json, autorefinement: $json } }}"
+      }
+    },
+    {
+      "id": "respond-ok",
+      "name": "Webhook: Return Response Step2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1540,
+        400
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { status: 'completed', evaluation: $json } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Load Test Scenarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Load Test Scenarios": {
+      "main": [
+        [
+          {
+            "node": "Transform: Split Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Split Items": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Simulate Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Simulate Conversation": {
+      "main": [
+        [
+          {
+            "node": "Transform: Evaluate Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Evaluate Result": {
+      "main": [
+        [
+          {
+            "node": "Transform: Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Route: Needs Autocorrection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Needs Autocorrection": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Trigger Autorefinement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Trigger Autorefinement": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Conversation evaluation endpoint for voice-agent QA."
+  },
+  "versionCounter": 59
+}

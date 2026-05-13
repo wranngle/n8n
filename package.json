@@ -1,21 +1,17 @@
 {
-  "name": "n8n-workflow-development",
+  "name": "n8n-workflow-library",
   "version": "2.0.0",
-  "description": "n8n Workflow Development Command Center - Hook-driven deterministic methodology",
+  "description": "Reusable n8n workflow demos and workflow-as-code utilities",
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "verify": "node scripts/verify-workflows.js"
-  },
-  "dependencies": {
-    "js-yaml": "^4.1.0"
+    "export:public": "node scripts/export-public-workflows.js",
+    "verify": "node scripts/verify-workflows.js",
+    "check:scripts": "for f in scripts/*.js scripts/lib/*.js; do [ -f \"$f\" ] && node --check \"$f\"; done"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "author": "wranngle",
-  "license": "MIT",
-  "devDependencies": {
-    "yaml": "^2.8.2"
-  }
+  "license": "MIT"
 }

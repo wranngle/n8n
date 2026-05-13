@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-const https = require('https');
-const env = require('./lib/env');
+const api = require('./lib/n8n-api');
 
 const workflowId = process.argv[2];
 if (!workflowId) {
@@ -8,24 +7,16 @@ if (!workflowId) {
   process.exit(1);
 }
 
-const apiKey = env.require('N8N_API_KEY');
-
-const req = https.request({
-  hostname: 'n8n.wranngle.com',
-  path: `/api/v1/workflows/${workflowId}/activate`,
-  method: 'POST',
-  headers: { 'X-N8N-API-KEY': apiKey }
-}, res => {
-  let data = '';
-  res.on('data', c => data += c);
-  res.on('end', () => {
-    console.log('Status:', res.statusCode);
-    if (res.statusCode === 200) {
-      console.log('Workflow activated successfully');
-    } else {
-      console.log('Response:', data);
-    }
-  });
+(async () => {
+  const res = await api.request('POST', `/api/v1/workflows/${workflowId}/activate`);
+  console.log('Status:', res.status);
+  if (res.status === 200) {
+    console.log('Workflow activated successfully');
+    return;
+  }
+  console.error('Response:', typeof res.body === 'string' ? res.body : JSON.stringify(res.body, null, 2));
+  process.exit(1);
+})().catch(error => {
+  console.error('Error:', error.message);
+  process.exit(1);
 });
-req.on('error', e => console.error('Error:', e.message));
-req.end();

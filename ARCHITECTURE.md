@@ -1,83 +1,87 @@
 # Architecture
 
-This repo is a sanitized library of generic n8n workflows: lead intake, CRM enrichment, post-call processing, and webhook security middleware. ElevenLabs / voice-agent-specific code lives at [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals).
+This repository is organized as a reusable n8n workflow library plus a small workflow-as-code toolchain. The workflows are generic demos derived from real automation patterns, with tenant-specific IDs, credentials, and live operational history kept out of the library.
 
-## Product flow (the workflows in this repo)
+## Library Shape
 
-```
-   ┌──────────────┐
-   │ Lead intake  │   workflows/lead-intake-main.json
-   │ (form / API) │
-   └──────┬───────┘
-          │
-          ▼
-   ┌──────────────────┐
-   │ Enrichment       │   workflows/lead-enrichment-microservice.json
-   │ (CRM context)    │
-   └──────┬───────────┘
-          │
-          ▼
-   ┌──────────────────┐
-   │ Voice routing    │   (handed off to ElevenLabs runtime;
-   │                  │    eval harness lives in voice_ai_agent_evals)
-   └──────┬───────────┘
-          │
-          ▼
-   ┌──────────────────┐
-   │ Post-call        │   workflows/dev/pipeline-test-webhook-processor.json
-   │ (webhook fanout) │
-   └──────────────────┘
-```
-
-## Repo surface
-
-```
+```text
 n8n/
-├── workflows/
-│   ├── lead-intake-main.json
-│   ├── lead-enrichment-microservice.json
-│   ├── dev/                          # development-mode flows
-│   ├── knowledge_management/         # generic knowledge pipelines
-│   ├── governance.yaml               # phase tracking (DEV / ARCHIVED)
-│   └── registry.yaml
-├── scripts/                          # workflow API utilities, governance, security
-│   ├── activate-workflow.js
-│   ├── secure-n8n-webhooks.js        # apply X-Webhook-Secret middleware
-│   ├── secure-internal-callers.js    # patch HTTP Request nodes
-│   ├── governance-engine.js
-│   ├── enforce-governance.ps1
-│   ├── list_workflows.js / .py
-│   ├── update_workflow.py
-│   └── lib/
-├── templates/                        # generic n8n templates
-├── tests/
-├── context/                          # local knowledge bases (YouTube, Discord)
-├── docs/
-│   ├── index.md
-│   └── WEBHOOK_AUTH.md
-└── openspec/
-    ├── AGENTS.md
-    ├── project.md
-    └── specs/
+|-- workflows/
+|   |-- lead-intake-main.json
+|   |-- lead-enrichment-microservice.json
+|   |-- dev/
+|   |-- knowledge_management/
+|   |-- registry.yaml
+|   `-- governance.yaml
+|-- scripts/
+|   |-- convert-workflow.js
+|   |-- verify-workflows.js
+|   |-- governance-engine.js
+|   |-- secure-n8n-webhooks.js
+|   `-- lib/
+|-- context/technical-research/
+`-- docs/
 ```
 
-## Workflow governance
+## Workflow Patterns
 
-- **DEV**: all active development. Modifiable.
-- **ARCHIVED**: deprecated, read-only. Deletion is blocked; archive instead.
-- New workflows auto-tag as DEV.
+### Lead Intake
 
-`workflows/governance.yaml` is the authoritative phase tracker; `scripts/governance-engine.js` enforces it.
+```text
+Webhook intake
+  -> enrichment subworkflow
+  -> database persistence
+  -> email notification
+  -> downstream HTTP handoff
+```
 
-## Webhook authentication
+This pattern demonstrates how to keep the public webhook thin while moving business-specific enrichment into a reusable subworkflow.
 
-Every n8n webhook in this repo requires an `X-Webhook-Secret` header validated against `N8N_WEBHOOK_SECRET`. See [`docs/WEBHOOK_AUTH.md`](docs/WEBHOOK_AUTH.md) for the rotation playbook. ElevenLabs HMAC-signed webhooks (different protocol — HMAC-SHA256 over `<timestamp>.<body>`) are handled in `voice_ai_agent_evals`.
+### Enrichment Microservice
 
-## What this repo does NOT do
+```text
+Webhook request
+  -> normalize domain
+  -> call enrichment provider
+  -> shape response
+  -> respond to caller
+```
 
-- It does not run the live ElevenLabs voice agent (that's the ElevenLabs platform itself).
-- It does not host the eval harness (that's `wranngle/voice_ai_agent_evals`).
-- It does not host the brand design system (that's mirrored from `~/.dotfiles/DESIGN.md` into `wranngle/gtm_ops/DESIGN.md`).
-- It does not generate proposals or PDFs (that's `wranngle/gtm_ops`).
+This pattern is useful when multiple workflows need the same enrichment contract.
 
-This repo is the integration layer — the workflows that wire those things together.
+### Knowledge Ingestion
+
+```text
+Manual trigger
+  -> fetch source metadata
+  -> collect adjacent context
+  -> format a document
+  -> split and embed
+  -> upsert to vector storage
+```
+
+This pattern demonstrates n8n as an ingestion layer for retrieval-backed applications.
+
+## Workflow Lifecycle
+
+The public library has three states:
+
+| State | Meaning |
+|---|---|
+| `draft` | Useful pattern, still being refined or missing import notes |
+| `published` | Ready for readers to import after configuring credentials |
+| `retired` | Kept for reference, not recommended for new imports |
+
+The live n8n tenant can use stricter internal tags and activation rules, but this repo keeps public metadata focused on library readiness.
+
+## Conversion Boundary
+
+Workflow exports should not enter the library directly. Use [`scripts/convert-workflow.js`](scripts/convert-workflow.js) or an equivalent review step to remove runtime fields, credential IDs, webhook IDs, pinned data, static data, and tenant URLs.
+
+The conversion boundary is intentionally conservative: it preserves the workflow graph and expressions, then forces humans or agents to make environment-specific decisions explicit.
+
+## Verification
+
+[`scripts/verify-workflows.js`](scripts/verify-workflows.js) is the CI smoke check. It validates that workflow JSON parses and that reusable library exports do not contain runtime-only fields.
+
+For live-instance deployment, validate with the n8n MCP/API before create or update, then run a manual execution with sample input before activation.

@@ -1,0 +1,432 @@
+{
+  "exportedAt": "2026-05-11T01:59:36.519Z",
+  "exported": [
+    {
+      "name": "Client Intake Data Lookup",
+      "slug": "client-intake-data-lookup",
+      "state": "draft",
+      "summary": "Reusable intake endpoint that assembles client configuration and lookup data.",
+      "path": "workflows/live-universalized/client-intake-data-lookup.json",
+      "nodes": 13,
+      "integrations": [
+        "data-table",
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Lead Intake Form Receiver",
+      "slug": "lead-intake-form-receiver",
+      "state": "published",
+      "summary": "Production-style form receiver with validation, notification, and downstream handoff.",
+      "path": "workflows/live-universalized/lead-intake-form-receiver.json",
+      "nodes": 13,
+      "integrations": [
+        "email",
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Presales Report Generator",
+      "slug": "presales-report-generator",
+      "state": "draft",
+      "summary": "Webhook-driven presales research and report generation workflow.",
+      "path": "workflows/live-universalized/presales-report-generator.json",
+      "nodes": 13,
+      "integrations": [
+        "email",
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Universal Message Sender",
+      "slug": "universal-message-sender",
+      "state": "published",
+      "summary": "Reusable messaging endpoint with routing, provider calls, waits, and response handling.",
+      "path": "workflows/live-universalized/universal-message-sender.json",
+      "nodes": 24,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "SMS Conversation Assistant",
+      "slug": "sms-conversation-assistant",
+      "state": "published",
+      "summary": "SMS assistant workflow for request parsing, routing, and follow-up messaging.",
+      "path": "workflows/live-universalized/sms-conversation-assistant.json",
+      "nodes": 20,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Service Business SMS Assistant",
+      "slug": "service-business-sms-assistant",
+      "state": "draft",
+      "summary": "Service-business SMS assistant demo with Twilio delivery and structured response handling.",
+      "path": "workflows/live-universalized/service-business-sms-assistant.json",
+      "nodes": 13,
+      "integrations": [
+        "twilio",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Email Dispatch Endpoint",
+      "slug": "email-dispatch-endpoint",
+      "state": "draft",
+      "summary": "Authenticated email sending endpoint with validation and response shaping.",
+      "path": "workflows/live-universalized/email-dispatch-endpoint.json",
+      "nodes": 10,
+      "integrations": [
+        "email",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Vector Store Setup Utility",
+      "slug": "vector-store-setup-utility",
+      "state": "draft",
+      "summary": "Utility workflow for creating and validating vector-store infrastructure.",
+      "path": "workflows/live-universalized/vector-store-setup-utility.json",
+      "nodes": 6,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Execution Logger Endpoint",
+      "slug": "execution-logger-endpoint",
+      "state": "draft",
+      "summary": "Small endpoint for capturing workflow execution telemetry.",
+      "path": "workflows/live-universalized/execution-logger-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Slack Notification Endpoint",
+      "slug": "slack-notification-endpoint",
+      "state": "draft",
+      "summary": "Webhook endpoint for formatting and sending operational Slack notifications.",
+      "path": "workflows/live-universalized/slack-notification-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Client Data Lookup Endpoint",
+      "slug": "client-data-lookup-endpoint",
+      "state": "draft",
+      "summary": "Reusable lookup endpoint for workflow composition.",
+      "path": "workflows/live-universalized/client-data-lookup-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Scheduled Wait Loop",
+      "slug": "scheduled-wait-loop",
+      "state": "draft",
+      "summary": "Schedule and webhook controlled wait-loop orchestration pattern.",
+      "path": "workflows/live-universalized/scheduled-wait-loop.json",
+      "nodes": 12,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Outbound Voice Call With Context",
+      "slug": "outbound-voice-call-with-context",
+      "state": "draft",
+      "summary": "Outbound voice-call trigger that enriches requests with client context.",
+      "path": "workflows/live-universalized/outbound-voice-call-with-context.json",
+      "nodes": 13,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Reliable Outbound Voice Caller",
+      "slug": "reliable-outbound-voice-caller",
+      "state": "draft",
+      "summary": "Outbound voice-call endpoint with validation, routing, wait, and response handling.",
+      "path": "workflows/live-universalized/reliable-outbound-voice-caller.json",
+      "nodes": 12,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "CRM Post Call Updater",
+      "slug": "crm-post-call-updater",
+      "state": "draft",
+      "summary": "Post-call workflow that routes call outcomes into CRM updates.",
+      "path": "workflows/live-universalized/crm-post-call-updater.json",
+      "nodes": 28,
+      "integrations": [
+        "pipedrive",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Post Call Event Receiver",
+      "slug": "post-call-event-receiver",
+      "state": "draft",
+      "summary": "Webhook receiver for post-call events with routing and downstream handoff.",
+      "path": "workflows/live-universalized/post-call-event-receiver.json",
+      "nodes": 16,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Post Call Orchestrator",
+      "slug": "post-call-orchestrator",
+      "state": "draft",
+      "summary": "Orchestrates post-call processing across several internal workflow endpoints.",
+      "path": "workflows/live-universalized/post-call-orchestrator.json",
+      "nodes": 8,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "CRM Lead Auto Caller",
+      "slug": "crm-lead-auto-caller",
+      "state": "draft",
+      "summary": "CRM-triggered workflow that starts an outbound call flow for qualified leads.",
+      "path": "workflows/live-universalized/crm-lead-auto-caller.json",
+      "nodes": 7,
+      "integrations": [
+        "http",
+        "pipedrive",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Post Call Self Healing Endpoint",
+      "slug": "post-call-self-healing-endpoint",
+      "state": "draft",
+      "summary": "Endpoint pattern for retrying or repairing failed post-call processing.",
+      "path": "workflows/live-universalized/post-call-self-healing-endpoint.json",
+      "nodes": 5,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Dead Letter Reprocess Endpoint",
+      "slug": "dead-letter-reprocess-endpoint",
+      "state": "draft",
+      "summary": "Dead-letter reprocessing endpoint for failed workflow events.",
+      "path": "workflows/live-universalized/dead-letter-reprocess-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Bulk Web Scraper",
+      "slug": "bulk-web-scraper",
+      "state": "published",
+      "summary": "Bulk URL scraping workflow with fan-out, aggregation, and response shaping.",
+      "path": "workflows/live-universalized/bulk-web-scraper.json",
+      "nodes": 6,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Web Scraper Endpoint",
+      "slug": "web-scraper-endpoint",
+      "state": "published",
+      "summary": "Simple webhook scraping endpoint for single-page extraction.",
+      "path": "workflows/live-universalized/web-scraper-endpoint.json",
+      "nodes": 4,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Stealth Scraper Endpoint",
+      "slug": "stealth-scraper-endpoint",
+      "state": "draft",
+      "summary": "HTTP-backed stealth scraping endpoint pattern.",
+      "path": "workflows/live-universalized/stealth-scraper-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Browser Scraper Endpoint",
+      "slug": "browser-scraper-endpoint",
+      "state": "draft",
+      "summary": "Browser-backed scraping endpoint pattern.",
+      "path": "workflows/live-universalized/browser-scraper-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Fetch Scraper Endpoint",
+      "slug": "fetch-scraper-endpoint",
+      "state": "draft",
+      "summary": "Fetch-backed scraping endpoint pattern.",
+      "path": "workflows/live-universalized/fetch-scraper-endpoint.json",
+      "nodes": 3,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Workflow Test Data Table API",
+      "slug": "workflow-test-data-table-api",
+      "state": "published",
+      "summary": "Workflow-as-code test API using n8n Data Tables for cases and results.",
+      "path": "workflows/live-universalized/workflow-test-data-table-api.json",
+      "nodes": 29,
+      "integrations": [
+        "data-table",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Voice Agent Evaluation Harness",
+      "slug": "voice-agent-evaluation-harness",
+      "state": "published",
+      "summary": "Voice-agent simulation and evaluation harness.",
+      "path": "workflows/live-universalized/voice-agent-evaluation-harness.json",
+      "nodes": 18,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Simulation Review Master Orchestrator",
+      "slug": "simulation-review-master-orchestrator",
+      "state": "draft",
+      "summary": "Master orchestration workflow for simulation review runs.",
+      "path": "workflows/live-universalized/simulation-review-master-orchestrator.json",
+      "nodes": 11,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Simulation Verification Loop",
+      "slug": "simulation-verification-loop",
+      "state": "draft",
+      "summary": "Looping verification workflow with waits, checks, and terminal responses.",
+      "path": "workflows/live-universalized/simulation-verification-loop.json",
+      "nodes": 10,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Conversation Evaluation Endpoint",
+      "slug": "conversation-evaluation-endpoint",
+      "state": "draft",
+      "summary": "Conversation evaluation endpoint for voice-agent QA.",
+      "path": "workflows/live-universalized/conversation-evaluation-endpoint.json",
+      "nodes": 10,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Native Evaluation Runner",
+      "slug": "native-evaluation-runner",
+      "state": "draft",
+      "summary": "n8n-native evaluation runner pattern using evaluation trigger nodes.",
+      "path": "workflows/live-universalized/native-evaluation-runner.json",
+      "nodes": 9,
+      "integrations": [
+        "http",
+        "n8n-evaluation",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Parallel Evaluation Runner",
+      "slug": "parallel-evaluation-runner",
+      "state": "draft",
+      "summary": "Parallel fan-out evaluation runner with aggregation-ready responses.",
+      "path": "workflows/live-universalized/parallel-evaluation-runner.json",
+      "nodes": 6,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Voice Agent Config Lookup",
+      "slug": "voice-agent-config-lookup",
+      "state": "draft",
+      "summary": "Lookup helper for voice-agent configuration.",
+      "path": "workflows/live-universalized/voice-agent-config-lookup.json",
+      "nodes": 4,
+      "integrations": [
+        "http",
+        "webhook"
+      ]
+    },
+    {
+      "name": "Extraction Engine Test Harness",
+      "slug": "extraction-engine-test-harness",
+      "state": "draft",
+      "summary": "Test harness that invokes an extraction subworkflow.",
+      "path": "workflows/live-universalized/extraction-engine-test-harness.json",
+      "nodes": 3,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Pipeline Test Webhook Processor",
+      "slug": "pipeline-test-webhook-processor-live",
+      "state": "draft",
+      "summary": "Live-instance version of the pipeline smoke-test processor.",
+      "path": "workflows/live-universalized/pipeline-test-webhook-processor-live.json",
+      "nodes": 3,
+      "integrations": [
+        "webhook"
+      ]
+    },
+    {
+      "name": "Universal Evaluation Runner",
+      "slug": "universal-evaluation-runner",
+      "state": "draft",
+      "summary": "Manual evaluation runner that dispatches test payloads into target workflows.",
+      "path": "workflows/live-universalized/universal-evaluation-runner.json",
+      "nodes": 4,
+      "integrations": []
+    }
+  ],
+  "skipped": []
+}

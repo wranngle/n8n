@@ -1,0 +1,427 @@
+{
+  "name": "Scheduled Wait Loop",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "schedule-trigger",
+      "name": "Trigger: Schedule Run",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        400
+      ],
+      "parameters": {
+        "path": "autonomous-sleep-loop",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "init-loop",
+      "name": "Transform: Initialize Loop",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Initialize the autonomous improvement loop\nconst input = $input.first().json.body || $input.first().json || {};\n\nconst config = {\n  max_cycles: input.max_cycles || 5,\n  current_cycle: 1,\n  test_limit: input.test_limit || 100,\n  batch_size: input.batch_size || 50,\n  eval_webhook: '{{ $env.WEBHOOK_BASE_URL }}/webhook/parallel-eval-runner-v6',\n  autofix_webhook: '{{ $env.WEBHOOK_BASE_URL }}/webhook/autorefinement-trigger',\n  agent_id: input.agent_id || 'agent_8001kdgp7qbyf4wvhs540be78vew',\n  started_at: new Date().toISOString(),\n  trigger_source: input.trigger_source || 'scheduled',\n  history: []\n};\n\nreturn [{ json: config }];"
+      }
+    },
+    {
+      "id": "run-evaluations",
+      "name": "Transform: Run Evaluations",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Call the parallel evaluation runner\nconst config = $input.first().json;\n\ntry {\n  const evalResponse = await this.helpers.httpRequest({\n    method: 'POST',\n    url: config.eval_webhook,\n    body: {\n      limit: config.test_limit,\n      batch_size: config.batch_size\n    },\n    headers: { 'Content-Type': 'application/json' },\n    json: true,\n    timeout: 300000 // 5 min timeout for 1000 tests\n  });\n  \n  // Record this cycle's result\n  const cycleResult = {\n    cycle: config.current_cycle,\n    pass_rate: evalResponse.summary?.pass_rate || '0%',\n    passed: evalResponse.summary?.passed || 0,\n    failed: evalResponse.summary?.failed || 0,\n    needs_fix: evalResponse.needs_autocorrection || false,\n    timestamp: new Date().toISOString()\n  };\n  \n  config.history.push(cycleResult);\n  config.latest_result = evalResponse;\n  config.needs_autocorrection = evalResponse.needs_autocorrection || false;\n  config.current_pass_rate = evalResponse.summary?.pass_rate || '0%';\n  \n  return [{ json: config }];\n} catch (error) {\n  config.error = error.message;\n  config.needs_autocorrection = false; // Don't autofix on eval error\n  return [{ json: config }];\n}"
+      }
+    },
+    {
+      "id": "check-needs-fix",
+      "name": "Route: Needs Autofix",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "needs_fix",
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.needs_autocorrection }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "condition-1767837896818-avmt0gpe9"
+                  },
+                  {
+                    "leftValue": "={{ $json.current_cycle }}",
+                    "rightValue": "={{ $json.max_cycles }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    },
+                    "id": "condition-1767837896818-zihvu783k"
+                  }
+                ],
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                }
+              }
+            },
+            {
+              "outputKey": "max_cycles",
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.needs_autocorrection }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "condition-1767837896818-o73ibx7n6"
+                  },
+                  {
+                    "leftValue": "={{ $json.current_cycle }}",
+                    "rightValue": "={{ $json.max_cycles }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "id": "condition-1767837896818-j8mhsqpdq"
+                  }
+                ],
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                }
+              }
+            },
+            {
+              "outputKey": "perfect",
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.needs_autocorrection }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "condition-1767837896818-xplnbbk51"
+                  }
+                ],
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                }
+              }
+            }
+          ],
+          "fallbackOutput": "none"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "trigger-autofix",
+      "name": "Transform: Trigger Autorefinement",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Trigger the autorefinement workflow with failure data\nconst config = $input.first().json;\nconst evalResult = config.latest_result;\n\n// Extract failures for autorefinement\nconst failures = [];\nif (evalResult.failures_by_category) {\n  for (const [category, categoryFailures] of Object.entries(evalResult.failures_by_category)) {\n    failures.push(...categoryFailures.slice(0, 5)); // Max 5 per category\n  }\n}\n\ntry {\n  const autofixResponse = await this.helpers.httpRequest({\n    method: 'POST',\n    url: config.autofix_webhook,\n    body: {\n      failures: failures,\n      agent_id: config.agent_id,\n      total_tests: evalResult.summary?.total_tests || 0,\n      passed_tests: evalResult.summary?.passed || 0,\n      cycle: config.current_cycle\n    },\n    headers: { 'Content-Type': 'application/json' },\n    json: true,\n    timeout: 120000 // 2 min for autofix\n  });\n  \n  config.autofix_result = autofixResponse;\n  config.autofix_success = autofixResponse.status === 'success';\n  \n} catch (error) {\n  config.autofix_error = error.message;\n  config.autofix_success = false;\n}\n\n// Increment cycle for next iteration\nconfig.current_cycle += 1;\n\nreturn [{ json: config }];"
+      }
+    },
+    {
+      "id": "wait-propagation",
+      "name": "Wait: Pause Execution",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        200
+      ],
+      "parameters": {
+        "amount": 60,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "loop-back",
+      "name": "Flow: No Operation",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "final-summary-perfect",
+      "name": "Transform: Build Summary Perfect",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        400
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Build final summary - 100% pass rate achieved\nconst config = $input.first().json;\n\nconst summary = {\n  status: 'PERFECT',\n  emoji: '🎉',\n  message: `100% pass rate achieved in ${config.current_cycle} cycle(s)!`,\n  agent_id: config.agent_id,\n  final_pass_rate: config.current_pass_rate,\n  total_cycles: config.current_cycle,\n  started_at: config.started_at,\n  completed_at: new Date().toISOString(),\n  history: config.history,\n  trigger_source: config.trigger_source\n};\n\nreturn [{ json: summary }];"
+      }
+    },
+    {
+      "id": "final-summary-max",
+      "name": "Transform: Build Summary Max Cycles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        500
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Build final summary - max cycles reached without 100%\nconst config = $input.first().json;\n\nconst summary = {\n  status: 'MAX_CYCLES_REACHED',\n  emoji: '⚠️',\n  message: `Max ${config.max_cycles} cycles reached. Manual review needed.`,\n  agent_id: config.agent_id,\n  final_pass_rate: config.current_pass_rate,\n  total_cycles: config.max_cycles,\n  started_at: config.started_at,\n  completed_at: new Date().toISOString(),\n  history: config.history,\n  remaining_failures: config.latest_result?.failure_count || 0,\n  trigger_source: config.trigger_source\n};\n\nreturn [{ json: summary }];"
+      }
+    },
+    {
+      "id": "slack-final",
+      "name": "HTTP: Slack Final Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        450
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/PLACEHOLDER' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"blocks\": [\n    {\n      \"type\": \"header\",\n      \"text\": {\n        \"type\": \"plain_text\",\n        \"text\": \"{{ $json.emoji }} AUTONOMOUS SLEEP LOOP {{ $json.status }}\",\n        \"emoji\": true\n      }\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Status:*\\n{{ $json.status }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Final Pass Rate:*\\n{{ $json.final_pass_rate }}\"\n        }\n      ]\n    },\n    {\n      \"type\": \"section\",\n      \"fields\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Total Cycles:*\\n{{ $json.total_cycles }}\"\n        },\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"*Trigger:*\\n{{ $json.trigger_source }}\"\n        }\n      ]\n    },\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Summary:*\\n{{ $json.message }}\"\n      }\n    },\n    {\n      \"type\": \"divider\"\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"Agent: {{ $json.agent_id }} | Started: {{ $json.started_at }} | Completed: {{ $json.completed_at }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "respond-final",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        450
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $('Slack: Final Result').item.json }}"
+      }
+    }
+  ],
+  "connections": {
+    "Trigger: Schedule Run": {
+      "main": [
+        [
+          {
+            "node": "Transform: Initialize Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Initialize Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Initialize Loop": {
+      "main": [
+        [
+          {
+            "node": "Transform: Run Evaluations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Run Evaluations": {
+      "main": [
+        [
+          {
+            "node": "Route: Needs Autofix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Needs Autofix": {
+      "main": [
+        [
+          {
+            "node": "Transform: Trigger Autorefinement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Build Summary Max Cycles",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Build Summary Perfect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Trigger Autorefinement": {
+      "main": [
+        [
+          {
+            "node": "Wait: Pause Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait: Pause Execution": {
+      "main": [
+        [
+          {
+            "node": "Flow: No Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flow: No Operation": {
+      "main": [
+        [
+          {
+            "node": "Transform: Run Evaluations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Build Summary Perfect": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Slack Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Build Summary Max Cycles": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Slack Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Slack Final Result": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Schedule and webhook controlled wait-loop orchestration pattern."
+  },
+  "versionCounter": 11
+}

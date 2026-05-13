@@ -1,28 +1,14 @@
-const https = require('https');
-const env = require('./lib/env');
+const api = require('./lib/n8n-api');
 
-const options = {
-  hostname: 'n8n.wranngle.com',
-  path: '/api/v1/workflows',
-  method: 'GET',
-  headers: {
-    'X-N8N-API-KEY': env.require('N8N_API_KEY'),
-    'Content-Type': 'application/json'
+(async () => {
+  const res = await api.request('GET', '/api/v1/workflows');
+  if (res.status !== 200) {
+    console.error(`ERROR: HTTP ${res.status}`);
+    console.error(typeof res.body === 'string' ? res.body : JSON.stringify(res.body, null, 2));
+    process.exit(1);
   }
-};
-
-const req = https.request(options, (res) => {
-  let data = '';
-  res.on('data', (chunk) => data += chunk);
-  res.on('end', () => {
-    try {
-      const json = JSON.parse(data);
-      console.log(JSON.stringify(json, null, 2));
-    } catch (e) {
-      console.log(data);
-    }
-  });
+  console.log(JSON.stringify(res.body, null, 2));
+})().catch(error => {
+  console.error('Error:', error.message);
+  process.exit(1);
 });
-
-req.on('error', (e) => console.error('Error:', e.message));
-req.end();

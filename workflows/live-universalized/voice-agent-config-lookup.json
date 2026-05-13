@@ -1,0 +1,133 @@
+{
+  "name": "Voice Agent Config Lookup",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.elevenlabs.io/v1/convai/agents/{{ $json.body?.agent_id || $json.agent_id || 'agent_8001kdgp7qbyf4wvhs540be78vew' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "{{ $env.SECRET_VALUE }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "get-agent",
+      "name": "HTTP: Get Eleven Labs Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eval-get-agent",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, agent: $json.body, status: $json.statusCode } }}",
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "manualTriggerRecordData": true,
+        "jsonInput": "{\n  \"agent_id\": \"agent_5701kdgf9s4vfe9rhe68ntjrms9g\"\n}"
+      },
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        464
+      ],
+      "id": "b8e6303f-30d6-4a56-9015-37edc1501c75",
+      "name": "Trigger: Manual Start",
+      "alwaysOutputData": false
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Get Eleven Labs Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Get Eleven Labs Agent": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger: Manual Start": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Get Eleven Labs Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Lookup helper for voice-agent configuration."
+  },
+  "versionCounter": 46
+}

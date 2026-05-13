@@ -1,0 +1,169 @@
+{
+  "name": "Bulk Web Scraper",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "path": "bulk-scraper",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "split",
+      "name": "Transform: Split Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "fieldToSplitOut": "body.urls"
+      }
+    },
+    {
+      "id": "fetch",
+      "name": "HTTP: Fetch Each",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json['body.urls'] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "code",
+      "name": "Transform: Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nreturn items.map(item => {\n  const html = item.json.data || '';\n  const titleMatch = html.match(/<title>([^<]*)<\\/title>/i);\n  const h1Match = html.match(/<h1[^>]*>([^<]*)<\\/h1>/i);\n  return {\n    json: {\n      url: item.json.url,\n      title: titleMatch ? titleMatch[1].trim() : null,\n      h1: h1Match ? h1Match[1].trim() : null,\n      length: html.length\n    }\n  };\n});"
+      }
+    },
+    {
+      "id": "aggregate",
+      "name": "Transform: Aggregate Items",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "results",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": ""
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Split Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Split Items": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Fetch Each",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Fetch Each": {
+      "main": [
+        [
+          {
+            "node": "Transform: Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Extract": {
+      "main": [
+        [
+          {
+            "node": "Transform: Aggregate Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Aggregate Items": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "published",
+    "summary": "Bulk URL scraping workflow with fan-out, aggregation, and response shaping."
+  },
+  "versionCounter": 10
+}

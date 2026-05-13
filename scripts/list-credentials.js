@@ -1,38 +1,26 @@
-// List n8n credentials
-const https = require('https');
-const env = require('./lib/env');
+#!/usr/bin/env node
+// List n8n credential IDs, names, and types without printing credential data.
+const api = require('./lib/n8n-api');
 
-const apiKey = env.require('N8N_API_KEY');
-
-const options = {
-  hostname: 'n8n.wranngle.com',
-  port: 443,
-  path: '/api/v1/credentials',
-  method: 'GET',
-  headers: {
-    'X-N8N-API-KEY': apiKey
+(async () => {
+  const res = await api.request('GET', '/api/v1/credentials');
+  if (res.status !== 200) {
+    console.error(`ERROR: HTTP ${res.status}`);
+    console.error(typeof res.body === 'string' ? res.body : JSON.stringify(res.body, null, 2));
+    process.exit(1);
   }
-};
 
-const req = https.request(options, (res) => {
-  let data = '';
-  res.on('data', chunk => data += chunk);
-  res.on('end', () => {
-    console.log('Raw response:', data);
-    try {
-      const creds = JSON.parse(data);
-      console.log('\nExisting credentials:');
-      const list = creds.data || creds;
-      if (Array.isArray(list)) {
-        list.forEach(c => console.log(`  - ${c.id}: ${c.name} (${c.type})`));
-      } else {
-        console.log('Response structure:', JSON.stringify(creds, null, 2));
-      }
-    } catch (e) {
-      console.log('Parse error:', e.message);
-    }
+  const list = res.body.data || res.body;
+  if (!Array.isArray(list)) {
+    console.error('Unexpected response:', JSON.stringify(res.body, null, 2));
+    process.exit(1);
+  }
+
+  console.log('Existing credentials:');
+  list.forEach(credential => {
+    console.log(`  - ${credential.id}: ${credential.name} (${credential.type})`);
   });
+})().catch(error => {
+  console.error('Error:', error.message);
+  process.exit(1);
 });
-
-req.on('error', e => console.error(e));
-req.end();

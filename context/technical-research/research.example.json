@@ -1,5 +1,5 @@
 {
-  "_comment": "research.example.json — synthetic placeholder for the gitignored research.db SQLite database. The real DB is gitignored under the *.db pattern. This .example.json captures the schema + 3 sample rows so a reviewer can rebuild a fresh DB on clone.",
+  "_comment": "Example research database export. Real SQLite databases are ignored under the *.db pattern. This file captures the schema and sample rows for local rebuilds.",
   "_rebuild_recipe": "From this file, recreate research.db with: python3 -c \"import json,sqlite3; data=json.load(open('research.example.json')); conn=sqlite3.connect('research.db'); cur=conn.cursor(); [cur.execute(s) for s in data['schema']['statements']]; [cur.execute(f\\\"INSERT INTO {t} ({','.join(rows[0].keys())}) VALUES ({','.join('?'*len(rows[0]))})\\\", tuple(r.values())) for t,rows in data['rows'].items() for r in rows]; conn.commit()\"",
   "schema": {
     "statements": [

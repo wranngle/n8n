@@ -1,703 +1,312 @@
-# Workflow Governance Configuration
-# ==================================
+# Workflow library governance.
 #
-# DEPLOYMENT PHASES (SIMPLIFIED - DEV-ONLY POLICY):
-#   DEV      - All active development, freely modifiable
-#   ARCHIVED - Deprecated/superseded, read-only
-#
-# NOTE: ALPHA/BETA/GA/PROD phases are NOT USED in this organization.
-#       All active workflows must be DEV. When deprecated, move to ARCHIVED.
-#
-# RULES:
-#   - Deletion is BLOCKED (archive instead)
-#   - Only DEV phase workflows exist for active work
-#   - ARCHIVED for deprecated/superseded workflows
-#   - New workflows auto-tagged as DEV
-#   - Superseded workflows must be archived immediately
-#   - LITERAL TAGGING REQUIRED: Workflows must have actual tag objects in JSON, not just name prefixes.
-#   - LITERAL ARCHIVING REQUIRED: Archived workflows must have active: false.
-#   - ENFORCEMENT: scripts/governance-engine.js blocks non-compliant changes.
-#
-# TAG IDs (n8n native tags):
-#   DEV:      Nbnc0KJVYlJeasQJ
-#   ARCHIVED: 4k9QbQQTpxNkOoJQ
+# Live n8n tenants may use stricter phase tags and activation controls. This
+# public registry uses a library lifecycle so readers can tell which examples
+# are import-ready without exposing private runtime metadata.
 
-version: "2.5"
-last_updated: "2026-01-08T14:10:00Z"
+version: "3.0"
+last_updated: "2026-05-10"
 
 settings:
-  deletion_allowed: false
-  default_phase: DEV
-  require_phase_tag: true
-  similarity_threshold: 40
-  clone_threshold: 70
-  # DEV-ONLY POLICY: No ALPHA/BETA/GA/PROD phases allowed
-  allowed_phases: [DEV, ARCHIVED]
+  deletion_allowed_for_live_workflows: false
+  public_default_state: draft
+  allowed_states:
+    - draft
+    - published
+    - retired
+  duplicate_similarity_threshold: 70
 
-# n8n Native Tag IDs (only DEV and ARCHIVED are used)
-tag_ids:
-  DEV: "Nbnc0KJVYlJeasQJ"
-  ARCHIVED: "4k9QbQQTpxNkOoJQ"
-  # DEPRECATED - these tags should not be used:
-  # ALPHA: "QwqvzMfOTEAPn5PP"
-  # BETA: "Vb9lj5OMWWXzMCD1"
-  # GA: "ybOL0I5GqL216cLG"
-  # PROD: "UrBiIMoRnjp1lYyr"
+rules:
+  conversion_required:
+    description: "Workflow exports must pass through the conversion boundary before entering the library."
+    enforced_by:
+      - "scripts/convert-workflow.js"
+      - "scripts/verify-workflows.js"
 
-# Phase definitions (SIMPLIFIED)
-phases:
-  DEV:
-    description: "Development - all active work"
-    color: "#4CAF50"
+  no_runtime_fields:
+    description: "Reusable workflow JSON must not contain credentials, pinData, webhookId, staticData, or meta.instanceId."
+    enforced_by:
+      - "scripts/verify-workflows.js"
+
+  no_hardcoded_secrets:
+    description: "Secrets belong in n8n credentials or environment variables."
+    enforced_by:
+      - "manual review"
+      - "gitleaks"
+
+  no_direct_llm_http:
+    description: "Use n8n LangChain nodes instead of HTTP Request or Code nodes for LLM APIs."
+    enforced_by:
+      - "manual review"
+
+  prefer_switch_routing:
+    description: "Use Switch nodes for new conditional routing workflows."
+    enforced_by:
+      - "manual review"
+
+  archive_live_workflows:
+    description: "Do not delete live workflows to retire them; deactivate and mark retired or archived in the live tenant."
+    enforced_by:
+      - "manual review"
+
+lifecycle:
+  draft:
     modifiable: true
-    deletable: false
+    import_ready: false
+    required_verification:
+      - local_json_parse
 
-  ARCHIVED:
-    description: "Archived - deprecated/superseded, read-only"
-    color: "#757575"
+  published:
+    modifiable: true
+    import_ready: true
+    required_verification:
+      - local_json_parse
+      - public_export_check
+      - import_notes
+
+  retired:
     modifiable: false
-    deletable: false
+    import_ready: false
+    required_verification:
+      - local_json_parse
 
-# Tracked workflows with their current phase
 workflows:
-  # === DEVELOPMENT (All Active Workflows) ===
-  "5eowJIoZFZOSG85m":
-    name: "[DEV] ElevenLabs Twilio Outbound Call with Client Data"
-    phase: DEV
-    active: true
-    description: "ElevenLabs outbound calling + Sarah SMS Tool (dual webhook)"
-    created: "2025-12-27T06:21:37Z"
-    modified: "2025-12-31T00:00:00Z"
-    webhooks:
-      - path: "/webhook/initiate-call"
-        purpose: "Outbound call initiation"
-      - path: "/webhook/send-sms"
-        purpose: "Sarah agent SMS delivery"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-27T06:21:37Z"
-      - action: demoted
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "DEV-only policy: demoted from PROD to DEV"
+  lead-intake-main:
+    state: published
+    path: "workflows/lead-intake-main.json"
+    owner: library
+    notes: "Generic lead intake and enrichment composition demo."
 
-  "NcP4oEeS3xolYXzC":
-    name: "[DEV] ElevenLabs Twilio Outbound - Bulletproof Edition"
-    phase: DEV
-    active: true
-    description: "Production-ready outbound calling with retry logic"
-    created: "2025-12-27T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-27T00:00:00Z"
-      - action: demoted
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "DEV-only policy: demoted from GA to DEV"
+  lead-enrichment-microservice:
+    state: published
+    path: "workflows/lead-enrichment-microservice.json"
+    owner: library
+    notes: "Reusable enrichment endpoint demo."
 
-  "cEORduJCqCVDOKce":
-    name: "[DEV] ElevenLabs Call Completed - Update Pipedrive"
-    phase: DEV
-    active: true
-    description: "Process post-call webhooks and update CRM"
-    created: "2025-12-27T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-27T00:00:00Z"
-      - action: demoted
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "DEV-only policy: demoted from GA to DEV"
+  youtube-rag-pipeline:
+    state: draft
+    path: "workflows/knowledge_management/youtube-rag-pipeline/workflow.json"
+    owner: library
+    notes: "Knowledge ingestion pattern pending fuller import notes."
 
-  "qQmGqBM1pe4QUI05":
-    name: "[DEV] Pipedrive Lead Auto-Caller"
-    phase: DEV
-    active: false
-    description: "Auto-call new Pipedrive leads via bulletproof workflow"
-    created: "2025-12-27T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-27T00:00:00Z"
-      - action: demoted
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "DEV-only policy: demoted from ALPHA to DEV"
+  pipeline-test-webhook-processor:
+    state: draft
+    path: "workflows/dev/pipeline-test-webhook-processor.json"
+    owner: library
+    notes: "Webhook smoke-test workflow."
 
-  # === DEVELOPMENT (continued) ===
-  "wZryG5tdRBFZUNMF":
-    name: "[DEV] Southeastern Wyoming Garage Doors SMS Tool"
-    phase: DEV
-    active: true
-    description: "SMS booking tool for SEWY voice agent"
-    agent_id: "agent_8801kdhbm6ane7wbxrq0vfenmsj9"
-    factory_generated: true
-    created: "2025-12-28T00:00:00Z"
-    modified: "2025-12-28T05:36:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T00:00:00Z"
-        note: "Generated by voice-agent-factory skill"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-28T05:36:00Z"
-        note: "Applied n8n native DEV tag"
+  client-intake-data-lookup:
+    state: draft
+    path: "workflows/live-universalized/client-intake-data-lookup.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "IZIj5oh3VwCVJb34":
-    name: "[ARCHIVED] Voice Agent Tester - Automated Simulation"
-    phase: ARCHIVED
-    active: false
-    description: "Automated testing workflow for voice agents - superseded by v2.0"
-    created: "2025-12-28T00:00:00Z"
-    modified: "2026-01-08T00:00:00Z"
-    archived_reason: "Superseded by Voice Agent Tester v2.0"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-28T05:36:00Z"
-        note: "Applied n8n native DEV tag"
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2026-01-08T00:00:00Z"
-        note: "Tag fixed from DEV to ARCHIVED per governance audit"
+  lead-intake-form-receiver:
+    state: published
+    path: "workflows/live-universalized/lead-intake-form-receiver.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "D4GGMXFGC1PLOUT0":
-    name: "[DEV] Get ElevenLabs Agent"
-    phase: DEV
-    active: false
-    description: "Simple workflow to retrieve an ElevenLabs agent via API"
-    created: "2025-12-28T05:48:09Z"
-    modified: "2025-12-28T05:48:09Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T05:48:09Z"
-        note: "Minimal 2-node workflow per user request"
+  presales-report-generator:
+    state: draft
+    path: "workflows/live-universalized/presales-report-generator.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  # === ARCHIVED (Duplicates) ===
-  "1PEcVXAmWa4hMbHG":
-    name: "Sarah SMS Tool - BULLETPROOF v2.2"
-    phase: ARCHIVED
-    active: false
-    description: "Duplicate - archived for hygiene"
-    archived_reason: "Duplicate of tfie4q0zRL80PpQC"
-    created: "2025-12-28T00:00:00Z"
-    modified: "2025-12-28T05:36:00Z"
-    history:
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2025-12-28T05:36:00Z"
-        note: "Duplicate workflow - archived per governance hygiene"
+  universal-message-sender:
+    state: published
+    path: "workflows/live-universalized/universal-message-sender.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "99IwjxkWI0EOMDF1":
-    name: "Sarah SMS Tool - BULLETPROOF v2.2"
-    phase: ARCHIVED
-    active: false
-    description: "Duplicate - archived for hygiene"
-    archived_reason: "Duplicate of tfie4q0zRL80PpQC"
-    created: "2025-12-28T00:00:00Z"
-    modified: "2025-12-28T05:36:00Z"
-    history:
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2025-12-28T05:36:00Z"
-        note: "Duplicate workflow - archived per governance hygiene"
+  sms-conversation-assistant:
+    state: published
+    path: "workflows/live-universalized/sms-conversation-assistant.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "spdpuSuiFyjBtrgR":
-    name: "Sarah SMS Tool - BULLETPROOF v2.2"
-    phase: ARCHIVED
-    active: false
-    description: "Duplicate - archived for hygiene"
-    archived_reason: "Duplicate of tfie4q0zRL80PpQC"
-    created: "2025-12-28T00:00:00Z"
-    modified: "2025-12-28T05:36:00Z"
-    history:
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2025-12-28T05:36:00Z"
-        note: "Duplicate workflow - archived per governance hygiene"
+  service-business-sms-assistant:
+    state: draft
+    path: "workflows/live-universalized/service-business-sms-assistant.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# === SUPERSYSTEM (Autonomous Self-Improvement) ===
-  "M7ZmLGCxyVOn5QJ6":
-    name: "[DEV] Supersystem - Parallel Evaluation Runner v6"
-    phase: DEV
-    active: true
-    description: "Runs 1000 tests in <60 seconds with parallel execution"
-    created: "2026-01-01T05:22:17Z"
-    webhooks:
-      - path: "/webhook/parallel-eval-runner-v6"
-        purpose: "Trigger evaluation runs"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-01T05:22:17Z"
+  email-dispatch-endpoint:
+    state: draft
+    path: "workflows/live-universalized/email-dispatch-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "c9dFlI51VhvANoEj":
-    name: "[ARCHIVED] Supersystem - Autorefinement Orchestrator v2 (Duplicate)"
-    phase: ARCHIVED
-    active: false
-    description: "Duplicate - archived per governance audit 2026-01-09"
-    archived_reason: "Duplicate of zeQNX4g5mQlE4EQ0"
-    created: "2026-01-01T19:04:06Z"
-    webhooks:
-      - path: "/webhook/autorefinement-trigger"
-        purpose: "Receive failure data for autofix"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-01T19:04:06Z"
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2026-01-09T00:00:00Z"
-        note: "Duplicate archived per governance audit"
+  vector-store-setup-utility:
+    state: draft
+    path: "workflows/live-universalized/vector-store-setup-utility.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "SjItj6uzYSr9rotM":
-    name: "[DEV] Supersystem - Autonomous Sleep Loop"
-    phase: DEV
-    active: false
-    description: "Master orchestrator - runs nightly at midnight, loops until 100%"
-    created: "2026-01-01T18:58:31Z"
-    webhooks:
-      - path: "/webhook/autonomous-sleep-loop"
-        purpose: "Manual trigger for autonomous loop"
-    triggers:
-      - type: schedule
-        cron: "0 0 * * *"
-        purpose: "Nightly at midnight"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-01T18:58:31Z"
+  execution-logger-endpoint:
+    state: draft
+    path: "workflows/live-universalized/execution-logger-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# === SRIS (Self-Referential Improvement System) - Added 2026-01-07 ===
-  "4TqaQ6kORDzZVwVP":
-    name: "[DEV] SRIS - Master Orchestrator"
-    phase: DEV
-    active: true
-    description: "Central orchestrator for SRIS - coordinates evaluation, decision, and action phases"
-    created: "2026-01-07T22:21:22Z"
-    modified: "2026-01-08T01:52:06Z"
-    webhooks:
-      - path: "/webhook/sris-orchestrator"
-        purpose: "SRIS trigger endpoint"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-07T22:21:22Z"
-        note: "SRIS Epic 1 foundation"
-      - action: activated
-        phase: DEV
-        timestamp: "2026-01-08T01:52:06Z"
-        note: "Activated for production use"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  slack-notification-endpoint:
+    state: draft
+    path: "workflows/live-universalized/slack-notification-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "RjLiUAiuUs5XPvBj":
-    name: "[DEV] SRIS - ElevenLabs Conversation Evaluator"
-    phase: DEV
-    active: true
-    description: "Evaluates ElevenLabs voice agent conversations for quality metrics"
-    created: "2026-01-07T22:20:22Z"
-    modified: "2026-01-08T01:52:06Z"
-    webhooks:
-      - path: "/webhook/elevenlabs-conversation-eval"
-        purpose: "Conversation evaluation endpoint"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-07T22:20:22Z"
-        note: "SRIS Epic 3 - ElevenLabs evaluation"
-      - action: activated
-        phase: DEV
-        timestamp: "2026-01-08T01:52:06Z"
-        note: "Activated for production use"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  client-data-lookup-endpoint:
+    state: draft
+    path: "workflows/live-universalized/client-data-lookup-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "KoQChBtjUa5F9bZg":
-    name: "[DEV] SRIS - Verification Loop"
-    phase: DEV
-    active: true
-    description: "Verification and rollback loop for SRIS auto-fixes"
-    created: "2026-01-07T22:21:55Z"
-    modified: "2026-01-08T01:52:07Z"
-    webhooks:
-      - path: "/webhook/verification-loop"
-        purpose: "Verification trigger endpoint"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-07T22:21:55Z"
-        note: "SRIS Epic 6 - Verification system"
-      - action: activated
-        phase: DEV
-        timestamp: "2026-01-08T01:52:07Z"
-        note: "Activated for production use"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  scheduled-wait-loop:
+    state: draft
+    path: "workflows/live-universalized/scheduled-wait-loop.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# === TRANSCRIPT EXTRACTORS ===
-  "54sXqqJVSctlSF6V":
-    name: "[DEV] Transcript Field Extractor v2 - 5-Component Architecture"
-    phase: DEV
-    active: true
-    description: "Advanced transcript extraction with 5-component modular architecture"
-    created: "2025-12-29T06:00:49Z"
-    modified: "2025-12-29T21:39:50Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-29T06:00:49Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  outbound-voice-call-with-context:
+    state: draft
+    path: "workflows/live-universalized/outbound-voice-call-with-context.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "5hvmE72qa4VYyPOK":
-    name: "[DEV] Transcript Field Extractor - AI Agent"
-    phase: DEV
-    active: true
-    description: "AI-powered transcript field extraction using LangChain agent"
-    created: "2025-12-29T02:43:08Z"
-    modified: "2025-12-29T05:49:33Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-29T02:43:08Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  reliable-outbound-voice-caller:
+    state: draft
+    path: "workflows/live-universalized/reliable-outbound-voice-caller.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# === VOICE AGENT TESTING ===
-  "KrqpJuyN8pjTouAo":
-    name: "[DEV] Voice Agent Tester v2.0"
-    phase: DEV
-    active: true
-    description: "Voice agent testing with ElevenLabs simulate-conversation API"
-    created: "2025-12-28T23:38:42Z"
-    modified: "2025-12-28T23:38:42Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T23:38:42Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  crm-post-call-updater:
+    state: draft
+    path: "workflows/live-universalized/crm-post-call-updater.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "NBvO92RVDa8pCK0d":
-    name: "[ARCHIVED] Supersystem - Client Data Lookup (Test - Merged)"
-    phase: ARCHIVED
-    active: false
-    description: "Merged into oik6SebewNAh1cV5 - lacked eval input support"
-    archived_reason: "Merged - oik6SebewNAh1cV5 is canonical (eval-ready with input_phone/input_email support)"
-    created: "2026-01-01T04:50:53Z"
-    modified: "2026-01-09T00:00:00Z"
-    superseded_by: "oik6SebewNAh1cV5"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-01T04:50:53Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  post-call-event-receiver:
+    state: draft
+    path: "workflows/live-universalized/post-call-event-receiver.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "zeQNX4g5mQlE4EQ0":
-    name: "[ARCHIVED] Supersystem - Autorefinement Orchestrator v2 (Merged)"
-    phase: ARCHIVED
-    active: false
-    description: "Merged into dKJYSCGIORtUsTSM - had hardcoded API keys, lacked pattern analysis"
-    archived_reason: "Merged - dKJYSCGIORtUsTSM is canonical (better credentials, pattern analysis)"
-    created: "2026-01-01T05:10:55Z"
-    modified: "2026-01-09T00:00:00Z"
-    superseded_by: "dKJYSCGIORtUsTSM"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-01T05:10:55Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-08T01:55:00Z"
-        note: "Applied DEV tag per governance audit"
+  post-call-orchestrator:
+    state: draft
+    path: "workflows/live-universalized/post-call-orchestrator.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# === ARCHIVED (Additional) ===
-  "8zxKBJH4QiwzhNtf":
-    name: "[ARCHIVED] Single Simulation Test"
-    phase: ARCHIVED
-    active: false
-    description: "Single simulation test workflow - archived"
-    created: "2025-12-28T21:29:18Z"
-    modified: "2026-01-08T00:00:00Z"
-    archived_reason: "Test workflow no longer needed"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T21:29:18Z"
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2026-01-08T00:00:00Z"
-        note: "Archived per governance audit"
+  crm-lead-auto-caller:
+    state: draft
+    path: "workflows/live-universalized/crm-lead-auto-caller.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# Archive summary
-archive:
-  - id: "1PEcVXAmWa4hMbHG"
-    reason: "Duplicate workflow"
-    archived_at: "2025-12-28T05:36:00Z"
-  - id: "99IwjxkWI0EOMDF1"
-    reason: "Duplicate workflow"
-    archived_at: "2025-12-28T05:36:00Z"
-  - id: "spdpuSuiFyjBtrgR"
-    reason: "Duplicate workflow"
-    archived_at: "2025-12-28T05:36:00Z"
-  - id: "8CLfPvHIK10jcyPb"
-    reason: "Superseded - SMS added to dual-webhook workflow"
-    archived_at: "2025-12-28T18:40:00Z"
-  - id: "Xlr1brwbzNPMyTbW"
-    reason: "Superseded by Voice Agent Tester v2.0 (KrqpJuyN8pjTouAo)"
-    archived_at: "2026-01-08T02:15:00Z"
+  post-call-self-healing-endpoint:
+    state: draft
+    path: "workflows/live-universalized/post-call-self-healing-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# Additional tracked workflows (overflow from main workflows section)
-# TODO: Consolidate into main workflows section in next governance refactor
-overflow_workflows:
-  "8CLfPvHIK10jcyPb":
-    name: "[ARCHIVED] Sarah SMS Tool - ElevenLabs Webhook"
-    phase: ARCHIVED
-    active: false
-    description: "Standalone SMS webhook - superseded by 5eowJIoZFZOSG85m dual-webhook"
-    archived_reason: "SMS functionality merged into existing PROD workflow"
-    created: "2025-12-28T18:17:07Z"
-    modified: "2025-12-28T18:40:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T18:17:07Z"
-        note: "Created for Sarah SMS tool"
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2025-12-28T18:40:00Z"
-        note: "Superseded - SMS added to 5eowJIoZFZOSG85m instead"
+  dead-letter-reprocess-endpoint:
+    state: draft
+    path: "workflows/live-universalized/dead-letter-reprocess-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "Xlr1brwbzNPMyTbW":
-    name: "[ARCHIVED] Voice Agent Tester v2.0 - Automated Simulation"
-    phase: ARCHIVED
-    active: false
-    description: "ElevenLabs Conversation Simulation API testing with CI/CD support - superseded by KrqpJuyN8pjTouAo"
-    archived_reason: "Superseded by Voice Agent Tester v2.0 (KrqpJuyN8pjTouAo)"
-    created: "2025-12-28T19:42:31Z"
-    modified: "2026-01-08T02:15:00Z"
-    webhooks:
-      - path: "/webhook/voice-agent-test"
-        purpose: "Manual/CI/CD test trigger"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-28T19:42:31Z"
-        note: "Voice Agent Tester v2.0 with scenario filtering, metrics, and CI/CD integration"
-      - action: archived
-        phase: ARCHIVED
-        timestamp: "2026-01-08T02:15:00Z"
-        note: "Archived per governance audit - superseded by KrqpJuyN8pjTouAo"
+  bulk-web-scraper:
+    state: published
+    path: "workflows/live-universalized/bulk-web-scraper.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  # === SUPERSYSTEM WORKFLOWS (Added 2025-12-31) ===
-  "mwepwjfX27x4uTMu":
-    name: "[DEV] Supersystem - Native Evaluation Runner"
-    phase: DEV
-    active: true
-    description: "Native n8n Evaluations runner for Sarah agent testing (100 test cases)"
-    created: "2025-12-31T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    evaluations:
-      data_table: "supersystem-evaluation-dataset"
-      test_count: 100
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Primary Supersystem evaluation workflow"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Applied n8n native DEV tag"
+  web-scraper-endpoint:
+    state: published
+    path: "workflows/live-universalized/web-scraper-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "oik6SebewNAh1cV5":
-    name: "[DEV] Supersystem - Client Data Lookup (Eval-Ready)"
-    phase: DEV
-    active: false
-    description: "Client data lookup service for evaluation workflows"
-    created: "2025-12-29T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-29T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Applied n8n native DEV tag"
+  stealth-scraper-endpoint:
+    state: draft
+    path: "workflows/live-universalized/stealth-scraper-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "dKJYSCGIORtUsTSM":
-    name: "[DEV] Supersystem - Autorefinement Orchestrator"
-    phase: DEV
-    active: true
-    description: "Orchestrates autorefinement cycles for voice agent prompts"
-    created: "2025-12-30T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-30T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Applied n8n native DEV tag"
+  browser-scraper-endpoint:
+    state: draft
+    path: "workflows/live-universalized/browser-scraper-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "p60GgdEwiDcIrxgp":
-    name: "[DEV] Universal Evaluation Runner v2"
-    phase: DEV
-    active: false
-    description: "Universal evaluation runner for all workflow types"
-    created: "2026-01-08T22:31:14Z"
-    modified: "2026-01-09T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-08T22:31:14Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2026-01-09T00:00:00Z"
-        note: "Added DEV tag per governance audit"
+  fetch-scraper-endpoint:
+    state: draft
+    path: "workflows/live-universalized/fetch-scraper-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "8qlDREZy5qtEGkNK":
-    name: "[DEV] Supersystem - Post-Call Orchestrator (Test)"
-    phase: DEV
-    active: false
-    description: "Test workflow for post-call event orchestration"
-    created: "2025-12-29T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-29T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Applied n8n native DEV tag"
+  workflow-test-data-table-api:
+    state: published
+    path: "workflows/live-universalized/workflow-test-data-table-api.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "ITUFwZq7ixgjTZMJ":
-    name: "[DEV] Supersystem - Slack Notifier (Test)"
-    phase: DEV
-    active: false
-    description: "Test workflow for Slack notification integration"
-    created: "2025-12-29T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-29T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Applied n8n native DEV tag"
+  voice-agent-evaluation-harness:
+    state: published
+    path: "workflows/live-universalized/voice-agent-evaluation-harness.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-  "Ar2lX0cprjeWB4Kd":
-    name: "[DEV] Supersystem - Execution Logger (Test)"
-    phase: DEV
-    active: false
-    description: "Test workflow for execution logging"
-    created: "2025-12-29T00:00:00Z"
-    modified: "2025-12-31T00:00:00Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2025-12-29T00:00:00Z"
-      - action: tagged
-        phase: DEV
-        timestamp: "2025-12-31T00:00:00Z"
-        note: "Applied n8n native DEV tag"
+  simulation-review-master-orchestrator:
+    state: draft
+    path: "workflows/live-universalized/simulation-review-master-orchestrator.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# Pipeline Test Workflow (added 2026-01-07)
-  "paneUFRzPscNvih2":
-    name: "[DEV] Pipeline Test - Webhook Processor"
-    phase: DEV
-    active: true
-    description: "End-to-end pipeline validation workflow - receives POST, processes data, returns JSON"
-    created: "2026-01-07T18:34:28Z"
-    modified: "2026-01-07T19:28:00Z"
-    webhooks:
-      - path: "/webhook/pipeline-test"
-        purpose: "Pipeline validation endpoint"
-    evaluation:
-      test_count: 5
-      pass_rate: 100
-      last_run: "2026-01-07T19:28:39Z"
-    history:
-      - action: created
-        phase: DEV
-        timestamp: "2026-01-07T18:34:28Z"
-        note: "Created for end-to-end pipeline validation"
-      - action: evaluated
-        phase: DEV
-        timestamp: "2026-01-07T19:28:39Z"
-        note: "5/5 test cases passed (100%)"
+  simulation-verification-loop:
+    state: draft
+    path: "workflows/live-universalized/simulation-verification-loop.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# No untracked workflows remaining
-untracked: []
+  conversation-evaluation-endpoint:
+    state: draft
+    path: "workflows/live-universalized/conversation-evaluation-endpoint.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
 
-# ============================================================================
-# KNOWN BUG: n8n-mcp addTag Operation (2026-01-08) [RESOLVED]
-# ============================================================================
-#
-# BUG SUMMARY:
-#   The n8n-mcp server's `addTag` operation in `n8n_update_partial_workflow`
-#   returns success responses but does NOT persist tags to the n8n instance.
-#
-# SYMPTOMS:
-#   - Tool returns: { success: true, operationsApplied: 1 }
-#   - Subsequent n8n_get_workflow shows tags: []
-#   - Tested with both tagId and tagName parameters - same result
-#
-# ROOT CAUSE:
-#   n8n-mcp `addTag` operation does not make the correct API call.
-#   Tags require the dedicated endpoint: PUT /api/v1/workflows/{id}/tags
-#
-# WORKAROUND (SUCCESSFUL):
-#   Direct n8n REST API call via PowerShell:
-#   ```powershell
-#   $body = '[{"id":"tagId"}]'
-#   Invoke-RestMethod -Uri "$baseUrl/workflows/$workflowId/tags" `
-#     -Headers @{"X-N8N-API-KEY"=$apiKey; "Content-Type"="application/json"} `
-#     -Method PUT -Body $body
-#   ```
-#
-# RESOLUTION DATE: 2026-01-08T14:05:00Z
-# RESOLUTION METHOD: Direct API via PowerShell scripts
-# SCRIPTS LOCATION: scripts/add-tags.ps1, scripts/tag-last-workflow.ps1
-#
-# ============================================================================
-# TAG APPLICATION STATUS: COMPLETE (2026-01-08)
-# ============================================================================
-#
-# All 31 workflows now have n8n native tags applied:
-#   - 23 workflows with DEV tag (Nbnc0KJVYlJeasQJ)
-#   - 8 workflows with ARCHIVED tag (4k9QbQQTpxNkOoJQ)
-#
-# Verified via n8n_list_workflows - all tags persisting correctly.
-# ============================================================================
+  native-evaluation-runner:
+    state: draft
+    path: "workflows/live-universalized/native-evaluation-runner.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
+
+  parallel-evaluation-runner:
+    state: draft
+    path: "workflows/live-universalized/parallel-evaluation-runner.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
+
+  voice-agent-config-lookup:
+    state: draft
+    path: "workflows/live-universalized/voice-agent-config-lookup.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
+
+  extraction-engine-test-harness:
+    state: draft
+    path: "workflows/live-universalized/extraction-engine-test-harness.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
+
+  pipeline-test-webhook-processor-live:
+    state: draft
+    path: "workflows/live-universalized/pipeline-test-webhook-processor-live.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."
+
+  universal-evaluation-runner:
+    state: draft
+    path: "workflows/live-universalized/universal-evaluation-runner.json"
+    owner: library
+    notes: "Universalized from a live workflow pattern."

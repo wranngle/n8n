@@ -1,9 +1,9 @@
 {
-  "name": "[DEV] Pipeline Test - Webhook Processor",
+  "name": "Pipeline Test Webhook Processor",
   "nodes": [
     {
       "id": "webhook-trigger",
-      "name": "webhook_trigger",
+      "name": "Webhook: Receive Pipeline Test",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
@@ -20,7 +20,7 @@
     },
     {
       "id": "process-data",
-      "name": "process_data",
+      "name": "Transform: Build Test Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -34,7 +34,7 @@
     },
     {
       "id": "respond-webhook",
-      "name": "respond_to_webhook",
+      "name": "Webhook: Return Test Result",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
@@ -52,22 +52,22 @@
     }
   ],
   "connections": {
-    "webhook_trigger": {
+    "Webhook: Receive Pipeline Test": {
       "main": [
         [
           {
-            "node": "process_data",
+            "node": "Transform: Build Test Response",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "process_data": {
+    "Transform: Build Test Response": {
       "main": [
         [
           {
-            "node": "respond_to_webhook",
+            "node": "Webhook: Return Test Result",
             "type": "main",
             "index": 0
           }
@@ -81,15 +81,6 @@
   "meta": {
     "createdBy": "pipeline-test",
     "createdAt": "2026-01-07T18:40:00Z",
-    "purpose": "End-to-end pipeline validation workflow",
-    "research_proof": "internal-audit-2026-01-08"
-  },
-  "tags": [
-    {
-      "createdAt": "2026-01-08T14:10:00Z",
-      "updatedAt": "2026-01-08T14:10:00Z",
-      "id": "Nbnc0KJVYlJeasQJ",
-      "name": "DEV"
-    }
-  ]
+    "purpose": "End-to-end pipeline validation workflow"
+  }
 }

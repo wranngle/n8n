@@ -1,7 +1,7 @@
-name: 🔬 Research / spike
+name: Research / spike
 description: Investigate, prototype, or evaluate
 title: "research: "
-labels: [t.research, triage]
+labels: [research, triage]
 body:
   - type: markdown
     attributes:
@@ -33,12 +33,12 @@ body:
     attributes:
       label: Area
       options:
-        - core
-        - cli
-        - api
+        - workflows
+        - conversion
+        - verification
         - docs
         - ci
-        - infra
+        - security
         - other
     validations:
       required: true

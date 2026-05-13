@@ -1,494 +1,680 @@
-# Workflow Registry - Central relationship map for n8n workflows
-# This file tracks:
-# - Business processes and their workflows
-# - Many-to-many relationships between workflows
-# - Integration usage across workflows
-# - Documentation cache status
+# Public workflow library registry.
+#
+# This file is intentionally about reusable demo patterns, not live n8n tenant
+# workflow IDs. Runtime IDs, activation state, and customer-specific history
+# belong in private deployment records.
 
-version: "1.1"
-last_updated: "2025-12-29"
+version: "2.0"
+last_updated: "2026-05-10"
 
-# ============================================================================
-# BUSINESS PROCESSES
-# Each process groups related workflows that serve a common business goal
-# ============================================================================
-business_processes:
-  # Example/demo workflows (pre-existing)
-  _demos:
-    description: "Demo and test workflows"
-    status: development
-    workflows:
-      - webhook-echo
-      - get-weather
-      - hello-world-minimal
-      - example-webhook-to-slack
-    integrations: [webhook, openweathermap, slack]
+states:
+  draft:
+    description: "Useful pattern, still being refined or missing import notes."
+  published:
+    description: "Ready to import after credentials and env placeholders are configured."
+  retired:
+    description: "Kept for reference, not recommended for new imports."
 
-  # Sales call logging - sync VoIP calls to CRM
-  sales_call_logging:
-    description: "Log VoIP calls from RingCentral to CRM systems"
-    status: development
-    workflows:
-      - ringcentral-to-pipedrive
-    integrations: [ringcentral, pipedrive]
-
-  # Voice AI Agents - ElevenLabs + Twilio + Pipedrive integrations
-  voice_ai_agent_evals:
-    description: "Commercial lead qualification pipeline with AI voice agents"
-    status: production
-    workflows:
-      - elevenlabs-twilio-client-data
-      - elevenlabs-twilio-bulletproof
-      - pipedrive-lead-caller
-      - elevenlabs-call-completed
-      - transcript-field-extractor
-    integrations: [elevenlabs, twilio, pipedrive, google_gemini]
-    n8n_instance_ids:
-      elevenlabs-twilio-client-data: "5eowJIoZFZOSG85m"
-      elevenlabs-twilio-bulletproof: "NcP4oEeS3xolYXzC"
-      pipedrive-lead-caller: "qQmGqBM1pe4QUI05"
-      elevenlabs-call-completed: "cEORduJCqCVDOKce"
-      transcript-field-extractor: "5hvmE72qa4VYyPOK"
-    commercial_pipeline:
-      agent_id: "agent_5701kdgf9s4vfe9rhe68ntjrms9g"
-      agent_name: "Wranngle Lead Qualifier"
-      phone_number_id: "phnum_1901kdgev877fep99ex5fc5abb3m"
-      webhook_id: "REDACTED_ELEVENLABS_WEBHOOK_ID_3"
-
-  # Supersystem - Autonomous Self-Improving Evaluation Pipeline
-  supersystem:
-    description: "Autonomous evaluation and autorefinement for voice agents"
-    status: development
-    workflows:
-      - parallel-evaluation-runner
-      - autorefinement-orchestrator
-      - autonomous-sleep-loop
-      - client-lookup-test
-    integrations: [elevenlabs, openrouter, slack]
-    n8n_instance_ids:
-      parallel-evaluation-runner: "M7ZmLGCxyVOn5QJ6"
-      autorefinement-orchestrator: "c9dFlI51VhvANoEj"
-      autonomous-sleep-loop: "SjItj6uzYSr9rotM"
-    capabilities:
-      - "1000 tests in <60 seconds"
-      - "Automatic failure pattern detection"
-      - "AI-powered prompt fixes via gemini-3-pro"
-      - "Nightly scheduled runs at midnight"
-      - "Slack notifications on completion"
-
-  # Lead Enrichment - Centralized data enrichment microservice
-  lead_enrichment:
-    description: "Centralized Clay AI enrichment for all inbound leads"
-    status: production
-    workflows:
-      - lead-enrichment-microservice
-      - lead-intake-main
-    integrations: [webhook, clay_api, postgres, email, http_request]
-
-  # Knowledge Management - RAG Ingestion and Vector Databases
-  knowledge_management:
-    description: "Systems for ingesting and vectorizing content for AI knowledge bases"
-    status: development
-    workflows:
-      - youtube-rag-pipeline
-    integrations: [youtube, openai, qdrant]
-
-  # Template: Copy this for new business processes
-  # _template:
-  #   description: "What this process accomplishes"
-  #   status: planning | development | staging | production
-  #   owner: team-or-person
-  #   workflows: []
-  #   integrations: []
-  #   dependencies: []  # Other processes this depends on
-
-# ============================================================================
-# WORKFLOWS
-# Individual workflow metadata and relationships
-# ============================================================================
 workflows:
-  webhook-echo:
-    path: "dev/webhook-echo.json"
-    type: webhook_listener
-    description: "Echo webhook payload for testing"
-    serves_processes: [_demos]
-    depends_on: []
-    enables: []
+  lead-intake-main:
+    name: "Lead Intake Main"
+    path: "workflows/lead-intake-main.json"
+    state: published
+    summary: "Captures inbound lead submissions, enriches the lead, persists it, notifies the team, and hands off to a downstream workflow."
+    patterns:
+      - webhook-intake
+      - subworkflow-composition
+      - crm-enrichment
+      - notification-fanout
     integrations:
-      - name: webhook
-        type: trigger
-        docs_cached: false
-
-  get-weather:
-    path: "dev/get-weather.json"
-    type: data_fetch
-    description: "Fetch weather data demo"
-    serves_processes: [_demos]
-    depends_on: []
-    enables: []
-    integrations:
-      - name: openweathermap
-        type: api
-        docs_cached: false
-        credential_env: ".env.openweathermap"
-
-  hello-world-minimal:
-    path: "dev/hello-world-minimal.json"
-    type: utility
-    description: "Minimal workflow for testing"
-    serves_processes: [_demos]
-    depends_on: []
-    enables: []
-    integrations: []
-
-  example-webhook-to-slack:
-    path: "dev/example-webhook-to-slack.json"
-    type: webhook_processor
-    description: "Webhook to Slack notification"
-    serves_processes: [_demos]
-    depends_on: []
-    enables: []
-    integrations:
-      - name: webhook
-        type: trigger
-        docs_cached: false
-      - name: slack
-        type: output
-        docs_cached: false
-        credential_env: ".env.slack"
-
-  ringcentral-to-pipedrive:
-    path: "sales_call_logging/ringcentral-to-pipedrive/workflow.json"
-    type: data_sync
-    description: "Sync RingCentral call logs to PipeDrive activities"
-    serves_processes: [sales_call_logging]
-    depends_on: []
-    enables: []
-    integrations:
-      - name: ringcentral
-        type: input
-        docs_cached: true
-        credential_env: ".env.ringcentral"
-      - name: pipedrive
-        type: output
-        docs_cached: true
-        credential_env: ".env.pipedrive"
-
-  elevenlabs-twilio-client-data:
-    path: "voice_ai_agent_evals/elevenlabs-twilio-client-data.json"
-    type: ai_agent
-    status: deployed
-    n8n_id: "5eowJIoZFZOSG85m"
-    description: "ElevenLabs outbound calling with client initiation data (MVP)"
-    serves_processes: [voice_ai_agent_evals]
-    depends_on: []
-    enables: [elevenlabs-twilio-bulletproof]
-    webhook_path: "/initiate-call"
-    integrations:
-      - name: elevenlabs
-        type: ai_voice
-        docs_cached: true
-        credential_env: ".env.elevenlabs"
-      - name: twilio
-        type: telephony
-        docs_cached: true
-        credential_env: ".env.twilio"
-
-  elevenlabs-twilio-bulletproof:
-    path: "voice_ai_agent_evals/elevenlabs-twilio-bulletproof.json"
-    type: ai_agent
-    status: active
-    n8n_id: "NcP4oEeS3xolYXzC"
-    description: "Production-ready outbound calling with retry logic and comprehensive error handling"
-    serves_processes: [voice_ai_agent_evals]
-    depends_on: []
-    enables: [elevenlabs-call-completed]
-    webhook_path: "/initiate-call-v2"
-    features:
-      - input_validation
-      - phone_normalization
-      - xss_prevention
-      - exponential_backoff
-      - rate_limit_handling
-      - error_classification
-      - request_tracking
-    integrations:
-      - name: elevenlabs
-        type: ai_voice
-        docs_cached: true
-        credential_env: ".env.elevenlabs"
-      - name: twilio
-        type: telephony
-        docs_cached: true
-        credential_env: ".env.twilio"
-
-  pipedrive-lead-caller:
-    path: "voice_ai_agent_evals/pipedrive-lead-caller.json"
-    type: crm_trigger
-    status: inactive  # Needs Pipedrive credentials
-    n8n_id: "qQmGqBM1pe4QUI05"
-    description: "Auto-call new Pipedrive leads via bulletproof workflow"
-    serves_processes: [voice_ai_agent_evals]
-    depends_on: [elevenlabs-twilio-bulletproof]
-    enables: []
-    integrations:
-      - name: pipedrive
-        type: trigger
-        docs_cached: true
-        credential_env: ".env.pipedrive"
-
-  elevenlabs-call-completed:
-    path: "voice_ai_agent_evals/elevenlabs-call-completed.json"
-    type: webhook_processor
-    status: active
-    n8n_id: "cEORduJCqCVDOKce"
-    description: "Process ElevenLabs post-call webhooks and update Pipedrive with qualification results"
-    serves_processes: [voice_ai_agent_evals]
-    depends_on: [elevenlabs-twilio-bulletproof]
-    enables: []
-    webhook_path: "/call-completed"
-    features:
-      - bant_qualification
-      - call_result_parsing
-      - crm_note_creation
-      - lead_status_update
-    integrations:
-      - name: elevenlabs
-        type: webhook_source
-        docs_cached: true
-      - name: pipedrive
-        type: output
-        docs_cached: true
-        credential_env: ".env.pipedrive"
-
-  transcript-field-extractor:
-    path: "voice_ai_agent_evals/transcript-extraction/transcript-field-extractor.json"
-    type: ai_agent
-    status: archived
-    n8n_id: "5hvmE72qa4VYyPOK"
-    version: 30
-    description: "[ARCHIVED] Original 7-field extractor - replaced by v2"
-    serves_processes: [voice_ai_agent_evals]
-    depends_on: []
-    enables: []
-    webhook_path: "/extract-transcript"
-    tests_passed: ["extraction", "custom_schema", "error_handling", "validation"]
-    last_updated: "2025-12-29"
-    integrations:
-      - name: elevenlabs
-        type: ai_voice
-        docs_cached: true
-      - name: google_gemini
-        type: ai_llm
-        docs_cached: true
-
-  transcript-field-extractor-v2:
-    path: "voice_ai_agent_evals/transcript-extraction/transcript-field-extractor-v2.json"
-    type: ai_agent
-    status: active
-    n8n_id: "54sXqqJVSctlSF6V"
-    version: 1
-    description: "5-Component Architecture: Extract 22 structured fields from ElevenLabs transcripts using Gemini 2.0 Flash"
-    serves_processes: [voice_ai_agent_evals]
-    depends_on: []
-    enables: []
-    webhook_path: "/extract-transcript-v2"
-    architecture: "5-component-bulk-prompt"
-    components:
-      - "A: Conversation Transcript RAW"
-      - "B: Agent System Prompt"
-      - "C: Response Schema (22 fields)"
-      - "D: Extraction Instructions (micro-prompts)"
-      - "E: Agent Configuration (full spec)"
-    tests_passed: ["e2e_extraction", "22_field_schema", "5_component_verification"]
-    last_updated: "2025-12-29"
-    integrations:
-      - name: elevenlabs
-        type: ai_voice
-        docs_cached: true
-      - name: google_gemini
-        type: ai_llm
-        model: "gemini-3-pro-preview"
-        docs_cached: true
+      - webhook
+      - execute-workflow
+      - postgres
+      - email
+      - http
+    required_env:
+      - WEBHOOK_BASE_URL
+      - N8N_WEBHOOK_SECRET
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
   lead-enrichment-microservice:
-    path: "lead-enrichment-microservice.json"
-    type: webhook_processor
-    status: active
-    description: "Centralized data enrichment using Clearbit and Groq"
-    serves_processes: [lead_enrichment]
-    depends_on: []
-    enables: []
-    webhook_path: "/lead-enrichment"
+    name: "Lead Enrichment Microservice"
+    path: "workflows/lead-enrichment-microservice.json"
+    state: published
+    summary: "Normalizes a lead domain, calls an enrichment provider, and returns a compact enriched payload to callers."
+    patterns:
+      - reusable-webhook-service
+      - data-normalization
+      - external-api-enrichment
+      - response-shaping
     integrations:
-      - name: clearbit
-        type: data_enrichment
-      - name: groq_api
-        type: ai_llm
-
-  lead-intake-main:
-    path: "lead-intake-main.json"
-    type: webhook_processor
-    status: active
-    description: "Main lead intake orchestrator calling the enrichment service"
-    serves_processes: [lead_enrichment]
-    depends_on: [lead-enrichment-microservice]
-    enables: []
-    webhook_path: "/wranngle-intake-form"
-    integrations:
-      - name: postgres
-        type: storage
-      - name: email
-        type: output
-      - name: http_request
-        type: output
-
-  elevenlabs-call-completed-presales:
-    path: "voice_ai_agent_evals/templates/elevenlabs-call-completed-presales.json"
-    type: webhook_processor
-    status: active
-    description: "Processes ElevenLabs post-call transcripts and automatically triggers gtm_ops"
-    serves_processes: []
-    depends_on: []
-    enables: []
-    webhook_path: "/call-completed"
-    integrations:
-      - name: pipedrive
-        type: storage
-      - name: http_request
-        type: output
+      - webhook
+      - code
+      - http
+      - respond-to-webhook
+    required_env:
+      - CLAY_API_KEY
+      - N8N_WEBHOOK_SECRET
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
   youtube-rag-pipeline:
-    path: "knowledge_management/youtube-rag-pipeline/workflow.json"
-    type: scheduled
-    status: development
-    description: "Complete YouTube ingestion pipeline: Metadata, Comments, and Scraped Transcripts vectorized into Qdrant"
-    serves_processes: [knowledge_management]
-    depends_on: []
-    enables: []
+    name: "YouTube RAG Ingestion Pipeline"
+    path: "workflows/knowledge_management/youtube-rag-pipeline/workflow.json"
+    state: draft
+    summary: "Ingests video metadata, adjacent context, and transcript text into a vector store for retrieval-backed workflows."
+    patterns:
+      - knowledge-ingestion
+      - transcript-processing
+      - document-chunking
+      - vector-upsert
     integrations:
-      - name: youtube
-        type: api
-        docs_cached: true
-      - name: openai
-        type: ai_embeddings
-        docs_cached: true
-      - name: qdrant
-        type: vector_store
-        docs_cached: true
+      - youtube
+      - code
+      - langchain-text-splitter
+      - openai-embeddings
+      - qdrant
+    required_env:
+      - QDRANT_URL
+      - QDRANT_API_KEY
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-# ============================================================================
-# INTEGRATIONS
-# Tracked integrations and their documentation status
-# ============================================================================
-integrations:
-  # Core integrations used across workflows
-  webhook:
-    n8n_node: "n8n-nodes-base.webhook"
-    used_by: [webhook-echo, example-webhook-to-slack]
-    docs_cached: false
-    docs_path: null
+  pipeline-test-webhook-processor:
+    name: "Pipeline Test Webhook Processor"
+    path: "workflows/dev/pipeline-test-webhook-processor.json"
+    state: draft
+    summary: "Minimal authenticated webhook processor for testing request parsing, response shape, and deployment plumbing."
+    patterns:
+      - webhook-smoke-test
+      - request-normalization
+      - deterministic-response
+    integrations:
+      - webhook
+      - code
+      - respond-to-webhook
+    required_env:
+      - N8N_WEBHOOK_SECRET
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  openweathermap:
-    n8n_node: "n8n-nodes-base.openWeatherMap"
-    used_by: [get-weather]
-    docs_cached: false
-    docs_path: null
-    api_base: "https://api.openweathermap.org"
+  client-intake-data-lookup:
+    name: "Client Intake Data Lookup"
+    path: "workflows/live-universalized/client-intake-data-lookup.json"
+    state: draft
+    summary: "Reusable intake endpoint that assembles client configuration and lookup data."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - data-table
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  slack:
-    n8n_node: "n8n-nodes-base.slack"
-    used_by: [example-webhook-to-slack]
-    docs_cached: false
-    docs_path: null
-    auth_type: oauth2
+  lead-intake-form-receiver:
+    name: "Lead Intake Form Receiver"
+    path: "workflows/live-universalized/lead-intake-form-receiver.json"
+    state: published
+    summary: "Production-style form receiver with validation, notification, and downstream handoff."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - email
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  ringcentral:
-    n8n_node: null  # No native node - uses HTTP Request
-    used_by: [ringcentral-to-pipedrive]
-    docs_cached: true
-    docs_cached_date: "2025-12-20"
-    docs_path: "sales_call_logging/ringcentral-to-pipedrive/docs/ringcentral/"
-    auth_type: jwt
-    api_base: "https://platform.ringcentral.com/restapi/v1.0"
+  presales-report-generator:
+    name: "Presales Report Generator"
+    path: "workflows/live-universalized/presales-report-generator.json"
+    state: draft
+    summary: "Webhook-driven presales research and report generation workflow."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - email
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  pipedrive:
-    n8n_node: "n8n-nodes-base.pipedrive"
-    used_by: [ringcentral-to-pipedrive]
-    docs_cached: true
-    docs_cached_date: "2025-12-20"
-    docs_path: "sales_call_logging/ringcentral-to-pipedrive/docs/pipedrive/"
-    auth_type: api_token
-    api_base: "https://api.pipedrive.com/v1"
+  universal-message-sender:
+    name: "Universal Message Sender"
+    path: "workflows/live-universalized/universal-message-sender.json"
+    state: published
+    summary: "Reusable messaging endpoint with routing, provider calls, waits, and response handling."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  elevenlabs:
-    n8n_node: null  # No native node - uses HTTP Request
-    used_by: [elevenlabs-twilio-client-data, elevenlabs-twilio-bulletproof, transcript-field-extractor]
-    docs_cached: true
-    docs_cached_date: "2025-12-27"
-    docs_path: "docs/elevenlabs-twilio-failure-modes.md"
-    auth_type: api_key
-    api_base: "https://api.elevenlabs.io"
-    notes: "MCP server available: mcp__elevenlabs-mcp"
-    api_endpoints:
-      - path: "/v1/convai/twilio/outbound-call"
-        method: POST
-        purpose: "Initiate outbound call with client data"
+  sms-conversation-assistant:
+    name: "SMS Conversation Assistant"
+    path: "workflows/live-universalized/sms-conversation-assistant.json"
+    state: published
+    summary: "SMS assistant workflow for request parsing, routing, and follow-up messaging."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  google_gemini:
-    n8n_node: null # Using HTTP Request for bulk prompt
-    used_by: [transcript-field-extractor]
-    docs_cached: true
-    docs_cached_date: "2025-12-28"
-    auth_type: api_key
-    api_base: "https://generativelanguage.googleapis.com"
-    api_endpoints:
-      - path: "/v1beta/models/gemini-3-pro:generateContent"
-        method: POST
-        purpose: "LLM content generation and extraction"
+  service-business-sms-assistant:
+    name: "Service Business SMS Assistant"
+    path: "workflows/live-universalized/service-business-sms-assistant.json"
+    state: draft
+    summary: "Service-business SMS assistant demo with Twilio delivery and structured response handling."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - twilio
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-  twilio:
-    n8n_node: "n8n-nodes-base.twilio"
-    used_by: [elevenlabs-twilio-client-data, elevenlabs-twilio-bulletproof]
-    docs_cached: true
-    docs_cached_date: "2025-12-27"
-    docs_path: "docs/elevenlabs-twilio-failure-modes.md"
-    auth_type: basic  # Account SID + Auth Token
-    api_base: "https://api.twilio.com"
-    notes: "Phone number must be linked to ElevenLabs for outbound calls"
+  email-dispatch-endpoint:
+    name: "Email Dispatch Endpoint"
+    path: "workflows/live-universalized/email-dispatch-endpoint.json"
+    state: draft
+    summary: "Authenticated email sending endpoint with validation and response shaping."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - email
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-# ============================================================================
-# WORKFLOW TYPES
-# Standard types for categorization
-# ============================================================================
-workflow_types:
-  webhook_listener: "Receives external webhooks, minimal processing"
-  webhook_processor: "Receives webhooks, processes and routes data"
-  data_fetch: "Pulls data from external APIs"
-  data_sync: "Bidirectional sync between systems"
-  notification: "Sends notifications/alerts"
-  utility: "Helper workflows called by others"
-  ai_agent: "AI/LLM powered workflows"
-  scheduled: "Cron/schedule triggered workflows"
+  vector-store-setup-utility:
+    name: "Vector Store Setup Utility"
+    path: "workflows/live-universalized/vector-store-setup-utility.json"
+    state: draft
+    summary: "Utility workflow for creating and validating vector-store infrastructure."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-# ============================================================================
-# SHARED RESOURCES
-# Reusable subworkflows and utilities
-# ============================================================================
-shared:
-  error_handlers: []
-  notification_dispatchers: []
-  data_transformers: []
+  execution-logger-endpoint:
+    name: "Execution Logger Endpoint"
+    path: "workflows/live-universalized/execution-logger-endpoint.json"
+    state: draft
+    summary: "Small endpoint for capturing workflow execution telemetry."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
 
-# ============================================================================
-# PENDING DOCUMENTATION
-# Queue of integrations needing docs retrieval
-# ============================================================================
-docs_queue:
-  - integration: openweathermap
-    priority: low
-    reason: "Demo workflow"
-  - integration: slack
-    priority: medium
-    reason: "Common integration"
-  # elevenlabs and twilio removed - documented in docs/elevenlabs-twilio-failure-modes.md
+  slack-notification-endpoint:
+    name: "Slack Notification Endpoint"
+    path: "workflows/live-universalized/slack-notification-endpoint.json"
+    state: draft
+    summary: "Webhook endpoint for formatting and sending operational Slack notifications."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  client-data-lookup-endpoint:
+    name: "Client Data Lookup Endpoint"
+    path: "workflows/live-universalized/client-data-lookup-endpoint.json"
+    state: draft
+    summary: "Reusable lookup endpoint for workflow composition."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  scheduled-wait-loop:
+    name: "Scheduled Wait Loop"
+    path: "workflows/live-universalized/scheduled-wait-loop.json"
+    state: draft
+    summary: "Schedule and webhook controlled wait-loop orchestration pattern."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  outbound-voice-call-with-context:
+    name: "Outbound Voice Call With Context"
+    path: "workflows/live-universalized/outbound-voice-call-with-context.json"
+    state: draft
+    summary: "Outbound voice-call trigger that enriches requests with client context."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  reliable-outbound-voice-caller:
+    name: "Reliable Outbound Voice Caller"
+    path: "workflows/live-universalized/reliable-outbound-voice-caller.json"
+    state: draft
+    summary: "Outbound voice-call endpoint with validation, routing, wait, and response handling."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  crm-post-call-updater:
+    name: "CRM Post Call Updater"
+    path: "workflows/live-universalized/crm-post-call-updater.json"
+    state: draft
+    summary: "Post-call workflow that routes call outcomes into CRM updates."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - pipedrive
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  post-call-event-receiver:
+    name: "Post Call Event Receiver"
+    path: "workflows/live-universalized/post-call-event-receiver.json"
+    state: draft
+    summary: "Webhook receiver for post-call events with routing and downstream handoff."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  post-call-orchestrator:
+    name: "Post Call Orchestrator"
+    path: "workflows/live-universalized/post-call-orchestrator.json"
+    state: draft
+    summary: "Orchestrates post-call processing across several internal workflow endpoints."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  crm-lead-auto-caller:
+    name: "CRM Lead Auto Caller"
+    path: "workflows/live-universalized/crm-lead-auto-caller.json"
+    state: draft
+    summary: "CRM-triggered workflow that starts an outbound call flow for qualified leads."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - pipedrive
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  post-call-self-healing-endpoint:
+    name: "Post Call Self Healing Endpoint"
+    path: "workflows/live-universalized/post-call-self-healing-endpoint.json"
+    state: draft
+    summary: "Endpoint pattern for retrying or repairing failed post-call processing."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  dead-letter-reprocess-endpoint:
+    name: "Dead Letter Reprocess Endpoint"
+    path: "workflows/live-universalized/dead-letter-reprocess-endpoint.json"
+    state: draft
+    summary: "Dead-letter reprocessing endpoint for failed workflow events."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  bulk-web-scraper:
+    name: "Bulk Web Scraper"
+    path: "workflows/live-universalized/bulk-web-scraper.json"
+    state: published
+    summary: "Bulk URL scraping workflow with fan-out, aggregation, and response shaping."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  web-scraper-endpoint:
+    name: "Web Scraper Endpoint"
+    path: "workflows/live-universalized/web-scraper-endpoint.json"
+    state: published
+    summary: "Simple webhook scraping endpoint for single-page extraction."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  stealth-scraper-endpoint:
+    name: "Stealth Scraper Endpoint"
+    path: "workflows/live-universalized/stealth-scraper-endpoint.json"
+    state: draft
+    summary: "HTTP-backed stealth scraping endpoint pattern."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  browser-scraper-endpoint:
+    name: "Browser Scraper Endpoint"
+    path: "workflows/live-universalized/browser-scraper-endpoint.json"
+    state: draft
+    summary: "Browser-backed scraping endpoint pattern."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  fetch-scraper-endpoint:
+    name: "Fetch Scraper Endpoint"
+    path: "workflows/live-universalized/fetch-scraper-endpoint.json"
+    state: draft
+    summary: "Fetch-backed scraping endpoint pattern."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  workflow-test-data-table-api:
+    name: "Workflow Test Data Table API"
+    path: "workflows/live-universalized/workflow-test-data-table-api.json"
+    state: published
+    summary: "Workflow-as-code test API using n8n Data Tables for cases and results."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - data-table
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  voice-agent-evaluation-harness:
+    name: "Voice Agent Evaluation Harness"
+    path: "workflows/live-universalized/voice-agent-evaluation-harness.json"
+    state: published
+    summary: "Voice-agent simulation and evaluation harness."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  simulation-review-master-orchestrator:
+    name: "Simulation Review Master Orchestrator"
+    path: "workflows/live-universalized/simulation-review-master-orchestrator.json"
+    state: draft
+    summary: "Master orchestration workflow for simulation review runs."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  simulation-verification-loop:
+    name: "Simulation Verification Loop"
+    path: "workflows/live-universalized/simulation-verification-loop.json"
+    state: draft
+    summary: "Looping verification workflow with waits, checks, and terminal responses."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  conversation-evaluation-endpoint:
+    name: "Conversation Evaluation Endpoint"
+    path: "workflows/live-universalized/conversation-evaluation-endpoint.json"
+    state: draft
+    summary: "Conversation evaluation endpoint for voice-agent QA."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  native-evaluation-runner:
+    name: "Native Evaluation Runner"
+    path: "workflows/live-universalized/native-evaluation-runner.json"
+    state: draft
+    summary: "n8n-native evaluation runner pattern using evaluation trigger nodes."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - n8n-evaluation
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  parallel-evaluation-runner:
+    name: "Parallel Evaluation Runner"
+    path: "workflows/live-universalized/parallel-evaluation-runner.json"
+    state: draft
+    summary: "Parallel fan-out evaluation runner with aggregation-ready responses."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  voice-agent-config-lookup:
+    name: "Voice Agent Config Lookup"
+    path: "workflows/live-universalized/voice-agent-config-lookup.json"
+    state: draft
+    summary: "Lookup helper for voice-agent configuration."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - http
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  extraction-engine-test-harness:
+    name: "Extraction Engine Test Harness"
+    path: "workflows/live-universalized/extraction-engine-test-harness.json"
+    state: draft
+    summary: "Test harness that invokes an extraction subworkflow."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  pipeline-test-webhook-processor-live:
+    name: "Pipeline Test Webhook Processor"
+    path: "workflows/live-universalized/pipeline-test-webhook-processor-live.json"
+    state: draft
+    summary: "Live-instance version of the pipeline smoke-test processor."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - webhook
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending
+
+  universal-evaluation-runner:
+    name: "Universal Evaluation Runner"
+    path: "workflows/live-universalized/universal-evaluation-runner.json"
+    state: draft
+    summary: "Manual evaluation runner that dispatches test payloads into target workflows."
+    patterns:
+      - universalized-live-workflow
+    integrations:
+      - n8n
+    required_env: []
+    verification:
+      local_json_parse: true
+      public_export_check: true
+      sample_execution: pending

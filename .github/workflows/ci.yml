@@ -25,7 +25,7 @@ jobs:
         run: |
           shopt -s nullglob globstar
           files=( **/*.sh )
-          [[ ${#files[@]} -eq 0 ]] && { echo "no shell files — skipping"; exit 0; }
+          [[ ${#files[@]} -eq 0 ]] && { echo "no shell files - skipping"; exit 0; }
           sudo apt-get update -qq
           sudo apt-get install -y -qq shellcheck
           shellcheck -S warning "${files[@]}"
@@ -70,7 +70,7 @@ jobs:
             if [[ -f pyproject.toml ]]; then
               python3 -m pip install --quiet -e . 2>/dev/null || true
             fi
-            python3 -m pytest -q 2>/dev/null || echo "no pytest config — skipping"
+            python3 -m pytest -q 2>/dev/null || echo "no pytest config - skipping"
             echo "::endgroup::"
           elif [[ -f Cargo.toml ]];then
             echo "::group::rust"
@@ -83,6 +83,6 @@ jobs:
             go test ./...
             echo "::endgroup::"
           else
-            echo "no language toolchain detected — running smoke check only"
+            echo "no language toolchain detected - running smoke check only"
             ls -la
           fi

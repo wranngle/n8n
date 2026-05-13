@@ -1,9 +1,9 @@
 {
-  "name": "Lead Enrichment Microservice (Clay)",
+  "name": "Lead Enrichment Microservice",
   "nodes": [
     {
       "id": "webhook-1",
-      "name": "Lead Enrichment Webhook",
+      "name": "Webhook: Receive Lead",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
@@ -20,7 +20,7 @@
     },
     {
       "id": "extract-domain",
-      "name": "Extract Domain",
+      "name": "Transform: Extract Domain",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -33,7 +33,7 @@
     },
     {
       "id": "clay-enrich",
-      "name": "Clay AI Enrichment",
+      "name": "Enrich: Query Company Data",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
@@ -70,7 +70,7 @@
     },
     {
       "id": "format-response",
-      "name": "Format Response",
+      "name": "Transform: Format Enrichment",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -78,12 +78,12 @@
         300
       ],
       "parameters": {
-        "jsCode": "const lead = $(\"Extract Domain\").item.json;\nconst clayData = $input.item.json;\n\n// Clay usually returns deep enriched data including company info, description, and AI insights if configured\nreturn {\n  ...lead,\n  company_name: clayData.company?.name || lead.company_name || lead.businessName,\n  company_domain: clayData.company?.domain || lead.extracted_domain,\n  company_logo: clayData.company?.logoUrl || null,\n  ai_research: clayData.ai_summary || clayData.company?.description || 'Enriched via Clay AI',\n  enrichment_source: 'clay_official',\n  enriched_at: new Date().toISOString(),\n  status: 'enriched'\n};"
+        "jsCode": "const lead = $(\"Transform: Extract Domain\").item.json;\nconst enrichmentData = $input.item.json;\n\nreturn {\n  ...lead,\n  company_name: enrichmentData.company?.name || lead.company_name || lead.businessName,\n  company_domain: enrichmentData.company?.domain || lead.extracted_domain,\n  company_logo: enrichmentData.company?.logoUrl || null,\n  ai_research: enrichmentData.ai_summary || enrichmentData.company?.description || 'Enriched by provider',\n  enrichment_source: 'company_enrichment_provider',\n  enriched_at: new Date().toISOString(),\n  status: 'enriched'\n};"
       }
     },
     {
       "id": "respond-node",
-      "name": "Return Enriched Data",
+      "name": "Webhook: Return Enriched Data",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
@@ -100,44 +100,44 @@
     }
   ],
   "connections": {
-    "Lead Enrichment Webhook": {
+    "Webhook: Receive Lead": {
       "main": [
         [
           {
-            "node": "Extract Domain",
+            "node": "Transform: Extract Domain",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Extract Domain": {
+    "Transform: Extract Domain": {
       "main": [
         [
           {
-            "node": "Clay AI Enrichment",
+            "node": "Enrich: Query Company Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Clay AI Enrichment": {
+    "Enrich: Query Company Data": {
       "main": [
         [
           {
-            "node": "Format Response",
+            "node": "Transform: Format Enrichment",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Response": {
+    "Transform: Format Enrichment": {
       "main": [
         [
           {
-            "node": "Return Enriched Data",
+            "node": "Webhook: Return Enriched Data",
             "type": "main",
             "index": 0
           }

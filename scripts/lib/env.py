@@ -1,11 +1,11 @@
-"""Loads ~/.agents/.env into os.environ. Existing os.environ values win.
+"""Loads .env and ~/.agents/.env into os.environ. Existing os.environ values win.
 Import this module once at the top of any script that needs API keys."""
 
 import os
 import re
 from pathlib import Path
 
-ENV_PATH = Path.home() / ".agents" / ".env"
+ENV_PATHS = [Path.cwd() / ".env", Path.home() / ".agents" / ".env"]
 
 _KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
@@ -31,15 +31,25 @@ def _parse_env(text: str) -> dict[str, str]:
     return out
 
 
-if ENV_PATH.exists():
-    for k, v in _parse_env(ENV_PATH.read_text(encoding="utf-8")).items():
-        os.environ.setdefault(k, v)
+for env_path in ENV_PATHS:
+    if env_path.exists():
+        for k, v in _parse_env(env_path.read_text(encoding="utf-8")).items():
+            os.environ.setdefault(k, v)
 
 
 def require(key: str) -> str:
     v = os.environ.get(key)
     if not v:
         raise RuntimeError(
-            f"{key} is not set. Add it to {ENV_PATH} or export it before running."
+            f"{key} is not set. Add it to .env, ~/.agents/.env, or export it before running."
         )
     return v
+
+
+def n8n_api_url() -> str:
+    return require("N8N_API_URL").rstrip("/")
+
+
+def n8n_api_v1_url() -> str:
+    base = n8n_api_url()
+    return base if base.endswith("/api/v1") else f"{base}/api/v1"

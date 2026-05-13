@@ -1,0 +1,93 @@
+{
+  "name": "Extraction Engine Test Harness",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "extraction-engine-test",
+        "responseMode": "lastNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "prep",
+      "name": "Transform: Prepare Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nreturn [{ json: { transcript: body.transcript, agent_system_prompt: body.agent_system_prompt, extraction_config: body.extraction_config, metadata: body.metadata || {} } }];"
+      }
+    },
+    {
+      "id": "call_engine",
+      "name": "Workflow: Execute Subworkflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "2Z4wykQk0x1Y67Sr",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Prepare Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Prepare Input": {
+      "main": [
+        [
+          {
+            "node": "Workflow: Execute Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Test harness that invokes an extraction subworkflow."
+  },
+  "versionCounter": 31
+}

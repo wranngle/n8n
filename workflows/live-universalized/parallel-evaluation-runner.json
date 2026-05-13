@@ -1,0 +1,166 @@
+{
+  "name": "Parallel Evaluation Runner",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "path": "parallel-eval-runner-v6",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "load-tests",
+      "name": "Transform: Load Test Dataset",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const input = $input.first().json.body || {};\nconst limit = input.limit || 1000;\nconst batchSize = input.batch_size || 50;\nconst targetWorkflowUrl = input.target_webhook || '{{ $env.WEBHOOK_BASE_URL }}/webhook/client-lookup-test';\n\nconst testCases = [];\nlet id = 1;\n\n// Generate 1000 test cases across 5 categories (200 each)\n// Mock workflow returns client: null, so expected_client_found = 'false'\nfor (let i = 0; i < 200; i++) {\n  testCases.push({id: id++, category: 'client_lookup', input_phone: `+1555${String(1000000 + i).slice(-7)}`, expected_success: 'true', expected_client_found: 'false'});\n}\nfor (let i = 0; i < 200; i++) {\n  testCases.push({id: id++, category: 'phone_format', input_phone: `+1555${String(2000000 + i).slice(-7)}`, expected_success: 'true', expected_client_found: 'false'});\n}\nfor (let i = 0; i < 200; i++) {\n  const errInputs = ['', ' ', 'invalid', 'abc', '<script>', '{}', '[]', 'null', 'undef', 'NaN', '000', '---', '...', '@#$', 'phone', 'test', '!@#', '()', '[]{}', 'DROP', 'SELECT', '--', '/*', '*/', 'admin', 'root', 'password', '1234', 'true', 'false', 'OR 1=1', '; DROP', 'undefined', 'function', 'eval', 'exec', 'system', 'rm -rf', 'cmd', 'shell', 'bash', 'sh', 'python', 'node', 'require', 'import', 'export', 'process', 'Buffer', 'fs', 'child_process', 'fetch', 'XMLHttpRequest', 'document', 'window', 'alert', 'prompt', 'confirm', 'console', 'log', 'error', 'warn', 'debug', 'trace', 'info', 'dir', 'table', 'clear', 'count', 'assert', 'time', 'timeEnd', 'group', 'groupEnd', 'profile', 'profileEnd', 'mark', 'measure', 'memory', 'exception', 'createObjectURL', 'revokeObjectURL', 'URL', 'Blob', 'File', 'FileReader', 'FormData', 'Headers', 'Request', 'Response', 'AbortController', 'AbortSignal', 'Worker', 'SharedWorker', 'ServiceWorker', 'BroadcastChannel', 'MessageChannel', 'MessagePort', 'WebSocket', 'EventSource', 'XMLHttpRequest', 'fetch', 'cache', 'indexedDB', 'localStorage', 'sessionStorage', 'cookie', 'navigator', 'location', 'history', 'screen', 'crypto', 'performance', 'Intl', 'Date', 'JSON', 'Math', 'Number', 'String', 'Array', 'Object', 'Function', 'Symbol', 'BigInt', 'Map', 'Set', 'WeakMap', 'WeakSet', 'Promise', 'Proxy', 'Reflect', 'Error', 'TypeError', 'RangeError', 'SyntaxError', 'ReferenceError', 'URIError', 'EvalError', 'AggregateError', 'InternalError', 'RegExp', 'ArrayBuffer', 'SharedArrayBuffer', 'DataView', 'Int8Array', 'Uint8Array', 'Uint8ClampedArray', 'Int16Array', 'Uint16Array', 'Int32Array', 'Uint32Array', 'Float32Array', 'Float64Array', 'BigInt64Array', 'BigUint64Array', 'Atomics', 'Generator', 'AsyncGenerator', 'Iterator', 'AsyncIterator', 'NaN', 'Infinity', '-Infinity', 'null', 'undefined'];\n  testCases.push({id: id++, category: 'error_handling', input_phone: errInputs[i % errInputs.length], expected_success: 'true', expected_client_found: 'false'});\n}\nfor (let i = 0; i < 200; i++) {\n  testCases.push({id: id++, category: 'integration', input_phone: `+1555${String(4000000 + i).slice(-7)}`, input_email: `test${i}@example.com`, expected_success: 'true', expected_client_found: 'false'});\n}\nfor (let i = 0; i < 200; i++) {\n  testCases.push({id: id++, category: 'stress_test', input_phone: `+1555${String(5000000 + i).slice(-7)}`, expected_success: 'true', expected_client_found: 'false'});\n}\n\nconst tests = input.tests || testCases.slice(0, limit);\nconst batches = [];\nfor (let i = 0; i < tests.length; i += batchSize) {\n  batches.push({batch_id: Math.floor(i / batchSize) + 1, tests: tests.slice(i, i + batchSize), target_url: targetWorkflowUrl});\n}\n\nreturn [{json: {total_tests: tests.length, batch_count: batches.length, batch_size: batchSize, target_url: targetWorkflowUrl, batches: batches, started_at: new Date().toISOString()}}];"
+      }
+    },
+    {
+      "id": "split-batches",
+      "name": "Transform: Split Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "fieldToSplitOut": "batches",
+        "options": {}
+      }
+    },
+    {
+      "id": "execute-batch",
+      "name": "Transform: Execute Batch",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const allBatches = $input.all();\nconst allBatchResults = [];\nfor (const batchItem of allBatches) {\n  const batch = batchItem.json;\n  const batchResults = [];\n  for (const test of batch.tests) {\n    const startTime = Date.now();\n    try {\n      const response = await this.helpers.httpRequest({method: 'POST', url: batch.target_url, body: { phone: test.input_phone || '', email: test.input_email || '' }, headers: { 'Content-Type': 'application/json' }, json: true});\n      const elapsed = Date.now() - startTime;\n      const actualSuccess = response.success === true;\n      const expectedSuccess = test.expected_success === 'true';\n      const actualFound = response.client !== null && response.client !== undefined;\n      const expectedFound = test.expected_client_found === 'true';\n      const passed = actualSuccess === expectedSuccess && actualFound === expectedFound;\n      batchResults.push({test_id: test.id, category: test.category, passed: passed, elapsed_ms: elapsed, actual: { success: actualSuccess, client_found: actualFound }, expected: { success: expectedSuccess, client_found: expectedFound }});\n    } catch (error) {\n      batchResults.push({test_id: test.id, category: test.category, passed: false, error: error.message, elapsed_ms: Date.now() - startTime});\n    }\n  }\n  allBatchResults.push({json: {batch_id: batch.batch_id, results: batchResults, passed: batchResults.filter(r => r.passed).length, failed: batchResults.filter(r => !r.passed).length}});\n}\nreturn allBatchResults;"
+      }
+    },
+    {
+      "id": "aggregate-results",
+      "name": "Transform: Aggregate All Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const allResults = [];\nlet totalPassed = 0;\nlet totalFailed = 0;\nfor (const item of $input.all()) {\n  const batch = item.json;\n  allResults.push(...batch.results);\n  totalPassed += batch.passed;\n  totalFailed += batch.failed;\n}\nconst failures = allResults.filter(r => !r.passed);\nconst failuresByCategory = {};\nfor (const f of failures) {\n  failuresByCategory[f.category] = failuresByCategory[f.category] || [];\n  failuresByCategory[f.category].push(f);\n}\nconst totalTests = totalPassed + totalFailed;\nconst passRate = totalTests > 0 ? ((totalPassed / totalTests) * 100).toFixed(1) : '0.0';\nconst avgLatency = allResults.length > 0 ? allResults.reduce((sum, r) => sum + (r.elapsed_ms || 0), 0) / allResults.length : 0;\nreturn [{json: {summary: {total_tests: totalTests, passed: totalPassed, failed: totalFailed, pass_rate: passRate + '%', avg_latency_ms: Math.round(avgLatency)}, failures_by_category: failuresByCategory, failure_count: failures.length, needs_autocorrection: totalFailed > 0, completed_at: new Date().toISOString()}}];"
+      }
+    },
+    {
+      "id": "respond-results",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Load Test Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Load Test Dataset": {
+      "main": [
+        [
+          {
+            "node": "Transform: Split Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Split Items": {
+      "main": [
+        [
+          {
+            "node": "Transform: Execute Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Execute Batch": {
+      "main": [
+        [
+          {
+            "node": "Transform: Aggregate All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Aggregate All Results": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Parallel fan-out evaluation runner with aggregation-ready responses."
+  },
+  "versionCounter": 33
+}

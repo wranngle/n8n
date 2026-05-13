@@ -1,9 +1,9 @@
 {
-  "name": "Wranngle Lead Intake (Centralized)",
+  "name": "Lead Intake Main",
   "nodes": [
     {
       "id": "webhook-trigger",
-      "name": "Lead Intake Webhook",
+      "name": "Webhook: Receive Lead",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
@@ -11,7 +11,7 @@
         300
       ],
       "parameters": {
-        "path": "wranngle-intake-form",
+        "path": "lead-intake",
         "httpMethod": "POST",
         "responseMode": "onReceived",
         "responseData": "{ \"success\": true, \"message\": \"Lead received for processing\" }",
@@ -21,7 +21,7 @@
     },
     {
       "id": "call-enrichment",
-      "name": "Enrich Lead Data",
+      "name": "Workflow: Enrich Lead Data",
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
@@ -35,7 +35,7 @@
     },
     {
       "id": "save-db",
-      "name": "Save Enriched Lead to DB",
+      "name": "Database: Save Enriched Lead",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.3,
       "position": [
@@ -52,7 +52,7 @@
     },
     {
       "id": "email-notification",
-      "name": "Send Enriched Email",
+      "name": "Email: Send Lead Notification",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2,
       "position": [
@@ -60,16 +60,16 @@
         300
       ],
       "parameters": {
-        "fromEmail": "noreply@wranngle.com",
-        "toEmail": "sales@wranngle.com",
-        "subject": "=🔔 Enriched Lead: {{ $json.businessName }} ({{ $json.company_name || 'New' }})",
+        "fromEmail": "noreply@example.com",
+        "toEmail": "sales@example.com",
+        "subject": "=Enriched Lead: {{ $json.businessName }} ({{ $json.company_name || 'New' }})",
         "emailType": "html",
         "message": "=<h2>New Enriched Lead Submission</h2><p><strong>Business:</strong> {{ $json.businessName }}</p><p><strong>Enriched Name:</strong> {{ $json.company_name }}</p><p><strong>Industry:</strong> {{ $json.industry }}</p><p><strong>Owner:</strong> {{ $json.ownerName }}</p><p><strong>Email:</strong> {{ $json.email }}</p><p><strong>Phone:</strong> {{ $json.phone }}</p><h3>AI Research</h3><p>{{ $json.ai_research }}</p>"
       }
     },
     {
       "id": "universal-messenger",
-      "name": "Trigger Universal Messenger",
+      "name": "Notify: Trigger Message Handoff",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
@@ -78,7 +78,7 @@
       ],
       "parameters": {
         "method": "POST",
-        "url": "https://n8n.wranngle.com/webhook/universal-message-sender",
+        "url": "={{ $env.WEBHOOK_BASE_URL + '/webhook/message-send' }}",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -96,36 +96,36 @@
     }
   ],
   "connections": {
-    "Lead Intake Webhook": {
+    "Webhook: Receive Lead": {
       "main": [
         [
           {
-            "node": "Enrich Lead Data",
+            "node": "Workflow: Enrich Lead Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Enrich Lead Data": {
+    "Workflow: Enrich Lead Data": {
       "main": [
         [
           {
-            "node": "Save Enriched Lead to DB",
+            "node": "Database: Save Enriched Lead",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Send Enriched Email",
+            "node": "Email: Send Lead Notification",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Trigger Universal Messenger",
+            "node": "Notify: Trigger Message Handoff",
             "type": "main",
             "index": 0
           }

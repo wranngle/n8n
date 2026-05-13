@@ -1,17 +1,13 @@
-name: ✨ Feature
+name: Feature
 description: Something new
 title: "feat: "
-labels: [t.feat, triage]
+labels: [enhancement, triage]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Tip: state the problem before the solution. "Wouldn't it be cool if…" requests get deprioritized.
   - type: textarea
     id: problem
     attributes:
       label: Problem & Why now
-      description: What's the user pain? What changed that makes this matter?
+      description: What problem does this solve, and why now?
     validations:
       required: true
   - type: textarea
@@ -26,12 +22,12 @@ body:
     attributes:
       label: Area
       options:
-        - core
-        - cli
-        - api
+        - workflows
+        - conversion
+        - verification
         - docs
         - ci
-        - infra
+        - security
         - other
     validations:
       required: true

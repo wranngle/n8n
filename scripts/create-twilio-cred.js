@@ -1,7 +1,5 @@
-const https = require('https');
 const env = require('./lib/env');
-
-const apiKey = env.require('N8N_API_KEY');
+const api = require('./lib/n8n-api');
 
 const twilioCredential = {
     name: "Twilio API Credentials",
@@ -15,37 +13,19 @@ const twilioCredential = {
     }
 };
 
-const postData = JSON.stringify(twilioCredential);
-console.log('Sending:', postData);
+(async () => {
+    console.log('Creating Twilio credential in n8n...');
+    const res = await api.request('POST', '/api/v1/credentials', twilioCredential);
+    console.log(`Status: ${res.status}`);
 
-const options = {
-    hostname: 'n8n.wranngle.com',
-    port: 443,
-    path: '/api/v1/credentials',
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-N8N-API-KEY': apiKey,
-        'Content-Length': Buffer.byteLength(postData)
+    if (res.status === 200 || res.status === 201) {
+        console.log(`SUCCESS: Twilio Credential ID: ${res.body.id}`);
+        return;
     }
-};
 
-const req = https.request(options, (res) => {
-    let data = '';
-    res.on('data', (chunk) => { data += chunk; });
-    res.on('end', () => {
-        console.log(`Status: ${res.statusCode}`);
-        console.log(`Response: ${data}`);
-        if (res.statusCode === 200 || res.statusCode === 201) {
-            const result = JSON.parse(data);
-            console.log(`\nSUCCESS! Twilio Credential ID: ${result.id}`);
-        }
-    });
+    console.error('Response:', typeof res.body === 'string' ? res.body : JSON.stringify(res.body, null, 2));
+    process.exit(1);
+})().catch(error => {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
 });
-
-req.on('error', (e) => {
-    console.error(`Error: ${e.message}`);
-});
-
-req.write(postData);
-req.end();

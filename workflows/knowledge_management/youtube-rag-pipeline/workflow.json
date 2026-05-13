@@ -1,10 +1,10 @@
 {
-  "name": "YouTube RAG Pipeline - Ingestion & Vectorization",
+  "name": "YouTube RAG Ingestion Pipeline",
   "nodes": [
     {
       "parameters": {},
       "id": "trigger-manual",
-      "name": "Manual Trigger",
+      "name": "Trigger: Manual Start",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
@@ -17,7 +17,7 @@
         "videoId": "={{ $json.videoId }}"
       },
       "id": "get-metadata",
-      "name": "Get Metadata",
+      "name": "YouTube: Get Metadata",
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
@@ -32,7 +32,7 @@
         "limit": 20
       },
       "id": "get-comments",
-      "name": "Get Comments",
+      "name": "YouTube: Get Comments",
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
@@ -45,7 +45,7 @@
         "jsCode": "const inputItem = $input.first().json;\nlet videoId = inputItem.id;\n\nif (!videoId) {\n  return [{ json: { error: \"No video ID found\" } }];\n}\n\nconst youtubePageUrl = `https://www.youtube.com/watch?v=${videoId}`;\n\ntry {\n  const response = await fetch(youtubePageUrl);\n  if (!response.ok) throw new Error(\"Failed to fetch page\");\n  const body = await response.text();\n\n  const playerResponseMatch = body.match(/ytInitialPlayerResponse = ({.*?});/);\n  if (!playerResponseMatch) throw new Error(\"No player response found\");\n\n  const ytInitialPlayerResponse = JSON.parse(playerResponseMatch[1]);\n  const captionTracks = ytInitialPlayerResponse?.captions?.playerCaptionsTracklistRenderer?.captionTracks;\n\n  if (!captionTracks || captionTracks.length === 0) {\n    return [{ json: { ...inputItem, transcript: \"[No Captions Available]\" } }];\n  }\n\n  const preferredTrack = captionTracks.find(track => track.languageCode === 'en') || captionTracks[0];\n  const transcriptResponse = await fetch(preferredTrack.baseUrl + '&fmt=json3');\n  const transcriptData = await transcriptResponse.json();\n\n  const transcript = transcriptData.events\n    .filter(event => event.segs)\n    .map(event => event.segs.map(seg => seg.utf8).join(' ')\n    .join(' ')\n    .replace(/[\\u200B-\\u200D\\uFEFF]/g, '')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  return [{ json: { ...inputItem, transcript } }];\n\n} catch (error) {\n  return [{ json: { ...inputItem, transcript: \"[Error Fetching Transcript: \" + error.message + \"]\" } }];\n}"
       },
       "id": "fetch-transcript",
-      "name": "Fetch Transcript (Code)",
+      "name": "Transcript: Fetch Captions",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -68,7 +68,7 @@
         }
       },
       "id": "format-document",
-      "name": "Format Document",
+      "name": "Document: Format Content",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
@@ -82,7 +82,7 @@
         "chunkOverlap": 200
       },
       "id": "text-splitter",
-      "name": "Text Splitter",
+      "name": "Document: Split Text",
       "type": "n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
       "typeVersion": 1,
       "position": [
@@ -95,7 +95,7 @@
         "model": "text-embedding-3-small"
       },
       "id": "embeddings",
-      "name": "OpenAI Embeddings",
+      "name": "Embedding: Generate Vectors",
       "type": "n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1,
       "position": [
@@ -110,7 +110,7 @@
         "options": {}
       },
       "id": "qdrant-store",
-      "name": "Qdrant Vector Store",
+      "name": "Vector: Upsert Document",
       "type": "n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1,
       "position": [
@@ -120,77 +120,77 @@
     }
   ],
   "connections": {
-    "Manual Trigger": {
+    "Trigger: Manual Start": {
       "main": [
         [
           {
-            "node": "Get Metadata",
+            "node": "YouTube: Get Metadata",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get Metadata": {
+    "YouTube: Get Metadata": {
       "main": [
         [
           {
-            "node": "Get Comments",
+            "node": "YouTube: Get Comments",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Get Comments": {
+    "YouTube: Get Comments": {
       "main": [
         [
           {
-            "node": "Fetch Transcript (Code)",
+            "node": "Transcript: Fetch Captions",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Fetch Transcript (Code)": {
+    "Transcript: Fetch Captions": {
       "main": [
         [
           {
-            "node": "Format Document",
+            "node": "Document: Format Content",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Format Document": {
+    "Document: Format Content": {
       "main": [
         [
           {
-            "node": "Qdrant Vector Store",
+            "node": "Vector: Upsert Document",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Text Splitter": {
+    "Document: Split Text": {
       "ai_textSplitter": [
         [
           {
-            "node": "Qdrant Vector Store",
+            "node": "Vector: Upsert Document",
             "type": "ai_textSplitter",
             "index": 0
           }
         ]
       ]
     },
-    "OpenAI Embeddings": {
+    "Embedding: Generate Vectors": {
       "ai_embedding": [
         [
           {
-            "node": "Qdrant Vector Store",
+            "node": "Vector: Upsert Document",
             "type": "ai_embedding",
             "index": 0
           }

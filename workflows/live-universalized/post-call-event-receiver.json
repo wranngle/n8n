@@ -1,0 +1,633 @@
+{
+  "name": "Post Call Event Receiver",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "path": "post-call",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "extract-call-data",
+      "name": "Transform: Set Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "conversation_id",
+              "name": "conversation_id",
+              "type": "string",
+              "value": "={{ $json.body?.conversation_id || $json.conversation_id || '' }}"
+            },
+            {
+              "id": "agent_id",
+              "name": "agent_id",
+              "type": "string",
+              "value": "={{ $json.body?.agent_id || $json.agent_id || '' }}"
+            },
+            {
+              "id": "call_duration_seconds",
+              "name": "call_duration_seconds",
+              "type": "number",
+              "value": "={{ $json.body?.call_duration_seconds || $json.call_duration_seconds || 0 }}"
+            },
+            {
+              "id": "caller_id",
+              "name": "caller_id",
+              "type": "string",
+              "value": "={{ $json.body?.caller_id || $json.caller_id || '' }}"
+            },
+            {
+              "id": "call_status",
+              "name": "call_status",
+              "type": "string",
+              "value": "={{ $json.body?.call_status || $json.call_status || 'unknown' }}"
+            },
+            {
+              "id": "transcript",
+              "name": "transcript",
+              "type": "string",
+              "value": "={{ $json.body?.transcript || $json.transcript || '' }}"
+            },
+            {
+              "id": "call_summary",
+              "name": "call_summary",
+              "type": "string",
+              "value": "={{ $json.body?.call_summary || $json.call_summary || '' }}"
+            },
+            {
+              "id": "customer_sentiment",
+              "name": "customer_sentiment",
+              "type": "string",
+              "value": "={{ $json.body?.customer_sentiment || $json.customer_sentiment || 'neutral' }}"
+            },
+            {
+              "id": "error_type",
+              "name": "error_type",
+              "type": "string",
+              "value": "={{ $json.body?.error_type || $json.error_type || '' }}"
+            },
+            {
+              "id": "action_items_json",
+              "name": "action_items_json",
+              "type": "string",
+              "value": "={{ JSON.stringify($json.body?.action_items || $json.action_items || []) }}"
+            },
+            {
+              "id": "dynamic_variables_json",
+              "name": "dynamic_variables_json",
+              "type": "string",
+              "value": "={{ JSON.stringify($json.body?.dynamic_variables || $json.dynamic_variables || {}) }}"
+            }
+          ],
+          "includeOtherFields": true
+        }
+      }
+    },
+    {
+      "id": "validate-agent",
+      "name": "Route: Validate Agent ID",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "agent-match",
+              "leftValue": "={{ $json.agent_id }}",
+              "rightValue": "agent_8001kdgp7qbyf4wvhs540be78vew",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "error-invalid-agent",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        140
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { error: 'Invalid agent_id', received: $json.agent_id } }}",
+        "options": {
+          "responseCode": 400
+        }
+      }
+    },
+    {
+      "id": "check-call-status",
+      "name": "Route: Check Call Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        660,
+        0
+      ],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "outputKey": "completed",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "status-completed",
+                    "leftValue": "={{ $json.call_status }}",
+                    "rightValue": "completed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "failed",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "or",
+                "conditions": [
+                  {
+                    "id": "status-failed",
+                    "leftValue": "={{ $json.call_status }}",
+                    "rightValue": "failed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  },
+                  {
+                    "id": "status-error",
+                    "leftValue": "={{ $json.call_status }}",
+                    "rightValue": "error",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "outputKey": "abandoned",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "status-abandoned",
+                    "leftValue": "={{ $json.call_status }}",
+                    "rightValue": "abandoned",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "process-completed-call",
+      "name": "Transform: Process Completed Call",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -100
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Process completed call - extract insights and determine follow-up actions\n\nconst callData = $input.first().json;\n\n// Parse action items from the call (handle both direct and body-nested structures)\nconst actionItems = callData.action_items || callData.body?.action_items || (callData.action_items_json ? JSON.parse(callData.action_items_json) : []);\nconst dynamicVars = callData.dynamic_variables || callData.body?.dynamic_variables || (callData.dynamic_variables_json ? JSON.parse(callData.dynamic_variables_json) : {});\n\n// Determine follow-up type based on call content\nlet followUpType = 'none';\nlet followUpPriority = 'low';\nlet followUpNotes = '';\n\n// Check for booking requests\nconst bookingKeywords = ['book', 'schedule', 'demo', 'meeting', 'appointment', 'calendar'];\nconst transcript = (callData.transcript || '').toLowerCase();\nconst hasBookingIntent = bookingKeywords.some(kw => transcript.includes(kw));\n\nif (hasBookingIntent) {\n  followUpType = 'booking';\n  followUpPriority = 'high';\n  followUpNotes = 'Customer expressed interest in booking';\n}\n\n// Check for support issues\nconst supportKeywords = ['problem', 'issue', 'not working', 'broken', 'help', 'error'];\nconst hasSupportNeed = supportKeywords.some(kw => transcript.includes(kw));\n\nif (hasSupportNeed) {\n  followUpType = 'support';\n  followUpPriority = 'high';\n  followUpNotes = 'Customer reported an issue';\n}\n\n// Check sentiment for escalation\nif (callData.customer_sentiment === 'negative' || callData.customer_sentiment === 'frustrated') {\n  followUpPriority = 'urgent';\n  followUpNotes += ' - Negative sentiment detected';\n}\n\n// Build CRM update payload\nconst crmUpdate = {\n  phone: callData.caller_id,\n  last_call_date: new Date().toISOString(),\n  last_call_duration: callData.call_duration_seconds,\n  last_call_summary: callData.call_summary || 'No summary available',\n  last_call_sentiment: callData.customer_sentiment,\n  interaction_count_increment: 1\n};\n\n// Build email payload if follow-up needed\nlet emailPayload = null;\nif (followUpType !== 'none' && dynamicVars.customer_name !== 'there') {\n  emailPayload = {\n    to: dynamicVars.email || null,\n    first_name: dynamicVars.customer_first_name || 'there',\n    call_summary: callData.call_summary,\n    next_steps: followUpNotes,\n    template: 'call-followup'\n  };\n}\n\nreturn [{\n  json: {\n    ...callData,\n    processed: true,\n    follow_up_type: followUpType,\n    follow_up_priority: followUpPriority,\n    follow_up_notes: followUpNotes,\n    crm_update: crmUpdate,\n    email_payload: emailPayload,\n    action_items: actionItems,\n    dynamic_variables: dynamicVars\n  }\n}];"
+      }
+    },
+    {
+      "id": "process-failed-call",
+      "name": "Transform: Process Failed Call",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        40
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Process failed call - log error and trigger retry logic\n\nconst callData = $input.first().json;\n\n// Determine if retry is appropriate\nconst retryableStatuses = ['timeout', 'network_error', 'service_unavailable'];\nconst errorType = callData.error_type || callData.body?.error_type || 'unknown';\nconst shouldRetry = retryableStatuses.includes(errorType);\n\n// Build error log\nconst errorLog = {\n  timestamp: new Date().toISOString(),\n  conversation_id: callData.conversation_id,\n  caller_id: callData.caller_id,\n  error_type: errorType,\n  call_duration: callData.call_duration_seconds,\n  should_retry: shouldRetry,\n  retry_count: (callData.retry_count || 0) + 1\n};\n\n// Build notification payload for failed calls\nconst notification = {\n  channel: 'slack',\n  message: `Call Failed - Caller: ${callData.caller_id}, Error: ${errorType}, Duration: ${callData.call_duration_seconds}s, Retry: ${shouldRetry ? 'Yes' : 'No'}`,\n  priority: shouldRetry ? 'normal' : 'high'\n};\n\nreturn [{\n  json: {\n    ...callData,\n    processed: true,\n    error_log: errorLog,\n    should_retry: shouldRetry,\n    notification: notification,\n    follow_up_type: 'error_recovery',\n    follow_up_priority: 'high'\n  }\n}];"
+      }
+    },
+    {
+      "id": "process-abandoned-call",
+      "name": "Transform: Process Abandoned Call",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Process abandoned call - short calls where customer hung up\n\nconst callData = $input.first().json;\nconst duration = callData.call_duration_seconds || 0;\n\n// Classify abandonment reason\nlet abandonReason = 'unknown';\nif (duration < 5) {\n  abandonReason = 'immediate_hangup';\n} else if (duration < 30) {\n  abandonReason = 'early_abandonment';\n} else {\n  abandonReason = 'mid_call_abandonment';\n}\n\n// Determine if callback is appropriate\nconst shouldCallback = duration > 10 && callData.caller_id;\n\nreturn [{\n  json: {\n    ...callData,\n    processed: true,\n    abandon_reason: abandonReason,\n    should_callback: shouldCallback,\n    follow_up_type: shouldCallback ? 'callback' : 'none',\n    follow_up_priority: shouldCallback ? 'medium' : 'low'\n  }\n}];"
+      }
+    },
+    {
+      "id": "respond-completed",
+      "name": "Webhook: Return Response Step2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        -100
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, processed: true, call_status: 'completed', follow_up_type: $json.follow_up_type, follow_up_priority: $json.follow_up_priority } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "respond-failed",
+      "name": "Webhook: Return Response Step3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        40
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, processed: true, call_status: 'failed', should_retry: $json.should_retry, follow_up_type: $json.follow_up_type, follow_up_priority: $json.follow_up_priority } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "respond-abandoned",
+      "name": "Webhook: Return Response Step4",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        180
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, processed: true, call_status: 'abandoned', abandon_reason: $json.abandon_reason, should_callback: $json.should_callback, follow_up_type: $json.follow_up_type } }}",
+        "options": {
+          "responseCode": 200
+        }
+      }
+    },
+    {
+      "id": "prepare-extraction",
+      "name": "Transform: Prepare Extraction Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const callData = $input.first().json;\nconst transcript = callData.transcript || '';\nif (!transcript || transcript.length < 20) {\n  return [{ json: { skip: true, reason: 'Transcript too short for extraction' } }];\n}\nconst agentPrompt = 'You are client, a sales development representative for example Systems. You qualify leads for The 24/7 Filter - an AI-powered after-hours call answering service for small businesses including HVAC, plumbing, property management, and legal services.';\nreturn [{ json: {\n  skip: false,\n  transcript: transcript,\n  agent_system_prompt: agentPrompt,\n  extraction_config: {\n    categories: [\n      {\n        category_id: 'sales',\n        fields: [\n          { field_id: 'deal_stage', type: 'enum', values: ['discovery','qualification','proposal','negotiation','closed_won','closed_lost'], required: true, default_value: 'discovery', prompt: 'What stage of the sales process is this call at? Consider: Did the caller express a specific need? Did they mention budget or timeline? Are they evaluating options?', strictness: 'high' },\n          { field_id: 'budget_mentioned', type: 'string', required: false, prompt: 'Extract any budget, price range, or financial constraints mentioned. Include exact figures if stated.', strictness: 'medium' },\n          { field_id: 'decision_authority', type: 'enum', values: ['caller','other','unknown'], required: true, default_value: 'unknown', prompt: 'Does the caller have decision-making authority, or do they reference someone else who decides?', strictness: 'medium' },\n          { field_id: 'timeline', type: 'string', required: false, prompt: 'Extract any timeline, deadline, or urgency mentioned for making a decision or starting service.', strictness: 'medium' },\n          { field_id: 'next_steps', type: 'string', required: false, prompt: 'What next steps were discussed or agreed upon? Include callbacks, follow-ups, or actions.', strictness: 'low' },\n          { field_id: 'qualification_status', type: 'enum', values: ['qualified','not_qualified','needs_review'], required: true, default_value: 'needs_review', prompt: 'Based on the full conversation, is this caller a qualified lead? Qualified = expressed need + budget or timeline. Not qualified = no interest, wrong number, spam. Needs review = ambiguous or incomplete information.', strictness: 'medium' },\n          { field_id: 'transcript_summary', type: 'string', required: true, default_value: 'No summary available', prompt: 'Generate a concise 2-3 sentence summary of the entire conversation. Include: who called, what they wanted, and the outcome.', strictness: 'low' }\n        ],\n        context_rules: { default_strictness: 'medium', require_rationale: true, null_behavior: 'return_null_with_rationale' }\n      },\n      {\n        category_id: 'support',\n        fields: [\n          { field_id: 'issue_type', type: 'string', required: true, prompt: 'What type of issue or request is the caller reporting? Categorize briefly.', strictness: 'medium' },\n          { field_id: 'urgency', type: 'enum', values: ['emergency','soon','routine','estimate'], required: true, default_value: 'routine', prompt: 'How urgent is the caller issue? emergency = safety/critical system down. soon = needs quick attention. routine = standard request. estimate = quote/information only.', strictness: 'high' },\n          { field_id: 'resolution_status', type: 'enum', values: ['resolved','unresolved','escalated'], required: true, default_value: 'unresolved', prompt: 'Was the issue resolved during the call, left unresolved, or escalated?', strictness: 'high' },\n          { field_id: 'escalation_needed', type: 'boolean', required: true, default_value: false, prompt: 'Does this call require escalation to a human agent or specialist?', strictness: 'high' },\n          { field_id: 'existing_request', type: 'boolean', required: true, default_value: false, prompt: 'Is this regarding an existing request/ticket? Detection: reference to case/ticket numbers, following up on, checking status of. Default FALSE when unclear.', strictness: 'high' },\n          { field_id: 'request_affected_asset', type: 'string', required: false, prompt: 'Extract specific equipment, device, software, or system involved. Include model numbers, asset IDs if stated. Return null when no specific asset mentioned.', strictness: 'medium' },\n          { field_id: 'request_deadline', type: 'string', required: false, prompt: 'Extract requestor-specified date or timeframe. Examples: need this fixed by Friday, within 48 hours. Return null when none mentioned.', strictness: 'medium' },\n          { field_id: 'request_description', type: 'string', required: false, prompt: 'Generate single factual paragraph (80-120 words) using ONLY explicitly stated information. Inverted-pyramid format. Plain language, active voice. No future commitments.', strictness: 'low' },\n          { field_id: 'request_summary', type: 'string', required: false, prompt: 'Generate precise ticket title (<80 chars). Format: [Equipment/Issue] - [Location]. Avoid generic terms like issue, problem. Include equipment ID if provided.', strictness: 'medium' }\n        ],\n        context_rules: { default_strictness: 'medium', require_rationale: true, null_behavior: 'return_null_with_rationale' }\n      },\n      {\n        category_id: 'external_contacts',\n        fields: [\n          { field_id: 'requestor_first_name', type: 'string', required: false, prompt: 'Extract first name of person calling from self-introduction. Target phrases: This is [name], My name is [name]. Extract ONLY first name component. Return null if no first name provided.', strictness: 'high' },\n          { field_id: 'requestor_last_name', type: 'string', required: false, prompt: 'Extract ONLY last name of person calling. Exclude first names, titles/honorifics. Capture compound surnames completely. Return null when no last name provided.', strictness: 'high' },\n          { field_id: 'requestor_company_name', type: 'string', required: false, prompt: 'Extract requestor employer/company name from self-identification phrases. Valid triggers: I am with, calling from, I work for. Critical exclusions: Never extract service provider name from agent greeting, Ignore company being called. Return null when no company affiliation stated.', strictness: 'medium' },\n          { field_id: 'contact_phone', type: 'phone', required: false, prompt: 'Extract final confirmed callback phone number in E.164 format (+1XXXXXXXXXX). If user corrected a number, use correction only. Convert number words to digits. Return null if count < 10 digits or no number found.', strictness: 'high' },\n          { field_id: 'contact_email', type: 'email', required: false, prompt: 'Extract any email address the caller provides.', strictness: 'high' },\n          { field_id: 'contact_preferred_followup_channel', type: 'enum', values: ['phone','sms','email'], required: false, default_value: 'phone', prompt: 'Valid values: phone, sms, email. Detection triggers: call me, text me, send me an email. Default to phone when unclear.', strictness: 'medium' },\n          { field_id: 'contact_preferred_followup_time', type: 'string', required: false, prompt: 'Extract follow-up timing preferences. Examples: tomorrow afternoon, after 6 PM only, weekdays before noon. Return null when none mentioned.', strictness: 'medium' },\n          { field_id: 'requested_service_address', type: 'string', required: false, prompt: 'Extract physical location WHERE WORK HAPPENS (dispatch destination). NOT the branch being contacted. Return null if no dispatch required or requestor coming to company location.', strictness: 'medium' },\n          { field_id: 'requestor_is_contact', type: 'boolean', required: true, default_value: true, prompt: 'Is requestor the designated contact for follow-up? Default: TRUE. Set FALSE only when requestor makes explicit statement designating alternate contact.', strictness: 'high' }\n        ],\n        context_rules: { default_strictness: 'high', require_rationale: false, null_behavior: 'return_null_with_rationale' }\n      },\n      {\n        category_id: 'internal_contacts',\n        fields: [\n          { field_id: 'requested_person', type: 'string', required: false, prompt: 'Name of specific person requestor asks to speak with. Return null if no specific person requested by name.', strictness: 'high' },\n          { field_id: 'department', type: 'enum', values: ['Service','Field Service','Sales','Marketing','Purchasing','Fulfillment','Shipping','Billing','Finance','Accounting','HR','Payroll','IT','IT Support','Operations','Contracts','Administration','General'], required: true, default_value: 'General', prompt: 'EXACTLY one from allowed values. Default General when unclear.', strictness: 'high' },\n          { field_id: 'transfer_reason', type: 'string', required: false, prompt: 'Short summary (<=120 chars) explaining WHY transferred. Return null if no transfer.', strictness: 'low' },\n          { field_id: 'conversation_transferred', type: 'boolean', required: true, default_value: false, prompt: 'Was conversation transferred to live person? Set TRUE only when actual transfer mechanism invoked. Default FALSE.', strictness: 'high' },\n          { field_id: 'transfer_destination', type: 'string', required: false, prompt: 'If transferred, capture destination label. Examples: Main operator, Billing department. Return null if no transfer.', strictness: 'medium' }\n        ],\n        context_rules: { default_strictness: 'medium', require_rationale: false, null_behavior: 'return_null_with_rationale' }\n      },\n      {\n        category_id: 'external_company',\n        fields: [\n          { field_id: 'company_industry', type: 'string', required: false, prompt: 'What industry does the caller company operate in?', strictness: 'medium' },\n          { field_id: 'company_size', type: 'string', required: false, prompt: 'Extract any mention of company size (employees, revenue, locations).', strictness: 'medium' },\n          { field_id: 'company_location', type: 'string', required: false, prompt: 'Extract the caller company location (city, state, region).', strictness: 'medium' }\n        ],\n        context_rules: { default_strictness: 'medium', require_rationale: false, null_behavior: 'return_null_with_rationale' }\n      },\n      {\n        category_id: 'internal_company',\n        fields: [\n          { field_id: 'site_location', type: 'string', required: false, prompt: 'Site or branch location for internal routing. Return null if none mentioned.', strictness: 'medium' },\n          { field_id: 'service_area', type: 'string', required: false, prompt: 'What service area or product line does this call relate to?', strictness: 'medium' },\n          { field_id: 'account_status', type: 'enum', values: ['active','inactive','prospect','churned'], required: true, default_value: 'prospect', prompt: 'What is the caller account status? Are they an existing customer, prospect, or former customer?', strictness: 'high' }\n        ],\n        context_rules: { default_strictness: 'medium', require_rationale: false, null_behavior: 'return_null_with_rationale' }\n      }\n    ],\n    global_context: { agent_identity: 'client - example Lead Specialist', business_domain: 'AI-powered after-hours call answering for SMBs' }\n  },\n  metadata: { conversation_id: callData.conversation_id, agent_id: callData.agent_id }\n} }];"
+      }
+    },
+    {
+      "id": "check-skip",
+      "name": "Route: Check Skip Extraction",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        -300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip-check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "call-extraction",
+      "name": "Workflow: Execute Subworkflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -300
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": "{{ $env.N8N_SUBWORKFLOW_ID }}",
+        "mode": "each",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "log-extraction",
+      "name": "Transform: Flatten Extraction Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        -300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const input = $input.first().json;\nconst fields = input.fields || [];\nconst meta = {\n  extraction_id: input.extraction_id || '',\n  conversation_id: input.conversation_id || $('Prepare Extraction Input').first().json.metadata?.conversation_id || '',\n  timestamp: input.timestamp || new Date().toISOString(),\n  model: input.model || '',\n  categories_processed: input.categories_processed || 0,\n  errors_count: (input.errors || []).length,\n};\nconst row = { ...meta };\nfor (const f of fields) {\n  const key = f.category + '__' + f.field_id;\n  row[key] = String(f.value ?? '');\n}\nrow.raw_envelope = JSON.stringify(input);\nreturn [{ json: row }];"
+      }
+    },
+    {
+      "id": "write-dt",
+      "name": "HTTP: Write To Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        -300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://cgezudpwebljssmeuybm.supabase.co/rest/v1/extraction_results",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnZXp1ZHB3ZWJsanNzbWV1eWJtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTczMjU2NywiZXhwIjoyMDg1MzA4NTY3fQ.26kwk1VEyGj2Dfba80elLIr35SkWKoQNFJrH7HF59tQ"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnZXp1ZHB3ZWJsanNzbWV1eWJtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTczMjU2NywiZXhwIjoyMDg1MzA4NTY3fQ.26kwk1VEyGj2Dfba80elLIr35SkWKoQNFJrH7HF59tQ"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Set Fields": {
+      "main": [
+        [
+          {
+            "node": "Route: Validate Agent ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Validate Agent ID": {
+      "main": [
+        [
+          {
+            "node": "Route: Check Call Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Check Call Status": {
+      "main": [
+        [
+          {
+            "node": "Transform: Process Completed Call",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Transform: Prepare Extraction Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Process Failed Call",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Process Abandoned Call",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Process Completed Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Process Completed Call": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Process Failed Call": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response Step3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Process Abandoned Call": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response Step4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Prepare Extraction Input": {
+      "main": [
+        [
+          {
+            "node": "Route: Check Skip Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Check Skip Extraction": {
+      "main": [
+        [
+          {
+            "node": "Workflow: Execute Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow: Execute Subworkflow": {
+      "main": [
+        [
+          {
+            "node": "Transform: Flatten Extraction Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Flatten Extraction Results": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Write To Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Webhook receiver for post-call events with routing and downstream handoff."
+  },
+  "versionCounter": 50
+}

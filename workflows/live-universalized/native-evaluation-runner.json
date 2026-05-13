@@ -1,0 +1,274 @@
+{
+  "name": "Native Evaluation Runner",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "5Z1aGKJFAcRk4j6n",
+          "mode": "list",
+          "cachedResultName": "orchestration-system-evaluation-dataset"
+        }
+      },
+      "id": "1d47765a-5d5c-4b5a-935f-b56ffd2f1077",
+      "name": "Evaluate: Run Test",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare ElevenLabs test payload from Data Table row\nconst item = $input.first();\nconst testData = item.json;\n\n// Extract test case data\nconst testName = testData.test_name || 'Unknown Test';\nlet chatHistory = [];\ntry {\n  const rawHistory = typeof testData.chat_history === 'string' \n    ? JSON.parse(testData.chat_history) \n    : testData.chat_history || [];\n  // Ensure each entry has required fields\n  chatHistory = rawHistory.map((entry, idx) => ({\n    role: entry.role || 'user',\n    message: entry.message || entry.content || 'Hello',\n    time_in_call_secs: entry.time_in_call_secs ?? idx\n  }));\n} catch(e) {\n  chatHistory = [{role: 'user', message: 'Hello', time_in_call_secs: 0}];\n}\n\nconst successCondition = testData.success_condition || 'Agent responds appropriately';\nconst testType = testData.test_type || 'llm';\nconst agentId = testData.agent_id || 'agent_8001kdgp7qbyf4wvhs540be78vew';\n\n// Build API payload with correct format per ElevenLabs API docs\n// success_examples and failure_examples must be arrays of {response, type} objects\nreturn [{\n  json: {\n    test_name: testName,\n    test_type: testType,\n    category: testData.category || 'general',\n    agent_id: agentId,\n    api_payload: {\n      name: testName,\n      type: testType,\n      chat_history: chatHistory,\n      success_condition: successCondition,\n      success_examples: [\n        { response: 'Agent correctly follows the expected behavior', type: 'success' }\n      ],\n      failure_examples: [\n        { response: 'Agent fails to follow expected behavior', type: 'failure' }\n      ]\n    }\n  }\n}];"
+      },
+      "id": "prepare-payload",
+      "name": "Transform: Prepare Test Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/convai/agent-testing/create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.api_payload) }}",
+        "options": {}
+      },
+      "id": "create-test",
+      "name": "HTTP: Create Test In Eleven Labs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/convai/agents/{{ $('Prepare Test Payload').item.json.agent_id }}/run-tests",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"tests\": [{\"test_id\": \"{{ $json.id }}\"}]}",
+        "options": {}
+      },
+      "id": "run-tests",
+      "name": "HTTP: Run Tests",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "wait-for-results",
+      "name": "Wait: Pause Execution",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.elevenlabs.io/v1/convai/test-invocations/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-results",
+      "name": "HTTP: Get Test Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse test results and determine pass/fail\nconst testPayload = $('Prepare Test Payload').item.json;\nconst results = $input.first().json;\n\n// Check if test passed\nlet passed = false;\nlet score = 0;\nlet details = 'No results';\n\nif (results && results.status) {\n  if (results.status === 'completed') {\n    passed = results.passed === true;\n    score = passed ? 100 : 0;\n    details = results.evaluation_result || 'Completed';\n  } else if (results.status === 'running') {\n    details = 'Test still running';\n  } else {\n    details = `Status: ${results.status}`;\n  }\n}\n\nreturn [{\n  json: {\n    test_name: testPayload.test_name,\n    category: testPayload.category,\n    result: passed ? 'pass' : 'fail',\n    score: score,\n    details: details,\n    raw_results: results,\n    evaluated_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "evaluate-result",
+      "name": "Transform: Evaluate Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "5Z1aGKJFAcRk4j6n",
+          "mode": "list",
+          "cachedResultName": "orchestration-system-evaluation-dataset"
+        },
+        "outputs": {
+          "values": [
+            {
+              "outputName": "result",
+              "outputValue": "={{ $json.result }}"
+            },
+            {
+              "outputName": "score",
+              "outputValue": "={{ $json.score }}"
+            },
+            {
+              "outputName": "details",
+              "outputValue": "={{ $json.details }}"
+            }
+          ]
+        }
+      },
+      "id": "evaluation-output",
+      "name": "Evaluate: Run Test Step2",
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        1552,
+        0
+      ]
+    },
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        0
+      ],
+      "parameters": {
+        "path": "native-eval-runner",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    }
+  ],
+  "connections": {
+    "Evaluate: Run Test": {
+      "main": [
+        [
+          {
+            "node": "Transform: Prepare Test Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Prepare Test Payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Create Test In Eleven Labs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Create Test In Eleven Labs": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Run Tests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Run Tests": {
+      "main": [
+        [
+          {
+            "node": "Wait: Pause Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait: Pause Execution": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Get Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Get Test Results": {
+      "main": [
+        [
+          {
+            "node": "Transform: Evaluate Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Evaluate Result": {
+      "main": [
+        [
+          {
+            "node": "Evaluate: Run Test Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Receive Request": {
+      "0": [
+        [
+          {
+            "node": "Transform: Prepare Test Payload",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "n8n-native evaluation runner pattern using evaluation trigger nodes."
+  },
+  "versionCounter": 28
+}

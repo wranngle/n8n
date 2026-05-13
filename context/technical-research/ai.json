@@ -7,18 +7,19 @@
   "research_date": "2025-12-31T03:36:32.308Z",
   "has_native_n8n_node": true,
   "has_native_node": true,
-  "native_node_name": "n8n-nodes-base.gmail",
-  "auth_type": "oauth2",
-  "api_quality": "excellent",
+  "native_node_name": "n8n AI/LangChain/provider nodes",
+  "auth_type": "Native n8n credentials or environment variables",
+  "auth_notes": "Use first-class n8n AI, LangChain, or provider nodes when available. Do not call LLM APIs from HTTP Request nodes or Code nodes in reusable workflow demos.",
+  "api_quality": "varies by provider",
   "complexity": {
     "score": 2,
     "tier": "standard",
-    "estimated_hours": 4
+    "estimated_hours": 8
   },
   "effort_recommendation": {
     "tier": "standard",
-    "base_hours": 4,
-    "rationale": "Native n8n node: n8n-nodes-base.gmail"
+    "base_hours": 8,
+    "rationale": "Use first-class n8n AI, LangChain, or provider nodes and keep provider credentials out of workflow JSON."
   },
   "freshness": {
     "stale": false,
@@ -26,6 +27,6 @@
     "score": 0.9,
     "reason": "database"
   },
-  "_database_match": "gmail",
+  "_database_match": null,
   "_is_category": false
 }

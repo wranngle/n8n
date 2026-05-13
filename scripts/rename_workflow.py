@@ -9,15 +9,27 @@ import urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import env  # noqa: E402
 
-API_KEY = env.require("N8N_API_KEY")
-BASE_URL = "https://n8n.wranngle.com/api/v1/workflows"
+ALLOWED_PUT_FIELDS = ("name", "nodes", "connections", "settings", "staticData", "pinData")
 
-def rename_workflow(workflow_id, new_name):
+
+def workflow_put_body(workflow):
+    body = {}
+    for key in ALLOWED_PUT_FIELDS:
+        value = workflow.get(key)
+        if value is None:
+            continue
+        if key in ("staticData", "pinData") and isinstance(value, dict) and not value:
+            continue
+        body[key] = value
+    return body
+
+
+def rename_workflow(base_url, api_key, workflow_id, new_name):
     """Get workflow, update name, PUT back"""
     # GET current workflow
-    get_url = f"{BASE_URL}/{workflow_id}"
+    get_url = f"{base_url}/{workflow_id}"
     req = urllib.request.Request(get_url, method='GET')
-    req.add_header('X-N8N-API-KEY', API_KEY)
+    req.add_header('X-N8N-API-KEY', api_key)
 
     try:
         with urllib.request.urlopen(req) as response:
@@ -26,23 +38,14 @@ def rename_workflow(workflow_id, new_name):
         print(f"GET failed: {e.code} - {e.read().decode('utf-8')}")
         return False
 
-    # n8n API v1 PUT only accepts these fields
-    allowed_fields = ['name', 'nodes', 'connections', 'settings', 'staticData', 'pinData']
-    clean_workflow = {}
-    for k in allowed_fields:
-        if k in workflow and workflow[k] is not None:
-            clean_workflow[k] = workflow[k]
-    clean_workflow['name'] = new_name
-    workflow = clean_workflow
-
-    # Debug: print what we're sending
-    print(f"Sending keys: {list(workflow.keys())}")
+    workflow = workflow_put_body(workflow)
+    workflow['name'] = new_name
 
     # PUT updated workflow
-    put_url = f"{BASE_URL}/{workflow_id}"
+    put_url = f"{base_url}/{workflow_id}"
     data = json.dumps(workflow).encode('utf-8')
     req = urllib.request.Request(put_url, data=data, method='PUT')
-    req.add_header('X-N8N-API-KEY', API_KEY)
+    req.add_header('X-N8N-API-KEY', api_key)
     req.add_header('Content-Type', 'application/json')
 
     try:
@@ -61,5 +64,7 @@ if __name__ == "__main__":
 
     workflow_id = sys.argv[1]
     new_name = sys.argv[2]
-    success = rename_workflow(workflow_id, new_name)
+    api_key = env.require("N8N_API_KEY")
+    base_url = f"{env.n8n_api_v1_url()}/workflows"
+    success = rename_workflow(base_url, api_key, workflow_id, new_name)
     sys.exit(0 if success else 1)

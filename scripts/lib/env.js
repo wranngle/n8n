@@ -1,11 +1,14 @@
-// Loads ~/.agents/.env into process.env. Existing process.env values win.
+// Loads .env and ~/.agents/.env into process.env. Existing process.env values win.
 // Require this module once at the top of any script that needs API keys.
 
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const ENV_PATH = path.join(os.homedir(), '.agents', '.env');
+const ENV_PATHS = [
+  path.join(process.cwd(), '.env'),
+  path.join(os.homedir(), '.agents', '.env'),
+];
 
 function parseEnvFile(text) {
   const out = {};
@@ -26,19 +29,30 @@ function parseEnvFile(text) {
   return out;
 }
 
-if (fs.existsSync(ENV_PATH)) {
-  const parsed = parseEnvFile(fs.readFileSync(ENV_PATH, 'utf8'));
-  for (const [k, v] of Object.entries(parsed)) {
-    if (process.env[k] === undefined) process.env[k] = v;
+for (const envPath of ENV_PATHS) {
+  if (fs.existsSync(envPath)) {
+    const parsed = parseEnvFile(fs.readFileSync(envPath, 'utf8'));
+    for (const [k, v] of Object.entries(parsed)) {
+      if (process.env[k] === undefined) process.env[k] = v;
+    }
   }
 }
 
 function require_(key) {
   const v = process.env[key];
   if (!v) {
-    throw new Error(`${key} is not set. Add it to ${ENV_PATH} or export it before running.`);
+    throw new Error(`${key} is not set. Add it to .env, ~/.agents/.env, or export it before running.`);
   }
   return v;
 }
 
-module.exports = { ENV_PATH, require: require_ };
+function n8nApiUrl() {
+  const raw = require_('N8N_API_URL');
+  return raw.replace(/\/+$/, '');
+}
+
+function n8nHost() {
+  return new URL(n8nApiUrl()).hostname;
+}
+
+module.exports = { ENV_PATHS, require: require_, n8nApiUrl, n8nHost };

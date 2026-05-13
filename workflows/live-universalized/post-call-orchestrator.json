@@ -1,0 +1,226 @@
+{
+  "name": "Post Call Orchestrator",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "post-call-test",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Parse ElevenLabs post_call webhook payload\nconst input = $json.body || $json;\n\n// Extract key fields from ElevenLabs payload\nconst parsed = {\n  conversation_id: input.conversation_id || input.data?.conversation_id || 'unknown',\n  agent_id: input.agent_id || input.data?.agent_id || '',\n  agent_name: input.agent_name || input.data?.agent_name || 'Unknown Agent',\n  event_type: input.event_type || input.type || 'post_call',\n  caller_phone: input.caller_phone || input.metadata?.caller_phone || '',\n  duration_seconds: input.duration_seconds || input.call_duration || 0,\n  outcome: input.outcome || input.status || 'unknown',\n  transcript_available: !!input.transcript || !!input.data?.transcript,\n  errors: input.errors || '',\n  timestamp: new Date().toISOString(),\n  raw_payload: input\n};\n\nreturn { json: parsed };"
+      },
+      "id": "parse-event",
+      "name": "Transform: Parse Post Call Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Build payloads for each subworkflow\nconst data = $json;\n\n// Define subworkflows to call\nconst subworkflows = [\n  {\n    name: 'execution_logger',\n    url: '{{ $env.WEBHOOK_BASE_URL }}/webhook/log-execution-test',\n    payload: {\n      conversation_id: data.conversation_id,\n      agent_name: data.agent_name,\n      caller_phone: data.caller_phone,\n      duration_seconds: data.duration_seconds,\n      outcome: data.outcome,\n      errors: data.errors\n    },\n    required: true\n  },\n  {\n    name: 'slack_notifier',\n    url: '{{ $env.WEBHOOK_BASE_URL }}/webhook/slack-notify-test',\n    payload: {\n      conversation_id: data.conversation_id,\n      agent_name: data.agent_name,\n      caller_phone: data.caller_phone,\n      duration_seconds: data.duration_seconds,\n      outcome: data.outcome,\n      summary: 'Post-call processing triggered'\n    },\n    required: false\n  }\n];\n\n// In production, would also call transcript extractor if transcript_available\nif (data.transcript_available) {\n  subworkflows.push({\n    name: 'transcript_extractor',\n    url: '{{ $env.WEBHOOK_BASE_URL }}/webhook/extract-transcript-v2',\n    payload: { conversation_id: data.conversation_id },\n    required: false\n  });\n}\n\nreturn {\n  json: {\n    parsed_data: data,\n    subworkflows: subworkflows,\n    subworkflow_count: subworkflows.length\n  }\n};"
+      },
+      "id": "fan-out-calls",
+      "name": "Transform: Build Fan Out Payloads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.subworkflows[0].url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.subworkflows[0].payload) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "call-execution-logger",
+      "name": "HTTP: Call Execution Logger",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.subworkflows[1].url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.subworkflows[1].payload) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "call-slack-notifier",
+      "name": "HTTP: Call Slack Notifier",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        112
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "merge-results",
+      "name": "Merge: Combine Branches",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate results from all subworkflow calls\nconst items = $input.all();\nconst results = {};\nlet loggerCalled = false;\nlet slackCalled = false;\n\n// Each item contains the HTTP response from a subworkflow\nitems.forEach((item) => {\n  if (item.json.logged !== undefined) {\n    loggerCalled = true;\n    results.execution_logger = {\n      called: true,\n      success: item.json.success !== false,\n      response: item.json\n    };\n  } else if (item.json.slackPayload !== undefined || item.json.slack !== undefined) {\n    slackCalled = true;\n    results.slack_notifier = {\n      called: true,\n      success: item.json.success !== false,\n      response: item.json\n    };\n  } else {\n    // Fallback - assign based on position\n    const key = Object.keys(results).length === 0 ? 'execution_logger' : 'slack_notifier';\n    if (key === 'execution_logger') loggerCalled = true;\n    if (key === 'slack_notifier') slackCalled = true;\n    results[key] = {\n      called: true,\n      success: item.json.success !== false,\n      response: item.json\n    };\n  }\n});\n\nconst allSuccess = Object.values(results).every(r => r.success);\nconst partialSuccess = !allSuccess && Object.values(results).some(r => r.success);\n\nreturn [{\n  json: {\n    success: true,\n    summary: 'Post-call processing complete',\n    logged: loggerCalled,\n    notified: slackCalled,\n    execution_logger: results.execution_logger || { called: false },\n    slack_notifier: results.slack_notifier || { called: false },\n    partial_success: partialSuccess,\n    orchestration_complete: true,\n    all_success: allSuccess,\n    subworkflow_results: results,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "aggregate-results",
+      "name": "Transform: Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1328,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Parse Post Call Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Parse Post Call Event": {
+      "main": [
+        [
+          {
+            "node": "Transform: Build Fan Out Payloads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Build Fan Out Payloads": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Call Execution Logger",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP: Call Slack Notifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Call Execution Logger": {
+      "main": [
+        [
+          {
+            "node": "Merge: Combine Branches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Call Slack Notifier": {
+      "main": [
+        [
+          {
+            "node": "Merge: Combine Branches",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge: Combine Branches": {
+      "main": [
+        [
+          {
+            "node": "Transform: Aggregate Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Aggregate Results": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Orchestrates post-call processing across several internal workflow endpoints."
+  },
+  "versionCounter": 32
+}

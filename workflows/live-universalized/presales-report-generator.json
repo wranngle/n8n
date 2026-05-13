@@ -1,0 +1,487 @@
+{
+  "name": "Presales Report Generator",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "webhook-intake",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "presales-intake",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        },
+        "authentication": "headerAuth"
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "code-transform",
+      "name": "Transform: Transform To API Format",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const formData = $input.all()[0].json.body || $input.all()[0].json;\n\nconst intake = {\n  client_name: formData.client_name || formData.company_name || formData.businessName || 'Unknown',\n  contact_name: formData.contact_name || formData.ownerName || '',\n  contact_title: formData.contact_title || '',\n  contact_email: formData.contact_email || formData.email || '',\n  industry: formData.industry || '',\n  q01_workflow_name: formData.q01_workflow_name || formData.workflow_name || formData.process_name || '',\n  q02_trigger_event: formData.q02_trigger_event || formData.trigger_event || '',\n  q03_business_objective: formData.q03_business_objective || formData.business_objective || formData.objective || '',\n  q04_end_condition: formData.q04_end_condition || formData.end_condition || '',\n  q05_outcome_owner: formData.q05_outcome_owner || formData.outcome_owner || '',\n  q06_runs_per_period: parseInt(formData.q06_runs_per_period || formData.volume || formData.runs_per_period || 50),\n  q06_period_unit: formData.q06_period_unit || formData.period_unit || 'day',\n  q07_avg_trigger_to_end: parseInt(formData.q07_avg_trigger_to_end || formData.time_per_item || 15),\n  q07_time_unit: formData.q07_time_unit || formData.time_unit || 'minutes',\n  q08_worst_case_delay: parseInt(formData.q08_worst_case_delay || formData.worst_case_delay || 0),\n  q08_delay_unit: formData.q08_delay_unit || formData.delay_unit || 'hours',\n  q09_business_hours: formData.q09_business_hours || 'standard',\n  q10_systems_involved: Array.isArray(formData.q10_systems_involved)\n    ? formData.q10_systems_involved\n    : (formData.systems_involved || formData.systems || '').split(',').map(s => s.trim()).filter(Boolean),\n  q10_systems_other: formData.q10_systems_other || '',\n  q11_manual_transfers: formData.q11_manual_transfers || '',\n  q12_human_decisions: formData.q12_human_decisions || '',\n  q13_common_failures: formData.q13_common_failures || formData.common_failures || '',\n  q14_failure_cost: formData.q14_failure_cost || formData.failure_cost || '',\n  hourly_rate: parseInt(formData.hourly_rate || 50),\n  q15_priority: formData.q15_priority || formData.priority || '',\n  budget_range: formData.budget_range || '',\n  timeline_weeks: formData.timeline_weeks || formData.timeline || '',\n  decision_maker: formData.decision_maker || 'no',\n  lead_source: formData.lead_source || 'web',\n  urgency: formData.urgency || 'medium',\n  competitors: formData.competitors || 'no',\n  previous_automation: formData.previous_automation || 'no'\n};\n\nconst cleanIntake = Object.fromEntries(\n  Object.entries(intake).filter(([_, v]) => v !== '' && v !== 0 && !(Array.isArray(v) && v.length === 0))\n);\n\nreturn {\n  json: {\n    intake: cleanIntake,\n    intakeJson: JSON.stringify(cleanIntake),\n    contact_email: cleanIntake.contact_email || ''\n  }\n};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "http-generate",
+      "name": "HTTP: Call Generate API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/api/generate",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ input: $json.intakeJson, structured: true }) }}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 30000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "if-success",
+      "name": "Route: Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-success",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "code-success",
+      "name": "Transform: Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const response = $input.all()[0].json;\nconst intake = $('Transform to API Format').all()[0].json.intake;\n\nreturn {\n  json: {\n    status: 'success',\n    message: `Report generated for ${response.summary?.client || intake.client_name || 'client'}`,\n    execution_id: response.execution_id,\n    client: response.summary?.client || intake.client_name,\n    contact_email: intake.contact_email || '',\n    total_price: response.summary?.total_price,\n    total_hours: response.summary?.total_hours,\n    audit_score: response.summary?.audit_score,\n    artifacts: response.artifacts,\n    html_url: response.artifacts?.html,\n    pdf_url: response.artifacts?.pdf,\n    json_url: response.artifacts?.json\n  }\n};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "code-error",
+      "name": "Transform: Format Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        500
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const response = $input.all()[0].json;\nconst intake = $('Transform to API Format').all()[0].json.intake;\n\nreturn {\n  json: {\n    status: 'error',\n    message: response.error || 'Report generation failed',\n    client: intake.client_name || 'Unknown',\n    contact_email: intake.contact_email || '',\n    execution_id: response.execution_id || null,\n    details: response\n  }\n};"
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "if-has-contact-email",
+      "name": "Route: Has Contact Email",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        100
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-email",
+              "leftValue": "={{ $json.contact_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "id": "email-client",
+      "name": "Email: Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        0
+      ],
+      "parameters": {
+        "fromEmail": "noreply@example.com",
+        "toEmail": "={{ $json.contact_email }}",
+        "subject": "=Your AI Process Audit Report - {{ $json.client }}",
+        "emailFormat": "html",
+        "html": "=<div style=\"font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 24px; background: #ffffff;\">\n  <div style=\"text-align: center; padding: 24px; background: #12111a; border-radius: 8px; margin-bottom: 32px;\">\n    <img src=\"https://i.ibb.co/WWFmbjKJ/example-wordmark-4096w.png\" alt=\"example\" width=\"160\" style=\"display: block; margin: 0 auto;\" />\n  </div>\n  <div style=\"border-left: 4px solid #ff5f00; padding-left: 20px; margin-bottom: 24px;\">\n    <h1 style=\"font-size: 24px; font-weight: 700; color: #12111a; margin: 0 0 8px 0;\">Your Report is Ready</h1>\n    <p style=\"font-size: 16px; color: #6b7280; margin: 0;\">AI Process Audit &amp; Proposal for {{ $json.client }}</p>\n  </div>\n  <div style=\"background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 24px;\">\n    <table style=\"width: 100%; font-size: 14px;\">\n      <tr><td style=\"color: #6b7280; padding: 4px 0;\">Estimated Investment</td><td style=\"font-weight: 700; text-align: right;\">{{ $json.total_price || 'See report' }}</td></tr>\n      <tr><td style=\"color: #6b7280; padding: 4px 0;\">Estimated Hours</td><td style=\"font-weight: 700; text-align: right;\">{{ $json.total_hours || 'See report' }}</td></tr>\n      <tr><td style=\"color: #6b7280; padding: 4px 0;\">Automation Score</td><td style=\"font-weight: 700; text-align: right;\">{{ $json.audit_score || 'See report' }}</td></tr>\n    </table>\n  </div>\n  <p style=\"font-size: 14px; color: #6b7280; line-height: 1.6;\">Your full report including AI Process Audit, Project Plan, and Commercial Proposal has been generated. Our team will follow up with you shortly to discuss the findings.</p>\n  <div style=\"text-align: center; margin: 32px 0;\">\n    <p style=\"font-size: 12px; color: #9ca3af;\">&copy; 2026 example Systems LLC</p>\n  </div>\n</div>",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "email-internal-success",
+      "name": "Email: Send Notification Step2",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        300
+      ],
+      "parameters": {
+        "fromEmail": "noreply@example.com",
+        "toEmail": "sales@example.com",
+        "subject": "=Presales Report Generated: {{ $json.client }}",
+        "emailFormat": "html",
+        "html": "=<div style=\"font-family: 'Inter', Arial, sans-serif; padding: 24px;\">\n  <h2 style=\"color: #12111a;\">Presales Report Generated</h2>\n  <div style=\"background: #f9fafb; border-left: 4px solid #10b981; padding: 16px; border-radius: 4px; margin-bottom: 16px;\">\n    <p><strong>Client:</strong> {{ $json.client }}</p>\n    <p><strong>Contact:</strong> {{ $json.contact_email || 'Not provided' }}</p>\n    <p><strong>Price:</strong> {{ $json.total_price || 'N/A' }}</p>\n    <p><strong>Hours:</strong> {{ $json.total_hours || 'N/A' }}</p>\n    <p><strong>Audit Score:</strong> {{ $json.audit_score || 'N/A' }}</p>\n    <p><strong>Execution ID:</strong> {{ $json.execution_id }}</p>\n  </div>\n  <p style=\"font-size: 12px; color: #9ca3af;\">Generated via presales intake webhook</p>\n</div>",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "email-internal-error",
+      "name": "Email: Send Notification Step3",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        500
+      ],
+      "parameters": {
+        "fromEmail": "noreply@example.com",
+        "toEmail": "sales@example.com",
+        "subject": "=FAILED: Presales Report - {{ $json.client }}",
+        "emailFormat": "html",
+        "html": "=<div style=\"font-family: 'Inter', Arial, sans-serif; padding: 24px;\">\n  <h2 style=\"color: #ef4444;\">Presales Report Generation FAILED</h2>\n  <div style=\"background: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; border-radius: 4px; margin-bottom: 16px;\">\n    <p><strong>Client:</strong> {{ $json.client }}</p>\n    <p><strong>Contact:</strong> {{ $json.contact_email || 'Not provided' }}</p>\n    <p><strong>Error:</strong> {{ $json.message }}</p>\n    <p><strong>Execution ID:</strong> {{ $json.execution_id || 'N/A' }}</p>\n  </div>\n  <p style=\"font-size: 12px; color: #9ca3af;\">Check pipeline logs for details</p>\n</div>",
+        "options": {}
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "respond-success",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1780,
+        200
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, execution_id: $('Format Success').item.json.execution_id, client: $('Format Success').item.json.client, artifacts: $('Format Success').item.json.artifacts }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "respond-error",
+      "name": "Webhook: Return Response Step2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        600
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: $json.message }) }}",
+        "options": {
+          "responseCode": 500
+        }
+      }
+    },
+    {
+      "id": "code-validate",
+      "name": "Transform: Validate Required Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        350,
+        300
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const formData = $input.all()[0].json.body || $input.all()[0].json;\nconst required = ['client_name', 'q01_workflow_name', 'q02_trigger_event', 'q03_business_objective'];\nconst missing = required.filter(f => !formData[f] && !formData[f.replace(/q\\d+_/, '')]);\n\nif (missing.length > 0) {\n  throw new Error(`Missing required fields: ${missing.join(', ')}`);\n}\n\nreturn $input.all();"
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Transform: Transform To API Format": {
+      "1": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "HTTP: Call Generate API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Call Generate API": {
+      "1": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Route: Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Check Success": {
+      "main": [
+        [
+          {
+            "node": "Transform: Format Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Format Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Format Success": {
+      "1": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Route: Has Contact Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email: Send Notification Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Has Contact Email": {
+      "1": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "2": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Email: Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Email: Send Notification": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email: Send Notification Step2": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Format Error": {
+      "1": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Email: Send Notification Step3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email: Send Notification Step3": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Validate Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Validate Required Fields": {
+      "1": [
+        [
+          {
+            "node": "Webhook: Return Response Step2",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Transform: Transform To API Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Webhook-driven presales research and report generation workflow."
+  },
+  "versionCounter": 38
+}

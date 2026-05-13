@@ -1,0 +1,118 @@
+{
+  "name": "Web Scraper Endpoint",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "path": "scraper",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "fetch",
+      "name": "HTTP: Fetch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.body.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "code",
+      "name": "Transform: Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data || '';\nconst titleMatch = html.match(/<title>([^<]*)<\\/title>/i);\nconst h1Match = html.match(/<h1[^>]*>([^<]*)<\\/h1>/i);\nreturn [{\n  json: {\n    success: true,\n    title: titleMatch ? titleMatch[1].trim() : null,\n    h1: h1Match ? h1Match[1].trim() : null,\n    length: html.length\n  }\n}];"
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        300
+      ],
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Fetch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Fetch": {
+      "main": [
+        [
+          {
+            "node": "Transform: Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Extract": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "published",
+    "summary": "Simple webhook scraping endpoint for single-page extraction."
+  },
+  "versionCounter": 10
+}

@@ -1,4 +1,4 @@
-title = "dotfiles-managed gitleaks config"
+title = "n8n workflow library gitleaks config"
 
 [extend]
 useDefault = true

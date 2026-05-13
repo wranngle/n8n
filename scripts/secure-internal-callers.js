@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Find every n8n HTTP Request node that targets another n8n webhook
- * (n8n.wranngle.com/webhook/...) and bind it to the shared X-Webhook-Secret
+ * on the configured tenant and bind it to the shared X-Webhook-Secret
  * credential. Idempotent.
  *
  * Usage:
@@ -9,29 +9,16 @@
  *   node scripts/secure-internal-callers.js --apply
  */
 
-const https = require('https');
 const env = require('./lib/env');
+const api = require('./lib/n8n-api');
 
 const APPLY = process.argv.includes('--apply');
-const HOST = 'n8n.wranngle.com';
-const API_KEY = env.require('N8N_API_KEY');
+const HOST = env.n8nHost();
 const CRED_ID = env.require('N8N_WEBHOOK_AUTH_CRED_ID');
 const CRED_NAME = 'X-Webhook-Secret (shared)';
 
 function request(method, path, body) {
-  return new Promise((resolve, reject) => {
-    const data = body ? JSON.stringify(body) : null;
-    const req = https.request({
-      hostname: HOST, path, method,
-      headers: {
-        'X-N8N-API-KEY': API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {}),
-      },
-    }, res => { let d=''; res.on('data',c=>d+=c); res.on('end',()=>{ try{resolve({status:res.statusCode,body:JSON.parse(d||'{}')})}catch{resolve({status:res.statusCode,body:d})} }); });
-    req.on('error', reject); if (data) req.write(data); req.end();
-  });
+  return api.request(method, path, body);
 }
 
 const ALLOWED = ['name','nodes','connections','settings','staticData','pinData'];
@@ -51,8 +38,7 @@ function isInternalN8nCall(node) {
   if (node.type !== 'n8n-nodes-base.httpRequest') return false;
   const url = node.parameters?.url;
   if (!url || typeof url !== 'string') return false;
-  // Match literal n8n.wranngle.com/webhook/ AND expressions that include /webhook/ on a wranngle domain.
-  return /n8n\.wranngle\.com\/webhook\//.test(url);
+  return url.includes(`${HOST}/webhook/`);
 }
 
 function patchHttpNode(node) {

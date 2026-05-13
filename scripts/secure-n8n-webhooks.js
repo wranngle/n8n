@@ -9,48 +9,23 @@
  *   node scripts/secure-n8n-webhooks.js --apply      # actually mutate
  */
 
-const https = require('https');
 const env = require('./lib/env');
+const api = require('./lib/n8n-api');
 
 const APPLY = process.argv.includes('--apply');
-const HOST = 'n8n.wranngle.com';
-const API_KEY = env.require('N8N_API_KEY');
 const SECRET = env.require('N8N_WEBHOOK_SECRET');
 const CRED_NAME = 'X-Webhook-Secret (shared)';
 const HEADER_NAME = 'X-Webhook-Secret';
 
-// Workflows that MUST NOT have header auth — they receive HMAC-signed traffic
-// from ElevenLabs. HMAC validation belongs inside the workflow itself.
-// See docs/WEBHOOK_AUTH.md "HMAC exceptions".
-const HMAC_EXEMPT = new Set([
-  'cEORduJCqCVDOKce', // [DEV] ElevenLabs Call Completed - Update Pipedrive
-  'FGjUvywqh09XKlYJ', // [DEV] Post-Call Bulletproof v2
-]);
+const HMAC_EXEMPT = new Set(
+  (process.env.N8N_HMAC_EXEMPT_WORKFLOW_IDS || '')
+    .split(',')
+    .map(id => id.trim())
+    .filter(Boolean)
+);
 
 function request(method, path, body) {
-  return new Promise((resolve, reject) => {
-    const data = body ? JSON.stringify(body) : null;
-    const req = https.request({
-      hostname: HOST, path, method,
-      headers: {
-        'X-N8N-API-KEY': API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {}),
-      },
-    }, res => {
-      let buf = '';
-      res.on('data', c => buf += c);
-      res.on('end', () => {
-        let parsed;
-        try { parsed = JSON.parse(buf || '{}'); } catch { parsed = buf; }
-        resolve({ status: res.statusCode, body: parsed });
-      });
-    });
-    req.on('error', reject);
-    if (data) req.write(data);
-    req.end();
-  });
+  return api.request(method, path, body);
 }
 
 async function listAllWorkflows() {
@@ -110,7 +85,7 @@ function pickPutBody(workflow) {
 
 async function processWorkflow(meta, credId, results) {
   if (/^\[ARCHIVED\]/.test(meta.name)) { results.skipped.push({ id: meta.id, name: meta.name, reason: 'archived' }); return; }
-  if (HMAC_EXEMPT.has(meta.id)) { results.skipped.push({ id: meta.id, name: meta.name, reason: 'HMAC-exempt (ElevenLabs)' }); return; }
+  if (HMAC_EXEMPT.has(meta.id)) { results.skipped.push({ id: meta.id, name: meta.name, reason: 'HMAC-exempt' }); return; }
   const r = await request('GET', `/api/v1/workflows/${meta.id}`);
   if (r.status !== 200) { results.errors.push({ id: meta.id, name: meta.name, stage: 'get', status: r.status, body: r.body }); return; }
   const wf = r.body;

@@ -1,18 +1,13 @@
-name: 🐞 Bug
+name: Bug
 description: Existing behavior is wrong
 title: "bug: "
-labels: [t.bug, triage]
+labels: [bug, triage]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Tip: paste this prompt to Claude / Codex / Gemini to fill the form for you →
-        > "Open a bug issue. Symptom: <one sentence>. Use my recent shell history and code context to fill all fields."
   - type: textarea
     id: what
     attributes:
       label: What & how to reproduce
-      description: Symptom in 1–2 lines, then exact steps. Include error messages verbatim.
+      description: Symptom in 1-2 lines, then exact steps. Include error messages verbatim.
       placeholder: |
         Symptom: ...
         Reproduce:
@@ -29,12 +24,12 @@ body:
       label: Area
       description: Drives the a/<area> label automatically via the issue-triage workflow.
       options:
-        - core
-        - cli
-        - api
+        - workflows
+        - conversion
+        - verification
         - docs
         - ci
-        - infra
+        - security
         - other
     validations:
       required: true

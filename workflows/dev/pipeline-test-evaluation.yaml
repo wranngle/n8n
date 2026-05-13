@@ -3,7 +3,7 @@
 # Evaluates the end-to-end n8n workflow development pipeline
 
 workflow:
-  name: "[DEV] Pipeline Test - Webhook Processor"
+  name: "Pipeline Test Webhook Processor"
   file: pipeline-test-webhook-processor.json
   webhook_path: /webhook/pipeline-test
 
@@ -110,7 +110,7 @@ metrics:
 
 execution:
   # Run with curl:
-  # curl -X POST https://n8n.wranngle.com/webhook/pipeline-test \
+  # curl -X POST "$N8N_WEBHOOK_BASE_URL/webhook/pipeline-test" \
   #   -H "Content-Type: application/json" \
   #   -d '{"name": "Test", "value": 42}'
 

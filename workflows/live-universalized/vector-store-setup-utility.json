@@ -1,0 +1,231 @@
+{
+  "name": "Vector Store Setup Utility",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "path": "qdrant-setup",
+        "httpMethod": "POST",
+        "responseMode": "lastNode",
+        "authentication": "headerAuth"
+      }
+    },
+    {
+      "id": "check-collection",
+      "name": "HTTP: Check Collection Exists",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:6333/collections/call_transcripts",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "needs-creation",
+      "name": "Route: Needs Creation",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "leftValue": "={{ $json.status?.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "create-collection",
+      "name": "HTTP: Create Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        200
+      ],
+      "parameters": {
+        "method": "PUT",
+        "url": "http://localhost:6333/collections/call_transcripts",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"vectors\":{\"size\":768,\"distance\":\"Cosine\"}}",
+        "options": {
+          "timeout": 15000
+        }
+      }
+    },
+    {
+      "id": "already-exists",
+      "name": "Transform: Set Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        400
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "status",
+              "value": "Collection already exists",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    },
+    {
+      "id": "result",
+      "name": "Transform: Set Fields Step2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        300
+      ],
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "name": "setup_complete",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "name": "collection_name",
+              "value": "call_transcripts",
+              "type": "string"
+            },
+            {
+              "name": "vector_size",
+              "value": "768 (Gemini text-embedding-004)",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true
+      }
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Check Collection Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Check Collection Exists": {
+      "main": [
+        [
+          {
+            "node": "Route: Needs Creation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route: Needs Creation": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Create Collection",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transform: Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Create Collection": {
+      "main": [
+        [
+          {
+            "node": "Transform: Set Fields Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Set Fields": {
+      "main": [
+        [
+          {
+            "node": "Transform: Set Fields Step2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Utility workflow for creating and validating vector-store infrastructure."
+  },
+  "versionCounter": 11
+}

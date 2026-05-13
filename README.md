@@ -1,56 +1,85 @@
-# n8n
+# n8n Workflow Library
 
-Sanitized n8n workflow library: lead intake, enrichment, post-call processing, and webhook security middleware. Generic n8n surface only — voice-agent / ElevenLabs-specific code lives at [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals).
+A public showcase of production-shaped n8n workflows, converted from real operating patterns into generic, reusable demos.
 
-## What's in here
+This repo is not a pile of exported JSON. It is a workflow-as-code library: every public workflow is importable, scrubbed of runtime metadata, cataloged, and checked for common n8n failure modes before it lands in Git.
 
-- **`workflows/`** — production flows ([`lead-intake-main.json`](workflows/lead-intake-main.json), [`lead-enrichment-microservice.json`](workflows/lead-enrichment-microservice.json), `dev/`, `knowledge_management/youtube-rag-pipeline/`) plus governance + registry YAMLs
-- **`scripts/`** — workflow API utilities ([`activate-workflow.js`](scripts/activate-workflow.js), [`list_workflows.js`](scripts/list_workflows.js), `update_workflow.py`, etc.), governance ([`governance-engine.js`](scripts/governance-engine.js)), and webhook security ([`secure-n8n-webhooks.js`](scripts/secure-n8n-webhooks.js), [`secure-internal-callers.js`](scripts/secure-internal-callers.js))
-- **`templates/`** — generic n8n templates
-- **`tests/`** — workflow integration smoke tests
-- **`context/`** — local knowledge bases (YouTube + Discord research) feeding the workflow generator
+## Showcase
 
-## Demo
+- **40 reusable workflow exports** across lead intake, messaging, voice automation, web scraping, workflow QA, retrieval, and infrastructure.
+- **36 universalized live workflows** converted from an actual n8n instance into public demos.
+- **7 published live-derived examples** ready to import after configuring credentials and environment variables.
+- **Workflow-as-code automation** for conversion, validation, governance, and repeatable live-instance export.
 
-🎬 _Loom walkthrough coming soon — workflow library tour: lead intake, enrichment, post-call processing, webhook security._
+Start with the curated showcase: [`docs/showcase.md`](docs/showcase.md).
 
-<!-- Replace with: <a href="https://www.loom.com/share/<id>"><img src="https://cdn.loom.com/sessions/thumbnails/<id>-with-play.gif" alt="Workflow library demo"></a> -->
+## Featured Workflows
 
-## Architecture
+| Workflow | Why It Matters |
+|---|---|
+| [`Lead Intake Form Receiver`](workflows/live-universalized/lead-intake-form-receiver.json) | Production-style lead capture with validation, notification, and downstream handoff. |
+| [`Universal Message Sender`](workflows/live-universalized/universal-message-sender.json) | Reusable messaging endpoint with routing, provider calls, waits, and response handling. |
+| [`SMS Conversation Assistant`](workflows/live-universalized/sms-conversation-assistant.json) | Multi-step SMS workflow pattern for request parsing, routing, and follow-up. |
+| [`Bulk Web Scraper`](workflows/live-universalized/bulk-web-scraper.json) | Fan-out scraping workflow with aggregation and webhook response shaping. |
+| [`Workflow Test Data Table API`](workflows/live-universalized/workflow-test-data-table-api.json) | n8n-as-code testing pattern using Data Tables for cases and results. |
+| [`Voice Agent Evaluation Harness`](workflows/live-universalized/voice-agent-evaluation-harness.json) | Evaluation harness for voice-agent simulation and QA workflows. |
+| [`YouTube RAG Ingestion Pipeline`](workflows/knowledge_management/youtube-rag-pipeline/workflow.json) | Retrieval pipeline with metadata, transcript formatting, embeddings, and Qdrant storage. |
 
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the lead intake → CRM → call → post-call flow and how this repo connects to its satellites:
+See [`WORKFLOWS.md`](WORKFLOWS.md) for the complete catalog and import notes.
 
-- [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals) — eval harness for ElevenLabs voice agents (the production agent runtime, prompt versioning, scenario framework)
-- [`wranngle/gtm_ops`](https://github.com/wranngle/gtm_ops) — unified GTM motion runtime (presales pipeline, ops-console, audit log surface)
+## Workflow-As-Code Practices
 
-## Webhook authentication
+The repository treats n8n exports as code:
 
-Every n8n webhook in this repo requires an `X-Webhook-Secret` header validated against `N8N_WEBHOOK_SECRET`. See [`docs/WEBHOOK_AUTH.md`](docs/WEBHOOK_AUTH.md) for the rotation playbook. ElevenLabs HMAC-signed webhooks (different protocol — HMAC-SHA256 over `<timestamp>.<body>`) are handled in `voice_ai_agent_evals`.
+- Workflow JSON is reviewed in Git before import.
+- Public examples are converted with [`scripts/convert-workflow.js`](scripts/convert-workflow.js), which removes tenant-specific runtime fields and rewrites environment-specific values as explicit placeholders.
+- [`scripts/verify-workflows.js`](scripts/verify-workflows.js) parses every workflow and blocks fields that should not be committed to a reusable library.
+- [`workflows/registry.yaml`](workflows/registry.yaml) documents each demo workflow by pattern, integrations, and verification state.
+- [`workflows/governance.yaml`](workflows/governance.yaml) records the lightweight lifecycle rules used by the library.
+- [`scripts/export-public-workflows.js`](scripts/export-public-workflows.js) regenerates the curated live-derived showcase from the configured n8n instance.
 
-## Workflow governance
+More detail lives in [`docs/showcase.md`](docs/showcase.md), [`docs/workflow-development.md`](docs/workflow-development.md), and [`docs/library-curation.md`](docs/library-curation.md).
 
-- **DEV**: all active development. Modifiable.
-- **ARCHIVED**: deprecated, read-only. Deletion is blocked; archive instead.
-- New workflows auto-tag as DEV.
-
-`workflows/governance.yaml` is the authoritative phase tracker; `scripts/governance-engine.js` enforces it. See [`WORKFLOWS.md`](WORKFLOWS.md) for the per-workflow index.
-
-## Running
+## Running Checks
 
 ```bash
-# Workflow API utilities (require N8N_API_KEY)
-node scripts/list_workflows.js
-node scripts/activate-workflow.js --workflow <id>
-
-# Governance audit
-node scripts/governance-engine.js --check
-
-# Webhook security middleware (idempotent, run after creating new workflows)
-node scripts/secure-n8n-webhooks.js --apply
-node scripts/secure-internal-callers.js --apply
+npm install
+npm run verify
+npm run check:scripts
 ```
 
-See [`.env.example`](.env.example) for required environment variables.
+Convert an exported workflow into a library-ready artifact:
+
+```bash
+node scripts/convert-workflow.js export.json workflows/dev/example-workflow.json \
+  --name "Example Workflow" \
+  --replace-url "https://tenant.example.com={{ $env.WEBHOOK_BASE_URL }}"
+```
+
+Export the curated live-instance set:
+
+```bash
+node scripts/export-public-workflows.js
+```
+
+## Importing
+
+1. Create the required credentials in n8n, such as Postgres, Email, YouTube, OpenAI, Qdrant, Header Auth, or provider-specific HTTP credentials.
+2. Import the workflow JSON.
+3. Configure environment variables referenced by expressions such as `{{ $env.WEBHOOK_BASE_URL }}`, `{{ $env.CLAY_API_KEY }}`, and `{{ $env.QDRANT_URL }}` in the target n8n runtime, or change the expressions to match your environment.
+4. Select the local credentials on imported nodes if n8n does not resolve them automatically.
+5. Run the workflow manually with sample input before activating it.
+
+Webhook examples use an `X-Webhook-Secret` shared-secret pattern. See [`docs/WEBHOOK_AUTH.md`](docs/WEBHOOK_AUTH.md).
+
+## Repo Map
+
+```text
+workflows/                  reusable workflow exports and metadata
+scripts/                    conversion, verification, deployment, and governance utilities
+context/technical-research/ optional integration research notes used when designing new demos
+docs/                       workflow development and security notes
+```
 
 ## License
 

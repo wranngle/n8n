@@ -1,16 +1,14 @@
-# n8n webhook authentication
+# n8n Webhook Authentication
 
-Generic n8n webhook surface in this repo requires a shared secret on every request:
+Webhook examples in this repo use a shared secret on every request:
 
 - **Header:** `X-Webhook-Secret`
 - **Source of truth (callers):** `N8N_WEBHOOK_SECRET` env var
 - **Source of truth (n8n side):** a single Header Auth credential whose value matches the env var
 
-Requests without the header (or with the wrong value) are rejected with `401`.
+Requests without the header, or with the wrong value, should be rejected with `401`.
 
-ElevenLabs / vendor-signed webhooks (HMAC-SHA256 over `<timestamp>.<body>`) are handled in [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals) — see `docs/webhook-security.md` there. This doc covers the n8n shared-secret pattern only.
-
-## Applying the pattern to a workflow
+## Applying The Pattern
 
 The two scripts under `scripts/` are idempotent.
 
@@ -20,9 +18,9 @@ node scripts/secure-n8n-webhooks.js --apply
 node scripts/secure-internal-callers.js --apply  # patch HTTP Request nodes calling n8n webhooks
 ```
 
-Pass `N8N_WEBHOOK_AUTH_CRED_ID=<your-cred-id>` to reuse an existing credential instead of creating a new one.
+Pass `N8N_WEBHOOK_AUTH_CRED_ID=<your-credential-id>` to reuse an existing credential instead of creating a new one.
 
-## Caller contract
+## Caller Contract
 
 JavaScript / TypeScript callers send:
 
@@ -33,9 +31,9 @@ headers: {
 }
 ```
 
-Callers throw at startup if `N8N_WEBHOOK_SECRET` is missing — fail fast rather than silently produce 401s.
+Callers should throw at startup if `N8N_WEBHOOK_SECRET` is missing.
 
-## Rotating the shared secret
+## Rotating The Shared Secret
 
 1. Generate a new secret: `openssl rand -hex 32`.
 2. Update the `X-Webhook-Secret` credential value in the n8n UI.
@@ -44,4 +42,4 @@ Callers throw at startup if `N8N_WEBHOOK_SECRET` is missing — fail fast rather
 
 ## Source JSONs
 
-Workflow JSONs in this repo reference the credential by id. If you re-import any of them, the credential resolves automatically against the live tenant.
+Workflow JSONs in this repo should not include secret values. Recreate the credential in the target tenant, then select it after import if n8n does not resolve it automatically.

@@ -1,0 +1,88 @@
+{
+  "name": "Execution Logger Endpoint",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "log-execution-test",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract and format log entry from webhook payload\nconst input = $json.body || $json;\n\nconst logEntry = {\n  timestamp: new Date().toISOString(),\n  conversation_id: input.conversation_id || 'unknown',\n  agent_name: input.agent_name || 'unknown',\n  caller_phone: input.caller_phone || '',\n  duration_seconds: input.duration_seconds || 0,\n  outcome: input.outcome || 'unknown',\n  extracted_fields: JSON.stringify(input.extracted_fields || {}),\n  errors: input.errors || ''\n};\n\nreturn { json: logEntry };"
+      },
+      "id": "format-log-entry",
+      "name": "Transform: Format Log Entry",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, logged: $json, message: 'Test mode - not written to sheet' } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Format Log Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Format Log Entry": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Small endpoint for capturing workflow execution telemetry."
+  },
+  "versionCounter": 30
+}

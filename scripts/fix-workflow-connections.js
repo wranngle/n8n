@@ -4,33 +4,25 @@
  * The n8n-mcp tool creates connections with "type": "0" instead of "type": "main"
  */
 
-const https = require('https');
-const fs = require('fs');
-const env = require('./lib/env');
+const api = require('./lib/n8n-api');
 
-const apiKey = env.require('N8N_API_KEY');
-const workflowId = process.argv[2] || 'cEORduJCqCVDOKce';
+const workflowId = process.argv[2];
+
+if (!workflowId) {
+  console.error('Usage: node scripts/fix-workflow-connections.js <workflow-id>');
+  process.exit(1);
+}
 
 console.log('Fixing workflow:', workflowId);
 
-// Get the workflow
-const getOptions = {
-  hostname: 'n8n.wranngle.com',
-  path: '/api/v1/workflows/' + workflowId,
-  method: 'GET',
-  headers: { 'X-N8N-API-KEY': apiKey }
-};
-
-https.request(getOptions, (res) => {
-  let data = '';
-  res.on('data', chunk => data += chunk);
-  res.on('end', () => {
-    if (res.statusCode !== 200) {
-      console.error('Failed to get workflow:', res.statusCode, data);
+(async () => {
+    const get = await api.request('GET', `/api/v1/workflows/${workflowId}`);
+    if (get.status !== 200) {
+      console.error('Failed to get workflow:', get.status, typeof get.body === 'string' ? get.body : JSON.stringify(get.body, null, 2));
       process.exit(1);
     }
 
-    const workflow = JSON.parse(data);
+    const workflow = get.body;
     const connections = workflow.connections;
     let fixedCount = 0;
 
@@ -74,46 +66,23 @@ https.request(getOptions, (res) => {
     console.log(`Fixed ${fixedCount} connection(s). Updating workflow...`);
 
     // Update the workflow
-    const updatePayload = JSON.stringify({
+    const updatePayload = {
       name: workflow.name,
       nodes: workflow.nodes,
       connections: connections,
       settings: workflow.settings
-    });
-
-    const updateOptions = {
-      hostname: 'n8n.wranngle.com',
-      path: '/api/v1/workflows/' + workflowId,
-      method: 'PUT',
-      headers: {
-        'X-N8N-API-KEY': apiKey,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(updatePayload)
-      }
     };
 
-    const updateReq = https.request(updateOptions, (updateRes) => {
-      let updateData = '';
-      updateRes.on('data', chunk => updateData += chunk);
-      updateRes.on('end', () => {
-        if (updateRes.statusCode === 200) {
-          console.log('Workflow connections fixed successfully!');
-        } else {
-          console.error('Failed to update workflow:', updateRes.statusCode);
-          console.error(updateData.slice(0, 1000));
-          process.exit(1);
-        }
-      });
-    });
+    const update = await api.request('PUT', `/api/v1/workflows/${workflowId}`, updatePayload);
 
-    updateReq.on('error', e => {
-      console.error('Update error:', e.message);
+    if (update.status === 200) {
+      console.log('Workflow connections fixed successfully!');
+    } else {
+      console.error('Failed to update workflow:', update.status);
+      console.error(typeof update.body === 'string' ? update.body.slice(0, 1000) : JSON.stringify(update.body, null, 2).slice(0, 1000));
       process.exit(1);
-    });
-    updateReq.write(updatePayload);
-    updateReq.end();
-  });
-}).on('error', e => {
-  console.error('Get error:', e.message);
+    }
+})().catch(error => {
+  console.error('Error:', error.message);
   process.exit(1);
-}).end();
+});

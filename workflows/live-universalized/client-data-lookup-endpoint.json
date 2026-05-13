@@ -1,0 +1,88 @@
+{
+  "name": "Client Data Lookup Endpoint",
+  "description": null,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "client-lookup-test",
+        "responseMode": "responseNode",
+        "options": {},
+        "authentication": "headerAuth"
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook: Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Simulate client data lookup - handles both webhook and evaluation inputs\nconst input = $json.body || $json;\n// Support both webhook format (phone/email) and evaluation format (input_phone/input_email)\nconst phone = input.input_phone || input.phone || '';\nconst email = input.input_email || input.email || '';\n\nconst mockClients = {\n  '{{ $env.SECRET_VALUE }}': {\n    first_name: 'John',\n    last_name: 'Smith',\n    company: 'Acme Corp',\n    account_type: 'Premium',\n    loyalty_tier: 'Gold',\n    last_interaction: 'Called 3 days ago about demo',\n    notes: 'Prefers morning calls'\n  },\n  '{{ $env.SECRET_VALUE }}': {\n    first_name: 'Jane',\n    last_name: 'Doe',\n    company: 'Tech Startup Inc',\n    account_type: 'Standard',\n    loyalty_tier: 'Silver',\n    last_interaction: 'First-time caller',\n    notes: ''\n  }\n};\n\nlet client = null;\nlet lookupKey = null;\n\nif (phone && mockClients[phone]) {\n  client = mockClients[phone];\n  lookupKey = phone;\n} else if (email && mockClients[email]) {\n  client = mockClients[email];\n  lookupKey = email;\n}\n\nconst latency = Math.floor(Math.random() * 10) + 2;\n\nif (client) {\n  return {\n    json: {\n      success: true,\n      client: client,\n      cache_hit: true,\n      lookup_key: lookupKey,\n      latency_ms: latency,\n      source: 'mock_database',\n      _eval_input: input // Preserve for evaluation comparison\n    }\n  };\n} else {\n  return {\n    json: {\n      success: true,\n      client: null,\n      cache_hit: false,\n      lookup_key: phone || email || 'none',\n      latency_ms: latency,\n      message: 'Client not found - new caller',\n      _eval_input: input // Preserve for evaluation comparison\n    }\n  };\n}"
+      },
+      "id": "simulate-lookup",
+      "name": "Transform: Simulate Client Lookup",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Webhook: Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Transform: Simulate Client Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform: Simulate Client Lookup": {
+      "main": [
+        [
+          {
+            "node": "Webhook: Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "meta": {
+    "source": "universalized-live-workflow",
+    "state": "draft",
+    "summary": "Reusable lookup endpoint for workflow composition."
+  },
+  "versionCounter": 25
+}
