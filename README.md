@@ -12,9 +12,9 @@ Sanitized n8n workflow library: lead intake, enrichment, post-call processing, a
 
 ## Demo
 
-🎬 _Loom walkthrough coming soon — workflow library tour: lead intake, enrichment, post-call processing, webhook security._
+[![Install walkthrough](https://img.shields.io/badge/%E2%96%B6-install--demo.mp4-blue?logo=github)](docs/install-demo.mp4)
 
-<!-- Replace with: <a href="https://www.loom.com/share/<id>"><img src="https://cdn.loom.com/sessions/thumbnails/<id>-with-play.gif" alt="Workflow library demo"></a> -->
+54-second deterministic walkthrough: browse `workflows/registry.yaml` → generate a synthetic fixture → `POST /rest/workflows` → invoke via webhook → governance check. Re-render with `node scripts/generate-install-demo.mjs` (ffmpeg required).
 
 ## Architecture
 
