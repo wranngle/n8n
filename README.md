@@ -27,6 +27,10 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the lead intake → CRM → call �
 
 Every n8n webhook in this repo requires an `X-Webhook-Secret` header validated against `N8N_WEBHOOK_SECRET`. See [`docs/WEBHOOK_AUTH.md`](docs/WEBHOOK_AUTH.md) for the rotation playbook. ElevenLabs HMAC-signed webhooks (different protocol — HMAC-SHA256 over `<timestamp>.<body>`) are handled in `voice_ai_agent_evals`.
 
+## Test fixtures
+
+[`scripts/generate-fixtures.js`](scripts/generate-fixtures.js) emits one deterministic synthetic payload per live-universalized workflow into `fixtures/`, keyed by registry slug. The generator inspects each workflow's trigger node (webhook, form, schedule, manual, evaluation, pipedrive) and shapes the payload accordingly so every importable workflow can be smoke-tested without touching tenant data. Re-running the script over a clean checkout produces zero diff — fixture drift is the signal, not the noise.
+
 ## Workflow governance
 
 - **DEV**: all active development. Modifiable.
