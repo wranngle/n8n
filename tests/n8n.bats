@@ -165,3 +165,110 @@ teardown() {
   [ "$status" -eq 2 ]
   [[ "$output" == *"Usage:"* ]]
 }
+
+# === pre-commit hook (secret-scrub) ===
+#
+# `lefthook run pre-commit` must block any commit whose staged workflow JSON
+# either contains a forbidden sanitization key (per verify-workflows) or
+# contains a leaked secret (per gitleaks dir + .gitleaks.toml). Each test
+# builds its own scratch git repo inside $TMP because the hook needs a
+# working tree with the real lefthook.yml/.gitleaks.toml/scripts files.
+
+precommit_scratch_setup() {
+  cd "$TMP"
+  git init -q
+  git config user.email "test@example.com"
+  git config user.name "test"
+  git config commit.gpgsign false
+
+  cp "$REPO_ROOT/lefthook.yml" .
+  cp "$REPO_ROOT/.gitleaks.toml" .
+  mkdir -p scripts workflows
+  cp "$REPO_ROOT/scripts/verify-workflows.js" scripts/
+
+  echo "scratch" > README.md
+  git add README.md
+  git commit -qm "init"
+}
+
+@test "pre-commit hook blocks staged workflow that contains a leaked stripe-shape secret" {
+  precommit_scratch_setup
+  # Build the leaked-secret literal at runtime so this test file itself
+  # does not trip GitHub's push-protection scanner. The runtime value
+  # matches gitleaks' default stripe rule.
+  local prefix="sk_live_"
+  local body="4eC39HqLyjWDarjtT1zdp7dc"
+  cat > workflows/poisoned.json <<JSON
+{
+  "name": "poisoned",
+  "nodes": [
+    {
+      "name": "HTTP",
+      "parameters": {
+        "stripeKey": "${prefix}${body}"
+      }
+    }
+  ],
+  "connections": {},
+  "settings": {}
+}
+JSON
+  git add workflows/poisoned.json
+
+  run lefthook run pre-commit
+  [ "$status" -ne 0 ]
+  echo "$output" | grep -qi "gitleaks"
+}
+
+@test "pre-commit hook blocks staged workflow with a credentials key" {
+  precommit_scratch_setup
+  cat > workflows/unsanitized.json <<'JSON'
+{
+  "name": "unsanitized",
+  "nodes": [
+    {
+      "name": "HTTP",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "abc",
+          "name": "auth"
+        }
+      }
+    }
+  ],
+  "connections": {},
+  "settings": {}
+}
+JSON
+  git add workflows/unsanitized.json
+
+  run lefthook run pre-commit
+  [ "$status" -ne 0 ]
+  echo "$output" | grep -qi "credentials"
+}
+
+@test "pre-commit hook passes a clean staged workflow" {
+  precommit_scratch_setup
+  cat > workflows/clean.json <<'JSON'
+{
+  "name": "clean",
+  "nodes": [],
+  "connections": {},
+  "settings": {}
+}
+JSON
+  git add workflows/clean.json
+
+  run lefthook run pre-commit
+  [ "$status" -eq 0 ]
+}
+
+@test "pre-commit hook is a no-op when no workflow JSON is staged" {
+  precommit_scratch_setup
+  mkdir -p docs
+  echo "# notes" > docs/note.md
+  git add docs/note.md
+
+  run lefthook run pre-commit
+  [ "$status" -eq 0 ]
+}

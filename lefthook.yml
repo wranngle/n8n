@@ -1,42 +1,27 @@
-# EXAMPLE USAGE:
+# Pre-commit secret-scrub for staged workflow JSON.
 #
-#   Refer for explanation to following link:
-#   https://lefthook.dev/configuration/
+# Two parallel jobs, both gated on `workflows/**/*.json`:
+#   1. verify-workflows: runs scripts/verify-workflows.js to assert no
+#      forbidden sanitization keys (credentials, pinData, webhookId,
+#      meta.instanceId, staticData) ever land in a committed workflow.
+#   2. gitleaks-staged-workflows: runs gitleaks against the staged JSON
+#      paths using the in-tree .gitleaks.toml config (default rules +
+#      project allowlist). A leak yields exit code 1 and blocks the
+#      commit.
 #
-# pre-push:
-#   jobs:
-#     - name: packages audit
-#       tags:
-#         - frontend
-#         - security
-#       run: yarn audit
-#
-#     - name: gems audit
-#       tags:
-#         - backend
-#         - security
-#       run: bundle audit
-#
-# pre-commit:
-#   parallel: true
-#   jobs:
-#     - run: yarn eslint {staged_files}
-#       glob: "*.{js,ts,jsx,tsx}"
-#
-#     - name: rubocop
-#       glob: "*.rb"
-#       exclude:
-#         - config/application.rb
-#         - config/routes.rb
-#       run: bundle exec rubocop --force-exclusion -- {all_files}
-#
-#     - name: govet
-#       files: git ls-files -m
-#       glob: "*.go"
-#       run: go vet -- {files}
-#
-#     - script: "hello.js"
-#       runner: node
-#
-#     - script: "hello.go"
-#       runner: go run
+# Either failure blocks the commit. Install with `lefthook install`.
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: verify-workflows
+      glob:
+        - "workflows/*.json"
+        - "workflows/**/*.json"
+      run: node scripts/verify-workflows.js
+
+    - name: gitleaks-staged-workflows
+      glob:
+        - "workflows/*.json"
+        - "workflows/**/*.json"
+      run: gitleaks dir --no-banner --config .gitleaks.toml --exit-code 1 {staged_files}
