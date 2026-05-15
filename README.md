@@ -52,6 +52,25 @@ node scripts/secure-internal-callers.js --apply
 
 See [`.env.example`](.env.example) for required environment variables.
 
+## Uninstall a workflow
+
+Reverse of `scripts/install-workflow.js`. Looks up workflows on the remote
+n8n instance and deletes each match. `--dry-run` prints the exact API calls
+without mutating anything.
+
+```bash
+# Preview what would be deleted
+node bin/uninstall-workflow.js --name lead-intake-main \
+  --n8n-url http://localhost:5678 --api-key "$N8N_API_KEY" --dry-run
+
+# Delete by id
+node bin/uninstall-workflow.js --id wf-42 \
+  --n8n-url http://localhost:5678 --api-key "$N8N_API_KEY"
+```
+
+`--n8n-url` and `--api-key` also accept `N8N_URL` / `N8N_API_KEY` env vars.
+Exits non-zero if no workflows match or any `DELETE` fails.
+
 ## License
 
 See [`LICENSE`](LICENSE).
