@@ -52,6 +52,25 @@ node scripts/secure-internal-callers.js --apply
 
 See [`.env.example`](.env.example) for required environment variables.
 
+## Diff two workflows
+
+`scripts/n8n-diff.js` renders a deterministic markdown diff between two
+workflow JSON files — nodes added/removed/modified, connection delta, and
+env-var changes. Pair it with the one-click installer in
+[`scripts/install-workflow.js`](scripts/install-workflow.js) for a "review
+before you ship" pre-merge check.
+
+```bash
+node scripts/n8n-diff.js workflows/a.json workflows/b.json
+node scripts/n8n-diff.js workflows/a.json workflows/b.json --out diff.md
+```
+
+Demo against the bundled fixture pair:
+
+```bash
+node scripts/n8n-diff.js fixtures/diff/a.json fixtures/diff/b.json
+```
+
 ## License
 
 See [`LICENSE`](LICENSE).

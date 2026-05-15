@@ -1,0 +1,52 @@
+{
+  "name": "hello-world",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "parameters": {
+        "path": "hello",
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [400, 100],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $env.GREETING }}"
+      }
+    },
+    {
+      "id": "legacy-log",
+      "name": "Legacy Log",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Respond", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Respond": {
+      "main": [
+        [
+          { "node": "Legacy Log", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}

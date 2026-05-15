@@ -1,0 +1,55 @@
+{
+  "name": "hello-world",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 100],
+      "parameters": {
+        "path": "hello",
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [400, 100],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $env.GREETING_V2 }}"
+      }
+    },
+    {
+      "id": "audit",
+      "name": "Audit Log",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [700, 100],
+      "parameters": {
+        "operation": "insert",
+        "table": "audit_log"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Respond", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Respond": {
+      "main": [
+        [
+          { "node": "Audit Log", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
