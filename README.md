@@ -95,6 +95,24 @@ node scripts/install-workflow.js workflows/lead-intake-main.json \
 
 On success the script prints the new workflow id and exits 0. `--n8n-url` and `--api-key` may also be supplied via `N8N_URL` / `N8N_API_KEY` env vars.
 
+## Diff two workflows
+
+`scripts/n8n-diff.js` renders a deterministic markdown diff between two
+workflow JSON files — nodes added/removed/modified, connection delta, and
+env-var changes. Pair it with the one-click installer above for a "review
+before you ship" pre-merge check.
+
+```bash
+node scripts/n8n-diff.js workflows/a.json workflows/b.json
+node scripts/n8n-diff.js workflows/a.json workflows/b.json --out diff.md
+```
+
+Demo against the bundled fixture pair:
+
+```bash
+node scripts/n8n-diff.js fixtures/diff/a.json fixtures/diff/b.json
+```
+
 ## License
 
 See [`LICENSE`](LICENSE).
