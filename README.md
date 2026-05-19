@@ -56,6 +56,17 @@ node scripts/secure-internal-callers.js --apply
 
 See [`.env.example`](.env.example) for required environment variables.
 
+## One-click install
+
+Import a workflow JSON into a local n8n instance via its REST API:
+
+```bash
+node scripts/install-workflow.js workflows/lead-intake-main.json \
+  --n8n-url http://localhost:5678 --api-key "$N8N_API_KEY"
+```
+
+On success the script prints the new workflow id and exits 0. `--n8n-url` and `--api-key` may also be supplied via `N8N_URL` / `N8N_API_KEY` env vars.
+
 ## License
 
 See [`LICENSE`](LICENSE).
