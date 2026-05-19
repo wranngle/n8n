@@ -84,6 +84,7 @@ node scripts/secure-internal-callers.js --apply
 
 See [`.env.example`](.env.example) for required environment variables.
 
+<<<<<<< HEAD
 ## One-click install
 
 Import a workflow JSON into a local n8n instance via its REST API:
@@ -131,6 +132,17 @@ Demo against the bundled fixture pair:
 ```bash
 node scripts/n8n-diff.js fixtures/diff/a.json fixtures/diff/b.json
 ```
+
+## Drift detector
+
+Compare workflows deployed on an n8n instance against the JSON files tracked in this repo:
+
+```bash
+node bin/drift.js --n8n-url http://localhost:5678 --api-key "$N8N_API_KEY" \
+  --workflows-dir ./workflows --out drift.md
+```
+
+The report (`drift.md`) groups results into three sections: `Only on instance`, `Only in repo`, and `Modified` (matched by `name`, compared via canonical fingerprint that ignores `id`/`updatedAt`/`active`). The script exits non-zero when any drift is detected so it can gate CI.
 
 ## License
 
