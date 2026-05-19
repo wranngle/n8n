@@ -13,6 +13,7 @@ paths = [
   '''\.env\.sample$''',
   '''\.gitleaks\.toml$''',
   '''\.gitleaksignore$''',
+  '''^fixtures/lint/.*\.json$''',
 ]
 regexes = [
   '''(?i)(example|dummy|fake|placeholder|test)[_-]?(api[_-]?key|secret|token|password)''',
