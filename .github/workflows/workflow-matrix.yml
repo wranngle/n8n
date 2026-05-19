@@ -68,4 +68,6 @@ jobs:
           node-version: '20'
       - name: run ci-matrix-runner
         shell: bash
-        run: scripts/ci-matrix-runner.sh "${{ matrix.workflow }}"
+        env:
+          WORKFLOW_SLUG: ${{ matrix.workflow }}
+        run: scripts/ci-matrix-runner.sh "$WORKFLOW_SLUG"
