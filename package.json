@@ -5,7 +5,9 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "verify": "node scripts/verify-workflows.js"
+    "verify": "node scripts/verify-workflows.js",
+    "build:site": "node scripts/build-site.js",
+    "test:site": "bats tests/site.bats"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"

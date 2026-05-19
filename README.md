@@ -16,6 +16,10 @@ Sanitized n8n workflow library: lead intake, enrichment, post-call processing, a
 
 54-second deterministic walkthrough: browse `workflows/registry.yaml` → generate a synthetic fixture → `POST /rest/workflows` → invoke via webhook → governance check. Re-render with `node scripts/generate-install-demo.mjs` (ffmpeg required).
 
+## Fork a workflow
+
+`npm run build:site` walks `workflows/` and emits one fork-landing page per workflow at `dist/site/<slug>/index.html`. Each page carries a Download `.json` link, a placeholder workflow screenshot (`screenshot.svg`), and a one-line problem statement. If a deterministic fixture is present at `fixtures/<slug>.json` (round-1 [#24](https://github.com/wranngle/n8n/pull/24)), the page also links a sample payload so the fork story is end-to-end. Test contract: `npm run test:site`.
+
 ## Architecture
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the lead intake → CRM → call → post-call flow and how this repo connects to its satellites:
