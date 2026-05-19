@@ -118,6 +118,9 @@ workflows:
       - name: webhook
         type: trigger
         docs_cached: false
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   get-weather:
     path: "dev/get-weather.json"
@@ -131,6 +134,9 @@ workflows:
         type: api
         docs_cached: false
         credential_env: ".env.openweathermap"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   hello-world-minimal:
     path: "dev/hello-world-minimal.json"
@@ -140,6 +146,9 @@ workflows:
     depends_on: []
     enables: []
     integrations: []
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   example-webhook-to-slack:
     path: "dev/example-webhook-to-slack.json"
@@ -156,6 +165,9 @@ workflows:
         type: output
         docs_cached: false
         credential_env: ".env.slack"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   ringcentral-to-pipedrive:
     path: "sales_call_logging/ringcentral-to-pipedrive/workflow.json"
@@ -173,6 +185,9 @@ workflows:
         type: output
         docs_cached: true
         credential_env: ".env.pipedrive"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   elevenlabs-twilio-client-data:
     path: "voice_ai_agent_evals/elevenlabs-twilio-client-data.json"
@@ -193,6 +208,9 @@ workflows:
         type: telephony
         docs_cached: true
         credential_env: ".env.twilio"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   elevenlabs-twilio-bulletproof:
     path: "voice_ai_agent_evals/elevenlabs-twilio-bulletproof.json"
@@ -221,6 +239,9 @@ workflows:
         type: telephony
         docs_cached: true
         credential_env: ".env.twilio"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   pipedrive-lead-caller:
     path: "voice_ai_agent_evals/pipedrive-lead-caller.json"
@@ -236,6 +257,9 @@ workflows:
         type: trigger
         docs_cached: true
         credential_env: ".env.pipedrive"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   elevenlabs-call-completed:
     path: "voice_ai_agent_evals/elevenlabs-call-completed.json"
@@ -260,6 +284,9 @@ workflows:
         type: output
         docs_cached: true
         credential_env: ".env.pipedrive"
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   transcript-field-extractor:
     path: "voice_ai_agent_evals/transcript-extraction/transcript-field-extractor.json"
@@ -281,6 +308,9 @@ workflows:
       - name: google_gemini
         type: ai_llm
         docs_cached: true
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   transcript-field-extractor-v2:
     path: "voice_ai_agent_evals/transcript-extraction/transcript-field-extractor-v2.json"
@@ -310,6 +340,9 @@ workflows:
         type: ai_llm
         model: "gemini-3-pro-preview"
         docs_cached: true
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   lead-enrichment-microservice:
     path: "lead-enrichment-microservice.json"
@@ -325,6 +358,9 @@ workflows:
         type: data_enrichment
       - name: groq_api
         type: ai_llm
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   lead-intake-main:
     path: "lead-intake-main.json"
@@ -342,6 +378,9 @@ workflows:
         type: output
       - name: http_request
         type: output
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   elevenlabs-call-completed-presales:
     path: "voice_ai_agent_evals/templates/elevenlabs-call-completed-presales.json"
@@ -357,6 +396,9 @@ workflows:
         type: storage
       - name: http_request
         type: output
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 
   youtube-rag-pipeline:
     path: "knowledge_management/youtube-rag-pipeline/workflow.json"
@@ -381,6 +423,9 @@ workflows:
 # INTEGRATIONS
 # Tracked integrations and their documentation status
 # ============================================================================
+    security:
+      audited: "2026-05-14"
+      scanner: gitleaks+verify
 integrations:
   # Core integrations used across workflows
   webhook:
