@@ -417,3 +417,6 @@ vite.config.ts.timestamp-*
 openspec/
 .claude/commands/openspec/
 .gemini/commands/openspec/
+
+# git_good runtime (per dotfiles doctrine)
+.artifacts/
