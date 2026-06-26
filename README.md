@@ -1,20 +1,20 @@
 # n8n
 
-Sanitized n8n workflow library: lead intake, enrichment, post-call processing, and webhook security middleware. Generic n8n surface only — voice-agent / ElevenLabs-specific code lives at [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals).
+Sanitized n8n workflow library: lead intake, enrichment, post-call processing, and webhook security middleware. The checked-in workflows are generic n8n. The registry still carries legacy voice-agent workflow metadata (ElevenLabs business process, integration entries), but the live agent runtime lives at [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals).
 
 ## What's in here
 
-- **`workflows/`** — production flows ([`lead-intake-main.json`](workflows/lead-intake-main.json), [`lead-enrichment-microservice.json`](workflows/lead-enrichment-microservice.json), `dev/`, `knowledge_management/youtube-rag-pipeline/`) plus governance + registry YAMLs
-- **`scripts/`** — workflow API utilities ([`activate-workflow.js`](scripts/activate-workflow.js), [`list_workflows.js`](scripts/list_workflows.js), `update_workflow.py`, etc.), governance ([`governance-engine.js`](scripts/governance-engine.js)), and webhook security ([`secure-n8n-webhooks.js`](scripts/secure-n8n-webhooks.js), [`secure-internal-callers.js`](scripts/secure-internal-callers.js))
-- **`templates/`** — generic n8n templates
-- **`tests/`** — workflow integration smoke tests
-- **`context/`** — local knowledge bases (YouTube + Discord research) feeding the workflow generator
+- **`workflows/`**: production flows ([`lead-intake-main.json`](workflows/lead-intake-main.json), [`lead-enrichment-microservice.json`](workflows/lead-enrichment-microservice.json), `dev/`, `knowledge_management/youtube-rag-pipeline/`) plus governance + registry YAMLs
+- **`scripts/`**: workflow API utilities ([`activate-workflow.js`](scripts/activate-workflow.js), [`list_workflows.js`](scripts/list_workflows.js), `update_workflow.py`, etc.), governance ([`governance-engine.js`](scripts/governance-engine.js)), and webhook security ([`secure-n8n-webhooks.js`](scripts/secure-n8n-webhooks.js), [`secure-internal-callers.js`](scripts/secure-internal-callers.js))
+- **`templates/`**: generic n8n templates
+- **`tests/`**: workflow integration smoke tests
+- **`context/`**: local knowledge bases (YouTube + Discord research) feeding the workflow generator
 
 ## Demo
 
 [![Install walkthrough](https://img.shields.io/badge/%E2%96%B6-install--demo.mp4-blue?logo=github)](docs/install-demo.mp4)
 
-54-second deterministic walkthrough: browse `workflows/registry.yaml` → generate a synthetic fixture → `POST /rest/workflows` → invoke via webhook → governance check. Re-render with `node scripts/generate-install-demo.mjs` (ffmpeg required).
+54-second walkthrough (historical, illustrative only): browse `workflows/registry.yaml` → generate a synthetic fixture → `POST /rest/workflows` → invoke via webhook → governance check. The current checkout ships no `workflows/live-universalized/` fixtures, so the fixture-generation step shown does not run today (see Test fixtures below). Re-render with `node scripts/generate-install-demo.mjs` (ffmpeg required).
 
 ## Fork a workflow
 
@@ -24,16 +24,16 @@ Sanitized n8n workflow library: lead intake, enrichment, post-call processing, a
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the lead intake → CRM → call → post-call flow and how this repo connects to its satellites:
 
-- [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals) — eval harness for ElevenLabs voice agents (the production agent runtime, prompt versioning, scenario framework)
-- [`wranngle/gtm_ops`](https://github.com/wranngle/gtm_ops) — unified GTM motion runtime (presales pipeline, ops-console, audit log surface)
+- [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals): eval harness for ElevenLabs voice agents (the production agent runtime, prompt versioning, scenario framework)
+- [`wranngle/gtm_ops`](https://github.com/wranngle/gtm_ops): unified GTM motion runtime (presales pipeline, ops-console, audit log surface)
 
 ## Webhook authentication
 
-Every n8n webhook in this repo requires an `X-Webhook-Secret` header validated against `N8N_WEBHOOK_SECRET`. See [`docs/WEBHOOK_AUTH.md`](docs/WEBHOOK_AUTH.md) for the rotation playbook. ElevenLabs HMAC-signed webhooks (different protocol — HMAC-SHA256 over `<timestamp>.<body>`) are handled in `voice_ai_agent_evals`.
+The hardening scripts can add an `X-Webhook-Secret` header, validated against `N8N_WEBHOOK_SECRET`, but not every checked-in workflow is currently hardened. See [`docs/WEBHOOK_AUTH.md`](docs/WEBHOOK_AUTH.md) for the rotation playbook. ElevenLabs HMAC-signed webhooks (different protocol, HMAC-SHA256 over `<timestamp>.<body>`) are handled in `voice_ai_agent_evals`.
 
 ## Test fixtures
 
-[`scripts/generate-fixtures.js`](scripts/generate-fixtures.js) emits one deterministic synthetic payload per live-universalized workflow into `fixtures/`, keyed by registry slug. The generator inspects each workflow's trigger node (webhook, form, schedule, manual, evaluation, pipedrive) and shapes the payload accordingly so every importable workflow can be smoke-tested without touching tenant data. Re-running the script over a clean checkout produces zero diff — fixture drift is the signal, not the noise.
+[`scripts/generate-fixtures.js`](scripts/generate-fixtures.js) emits fixtures only for `workflows/live-universalized/` entries; the current checkout has none. When entries exist, it writes one deterministic synthetic payload per workflow into `fixtures/`, keyed by registry slug. The generator inspects each workflow's trigger node (webhook, form, schedule, manual, evaluation, pipedrive) and shapes the payload accordingly so every importable workflow can be smoke-tested without touching tenant data. Re-running the script over a clean checkout produces zero diff: fixture drift is the signal, not the noise.
 
 ## Workflow governance
 
@@ -53,20 +53,8 @@ _Freshness reference: 2026-05-14. Entries audited within the last 90 days render
 
 | Workflow | Audit status | Scanner |
 | --- | --- | --- |
-| `elevenlabs-call-completed` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `elevenlabs-call-completed-presales` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `elevenlabs-twilio-bulletproof` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `elevenlabs-twilio-client-data` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `example-webhook-to-slack` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `get-weather` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `hello-world-minimal` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 | `lead-enrichment-microservice` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 | `lead-intake-main` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `pipedrive-lead-caller` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `ringcentral-to-pipedrive` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `transcript-field-extractor` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `transcript-field-extractor-v2` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `webhook-echo` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 | `youtube-rag-pipeline` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 <!-- END SECURITY AUDIT TABLE -->
 
@@ -88,7 +76,6 @@ node scripts/secure-internal-callers.js --apply
 
 See [`.env.example`](.env.example) for required environment variables.
 
-<<<<<<< HEAD
 ## One-click install
 
 Import a workflow JSON into a local n8n instance via its REST API:
@@ -122,7 +109,7 @@ Exits non-zero if no workflows match or any `DELETE` fails.
 ## Diff two workflows
 
 `scripts/n8n-diff.js` renders a deterministic markdown diff between two
-workflow JSON files — nodes added/removed/modified, connection delta, and
+workflow JSON files: nodes added/removed/modified, connection delta, and
 env-var changes. Pair it with the one-click installer above for a "review
 before you ship" pre-merge check.
 
