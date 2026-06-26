@@ -1,6 +1,6 @@
 # n8n
 
-Sanitized n8n workflow library: lead intake, enrichment, post-call processing, and webhook security middleware. Generic n8n surface only: voice-agent / ElevenLabs-specific code lives at [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals).
+Sanitized n8n workflow library: lead intake, enrichment, post-call processing, and webhook security middleware. The checked-in workflows are generic n8n. The registry still carries legacy voice-agent workflow metadata (ElevenLabs business process, integration entries), but the live agent runtime lives at [`wranngle/voice_ai_agent_evals`](https://github.com/wranngle/voice_ai_agent_evals).
 
 ## What's in here
 
@@ -14,7 +14,7 @@ Sanitized n8n workflow library: lead intake, enrichment, post-call processing, a
 
 [![Install walkthrough](https://img.shields.io/badge/%E2%96%B6-install--demo.mp4-blue?logo=github)](docs/install-demo.mp4)
 
-54-second deterministic walkthrough: browse `workflows/registry.yaml` → generate a synthetic fixture → `POST /rest/workflows` → invoke via webhook → governance check. Re-render with `node scripts/generate-install-demo.mjs` (ffmpeg required).
+54-second walkthrough (historical, illustrative only): browse `workflows/registry.yaml` → generate a synthetic fixture → `POST /rest/workflows` → invoke via webhook → governance check. The current checkout ships no `workflows/live-universalized/` fixtures, so the fixture-generation step shown does not run today (see Test fixtures below). Re-render with `node scripts/generate-install-demo.mjs` (ffmpeg required).
 
 ## Fork a workflow
 
@@ -53,20 +53,8 @@ _Freshness reference: 2026-05-14. Entries audited within the last 90 days render
 
 | Workflow | Audit status | Scanner |
 | --- | --- | --- |
-| `elevenlabs-call-completed` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `elevenlabs-call-completed-presales` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `elevenlabs-twilio-bulletproof` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `elevenlabs-twilio-client-data` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `example-webhook-to-slack` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `get-weather` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `hello-world-minimal` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 | `lead-enrichment-microservice` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 | `lead-intake-main` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `pipedrive-lead-caller` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `ringcentral-to-pipedrive` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `transcript-field-extractor` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `transcript-field-extractor-v2` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
-| `webhook-echo` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 | `youtube-rag-pipeline` | ![audited](https://img.shields.io/badge/audited-2026--05--14-brightgreen) | gitleaks+verify |
 <!-- END SECURITY AUDIT TABLE -->
 
